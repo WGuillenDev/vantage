@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Hand-made fixture for road-graph tests. Synthetic coordinates near lon 10 / lat 0; not real data. -->
+<osm version="0.6" generator="hand-made fixture">
+  <node id="30" lat="0.0004" lon="10.0001">
+    <tag k="amenity" v="hospital"/><tag k="name" v="Fixture Hospital North"/>
+  </node>
+  <node id="31" lat="0.0098" lon="10.0198"/>
+  <node id="32" lat="0.0098" lon="10.0202"/>
+  <node id="33" lat="0.0102" lon="10.0202"/>
+  <node id="34" lat="0.0102" lon="10.0198"/>
+  <way id="301">
+    <nd ref="31"/><nd ref="32"/><nd ref="33"/><nd ref="34"/><nd ref="31"/>
+    <tag k="amenity" v="hospital"/><tag k="building" v="yes"/><tag k="name" v="Fixture Hospital East"/>
+  </way>
+  <node id="35" lat="0.0000" lon="10.0150">
+    <tag k="amenity" v="hospital"/><tag k="name" v="Fixture Clinic Unlisted"/>
+  </node>
+  <node id="36" lat="0.0010" lon="10.0150">
+    <tag k="amenity" v="hospital"/>
+  </node>
+  <node id="40" lat="0.0052" lon="10.0102">
+    <tag k="place" v="village"/><tag k="name" v="Fixture Village"/>
+  </node>
+  <node id="41" lat="0.0450" lon="10.0100">
+    <tag k="place" v="hamlet"/><tag k="name" v="Fixture Far Hamlet"/>
+  </node>
+  <node id="42" lat="0.0010" lon="10.0010">
+    <tag k="place" v="locality"/><tag k="name" v="Fixture Locality"/>
+  </node>
+  <node id="43" lat="0.0010" lon="10.0020">
+    <tag k="place" v="village"/>
+  </node>
+  <node id="44" lat="0.0003" lon="10.0195">
+    <tag k="place" v="town"/><tag k="name" v="Fixture Town"/>
+  </node>
+</osm>
