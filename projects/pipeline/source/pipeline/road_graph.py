@@ -157,7 +157,12 @@ def _load_network(roads_osm: Path, bbox: tuple) -> list:
         # A two-way road is stored in both directions; keep the copy that starts at the lower OSM id.
         if u != v and (data["oneway"] or u < v)
     ]
-    return sorted(pieces, key=lambda p: p[:3])
+    return sorted(pieces, key=lambda p: (p[0], p[1], _smallest_way_id(p[3])))
+
+
+def _smallest_way_id(data: dict) -> int:
+    osmid = data["osmid"]
+    return min(osmid) if isinstance(osmid, list) else osmid
 
 
 def _coords(graph, u: int, v: int, data: dict) -> list[tuple]:
@@ -184,6 +189,9 @@ def _osm_key(entry: str) -> tuple[int, str]:
 
 
 def build(roads_osm: Path, features_osm: Path, settings: Settings) -> tuple[dict, dict[str, float]]:
+    allowlist = sorted(set(_read_allowlist(settings.allowlist)), key=_osm_key)
+    if not allowlist:
+        raise RoadGraphError(f"The hospital allowlist is empty: {settings.allowlist}")
     w, s, e, n = settings.bbox
     pieces = _load_network(roads_osm, (w, s, e, n))
     speeds = _speed_table(pieces, settings)
@@ -229,7 +237,7 @@ def build(roads_osm: Path, features_osm: Path, settings: Settings) -> tuple[dict
     features = ox.features_from_xml(features_osm)
 
     hospitals = []
-    for entry in sorted(set(_read_allowlist(settings.allowlist)), key=_osm_key):
+    for entry in allowlist:
         number, kind = _osm_key(entry)
         if (kind, number) not in features.index:
             raise RoadGraphError(f"Hospital {entry} from the allowlist was not found in the network area")
