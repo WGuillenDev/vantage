@@ -8,7 +8,7 @@
 flowchart TD
     src["<b>External sources</b><br/>NISAR GCOV · OSM roads · IMERG rain · WorldPop"]
     pipe["<b>pipeline/</b><br/>Python, offline"]
-    data["<b>frontend/public/data/</b><br/>meta.json<br/>change.geojson + PNGs<br/>graph.json<br/>scenarios.json<br/>rain.csv"]
+    data["<b>frontend/public/storage/</b><br/>meta.json<br/>change.geojson + PNGs<br/>graph.json<br/>scenarios.json<br/>rain.csv"]
     spa["<b>frontend/</b><br/>Static SPA, no server<br/>MapLibre + graph.ts"]
     contract["<b>contract/</b><br/>JSON Schemas + mocks"]
 
@@ -45,14 +45,14 @@ vantage/
     │   └── examples/        # mock data that satisfies the schemas
     ├── pipeline/            # Python, managed with uv
     └── frontend/            # Bun + strict TypeScript, React + Vite
-        └── public/data/     # the contract folder: pipeline output or mock copy
+        └── public/storage/     # the contract folder: pipeline output or mock copy
 ```
 
 The exact subfolders inside `pipeline/` and `frontend/source/` are not fixed. Propose them in a PR; do not assume them.
 
 ## 3. Data contract
 
-`frontend/public/data/` is the interface between both sides. Exact definitions live in `contract/schemas/`; the table is orientation only.
+`frontend/public/storage/` is the interface between both sides. Exact definitions live in `contract/schemas/`; the table is orientation only.
 
 | File | Contents |
 |---|---|
@@ -65,7 +65,7 @@ The exact subfolders inside `pipeline/` and `frontend/source/` are not fixed. Pr
 ### Rules
 
 1. Schemas and mocks are written in hours 0–2 and then **frozen**. Every file carries `schema_version`.
-2. The frontend works from minute one with `make mock`, which copies `contract/examples/` into `frontend/public/data/`. When the pipeline produces real data (`make all`), it writes to the same place and the web does not change.
+2. The frontend works from minute one with `make mock`, which copies `contract/examples/` into `frontend/public/storage/`. When the pipeline produces real data (`make all`), it writes to the same place and the web does not change.
 3. `make validate` checks the data folder against the schemas (using `jsonschema` in Python). It runs in CI and before every deploy.
 4. Changing a schema requires review by one backend and one frontend person, enforced with **CODEOWNERS**.
 5. **Raw NISAR data is never committed**, only light artifacts. GitHub rejects files over 100 MB.
@@ -86,7 +86,7 @@ Runs offline and is deterministic. Managed with **uv**.
 | Candidate segments | Change polygons + graph | Segments touching a change zone (with buffer) |
 | Impact | Graph + candidates + population | Remove one candidate at a time and recompute shortest paths to the nearest hospital → extra time, dependent population, isolated communities, criticality ranking → `scenarios.json` |
 | Rain context | IMERG Late daily | `rain.csv` |
-| Export | All of the above | Files in `frontend/public/data/`, then `make validate` |
+| Export | All of the above | Files in `frontend/public/storage/`, then `make validate` |
 
 ### Constraints
 
@@ -117,7 +117,7 @@ Frontend prototypes (side-panel layout versus full-bleed map, closure simulation
 
 | Command | What it does |
 |---|---|
-| `make mock` | Copy `contract/examples/` → `frontend/public/data/` |
+| `make mock` | Copy `contract/examples/` → `frontend/public/storage/` |
 | `make validate` | Validate the data folder against `contract/schemas/` |
 | `make all` | Run the pipeline and regenerate every data file |
 | `bun run build` (in `projects/frontend/`) | Build the SPA into `dist/` |

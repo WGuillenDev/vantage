@@ -1,6 +1,6 @@
 # VANTAGE — Contract reference
 
-> Field-by-field reference for the files in `projects/frontend/public/data/`, the only coupling between the pipeline (writes) and the SPA (reads).
+> Field-by-field reference for the files in `projects/frontend/public/storage/`, the only coupling between the pipeline (writes) and the SPA (reads).
 
 | File | Written by | Read by | Format |
 |---|---|---|---|
@@ -217,7 +217,7 @@ Header row is required. The pass dates in `meta.json` mark the interval on the c
 
 - Mocks must satisfy the schemas and include: 4 candidates, 3 hospitals, 5 communities, one candidate with an isolated community, one community with `population: null`, and both `before`/`after` overlays absent in a second variant (to test the hidden toggle).
 - Mock values are **fake**. Mark them clearly (for example `meta.area.name: "MOCK — not real data"`) so they never reach the demo as if real.
-- `make mock` copies them into `frontend/public/data/`.
+- `make mock` copies them into `frontend/public/storage/`.
 
 ## 10. Changing the contract
 

@@ -1,9 +1,10 @@
 EXAMPLES := projects/contract/examples
-DATA     := projects/frontend/public/data
+DATA     := projects/frontend/public/storage
 
 .PHONY: mock validate all
 
 mock:
+	rm -rf $(DATA)
 	mkdir -p $(DATA)
 	cp -r $(EXAMPLES)/. $(DATA)/
 
