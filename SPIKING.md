@@ -88,7 +88,7 @@ Se llena al terminar cada spike. Una línea por spike.
 | S3 | pendiente | — | — | — |
 | S4 | pendiente | — | — | — |
 | S5 | pendiente | — | — | — |
-| S6 | pendiente | — | — | — |
+| S6 | PASA | Mapa base y overlay de cambio visibles en local, build y Pages, sin errores de consola | — | W, V |
 | S7 | pendiente | — | — | — |
 | S8 | pendiente | — | — | — |
 
@@ -186,11 +186,12 @@ Copiá la plantilla en cada ficha al terminar. Dejá `pendiente` en lo que no se
 
 | Campo | Valor |
 |---|---|
-| Veredicto | pendiente |
-| Local (`bun run dev`) | pendiente |
-| Desplegado (URL de Pages) | pendiente |
-| Errores de consola | pendiente |
-| Notas / riesgos | pendiente |
+| Veredicto | PASA |
+| Local (`bun run dev`) | OK: mapa base y overlay de cambio visibles, sin errores de consola |
+| Build local (`bun run build` + `bun run preview`) | OK: mismo resultado que dev |
+| Desplegado (URL de Pages) | OK: https://wguillendev.github.io/vantage/ — overlay visible, sin errores de consola |
+| Errores de consola | Ninguno, en los tres casos |
+| Notas / riesgos | — |
 
 ### S7 · Acceso a población (WorldPop)
 
