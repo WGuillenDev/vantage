@@ -60,41 +60,41 @@ Rules:
 
 ## Invariants
 
-- INV-01 [none]
+- INV-01 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph finishes, the `graph.json` it wrote passes `make validate`'s graph schema and node-reference checks.
-- INV-02 [none]
+- INV-02 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes an edge, the first and last points of its `geometry` equal the `lon`/`lat` of its `from` and `to` nodes.
-- INV-03 [none]
+- INV-03 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes an edge, its `length_m` and `time_s` are integers and `time_s` equals `length_m / (speed_kmh / 3.6)` rounded half up for the edge's road class.
-- INV-04 [none]
+- INV-04 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes `graph.json`, no edge has `length_m` greater than 1000.
-- INV-05 [none]
+- INV-05 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes `graph.json`, every edge has `candidate_id: null`.
-- INV-06 [none]
+- INV-06 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes `graph.json`, its hospitals are exactly the features in the hospital allowlist, one per allowlisted id.
-- INV-07 [none]
+- INV-07 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   If an allowlisted OSM id is not found in the network area, then road-graph exits non-zero with an English error that names that id and writes no `graph.json`.
-- INV-08 [none]
+- INV-08 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes `graph.json`, every community comes from a named OSM `place` node of type `city`, `town`, `village` or `hamlet` and lies at most 3000 m from its snapped node.
-- INV-09 [none]
+- INV-09 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   If a community's nearest kept node is farther than 3000 m, then road-graph leaves it out of `graph.json` and logs its name and distance in English.
-- INV-10 [none]
+- INV-10 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes `graph.json`, every community has `population: null`.
-- INV-11 [none]
+- INV-11 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph produces its speed table, every road class that appears on an edge has an entry, and each entry is the class's `maxspeed` median or its documented fallback.
-- INV-12 [none]
+- INV-12 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph runs twice on the same OSM data and settings, the two `graph.json` files are byte-identical.
-- INV-13 [none]
+- INV-13 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes `graph.json`, the file is at most 3 MB.
-- INV-14 [none]
+- INV-14 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes `graph.json`, every node is reachable from every other node when edge direction is ignored.
-- INV-15 [none]
+- INV-15 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes `graph.json`, no edge has the same `from` and `to`.
-- INV-16 [none]
+- INV-16 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   If an allowlisted hospital has no OSM `name`, then road-graph exits non-zero with an English error that names its OSM id and writes no `graph.json`.
-- INV-17 [none]
+- INV-17 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   If a road class on a kept edge has fewer than `MIN_TAGGED` tagged edges and no configured fallback speed, then road-graph exits non-zero with an English error that names the class and writes no `graph.json`.
-- INV-18 [none]
+- INV-18 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   If the compact `graph.json` would exceed 3 MB, then road-graph exits non-zero with an English error that states the size and writes no `graph.json`.
 
 ## Deferred / Open questions
@@ -111,7 +111,7 @@ Rules:
 
 ## Acceptance criteria
 
-- ACC-01 [none]
+- ACC-01 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   Given the graph built for the network area, when every edge whose `road` is `"Ruta 32"` and whose `from`/`to` midpoint longitude lies in `[-83.98, -83.92]` (Ruta 32 inside Braulio Carrillo, as cut in spike S4) is removed, then a path still exists from the node of hospital `way/1168011056` to the node of hospital `way/326924912`.
 - ACC-02 [manual]
   Given the graph built for the network area, when Ian computes the baseline time from Hospital Dr. Rafael Ángel Calderón Guardia to Hospital Guápiles, then Ian judges it plausible against a cited reference (S4 corridor spike: 68.8 min).
