@@ -8,12 +8,14 @@
 flowchart TD
     src["<b>External sources</b><br/>NISAR GCOV · OSM roads · IMERG rain · WorldPop"]
     pipe["<b>pipeline/</b><br/>Python, offline"]
+    out["<b>pipeline/output/</b><br/>committed, light artifacts"]
     data["<b>frontend/public/storage/</b><br/>meta.json<br/>change.geojson + PNGs<br/>graph.json<br/>scenarios.json<br/>rain.csv"]
     spa["<b>frontend/</b><br/>Static SPA, no server<br/>MapLibre + graph.ts"]
     contract["<b>contract/</b><br/>JSON Schemas + mocks"]
 
     src --> pipe
-    pipe -->|writes| data
+    pipe -->|writes| out
+    out -->|make publish| data
     data -->|reads| spa
     contract -. "make validate" .-> data
     contract -. "make mock" .-> data
@@ -44,8 +46,9 @@ vantage/
     │   ├── schemas/         # JSON Schemas (one per data file)
     │   └── examples/        # mock data that satisfies the schemas
     ├── pipeline/            # Python, managed with uv
+    │   └── output/          # committed pipeline output (light artifacts only)
     └── frontend/            # Bun + strict TypeScript, React + Vite
-        └── public/storage/     # the contract folder: pipeline output or mock copy
+        └── public/storage/  # git-ignored contract folder: copy of the mocks or of output/
 ```
 
 The exact subfolders inside `pipeline/` and `frontend/source/` are not fixed. Propose them in a PR; do not assume them.
@@ -65,7 +68,7 @@ The exact subfolders inside `pipeline/` and `frontend/source/` are not fixed. Pr
 ### Rules
 
 1. Schemas and mocks are written in hours 0–2 and then **frozen**. Every file carries `schema_version`.
-2. The frontend works from minute one with `make mock`, which copies `contract/examples/` into `frontend/public/storage/`. When the pipeline produces real data (`make all`), it writes to the same place and the web does not change.
+2. The frontend works from minute one with `make mock`, which copies `contract/examples/` into `frontend/public/storage/`. When the pipeline produces real data (`make all`), it writes to `pipeline/output/` (committed), and `make publish` copies that into `storage/`; the web does not change. `storage/` is git-ignored.
 3. `make validate` checks the data folder against the schemas (using `jsonschema` in Python). It runs in CI and before every deploy.
 4. Changing a schema requires review by one backend and one frontend person, enforced with **CODEOWNERS**.
 5. **Raw NISAR data is never committed**, only light artifacts. GitHub rejects files over 100 MB.
@@ -86,7 +89,7 @@ Runs offline and is deterministic. Managed with **uv**.
 | Candidate segments | Change polygons + graph | Segments touching a change zone (with buffer) |
 | Impact | Graph + candidates + population | Remove one candidate at a time and recompute shortest paths to the nearest hospital → extra time, dependent population, isolated communities, criticality ranking → `scenarios.json` |
 | Rain context | IMERG Late daily | `rain.csv` |
-| Export | All of the above | Files in `frontend/public/storage/`, then `make validate` |
+| Export | All of the above | Files in `pipeline/output/`, then `make publish` and `make validate` |
 
 ### Constraints
 
@@ -118,11 +121,12 @@ Frontend prototypes (side-panel layout versus full-bleed map, closure simulation
 | Command | What it does |
 |---|---|
 | `make mock` | Copy `contract/examples/` → `frontend/public/storage/` |
-| `make validate` | Validate the data folder against `contract/schemas/` |
-| `make all` | Run the pipeline and regenerate every data file |
+| `make publish` | Copy `pipeline/output/` → `frontend/public/storage/` |
+| `make validate` | Validate `frontend/public/storage/` against `contract/schemas/` |
+| `make all` | Run the pipeline and regenerate every data file in `pipeline/output/` |
 | `bun run build` (in `projects/frontend/`) | Build the SPA into `dist/` |
 
-**Deployment:** GitHub Pages via GitHub Actions. The workflow runs `make validate`, then `bun run build` in `projects/frontend/`, then publishes `projects/frontend/dist`.
+**Deployment:** GitHub Pages via GitHub Actions. The workflow runs `make publish` (or `make mock` until real data exists), `make validate`, then `bun run build` in `projects/frontend/`, then publishes `projects/frontend/dist`.
 
 - Vite `base` must equal the repo name (exact name still to be set). Fetch data with `import.meta.env.BASE_URL`, otherwise Pages returns 404.
 - Deploy a skeleton with mocks early and test on every deploy.

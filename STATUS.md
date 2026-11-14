@@ -148,13 +148,15 @@ Se empieza solo después de G1. Si G1 eligió el plan B, ajustá las tareas y an
 | 14 nov | Overlays `before`/`after` opcionales; se decide en G2 | El contrato ya permite quitarlos (F9) | R |
 | 14 nov | `projects/frontend/public/storage/` va en `.gitignore`; el despliegue debe generar los datos (`make mock` o el pipeline) | Decisión de R; evita commitear datos | R |
 | 14 nov | `criticality`: una comunidad aislada usa como `extra_s` el mayor `extra_s` finito de todos los candidatos; población `null` suma 0 | Precisa «penalización máxima» para que el cálculo sea reproducible | R |
+| 14 nov | Overlay `change` obligatorio; `before`/`after` opcionales (G2). Cada PNG ≤ 2 MB, lo comprueba `make validate` | El radar es la evidencia que se muestra; los PNG pesados rompen el despliegue | R |
+| 14 nov | Población si WorldPop falla: se decide tras S7; respaldo ya soportado (`population: null`, tiempo extra y conteo) | No comprometer otra fuente a ciegas | R |
+| 14 nov | Los datos reales viven en `projects/pipeline/output/` (commiteado, solo artefactos livianos); `make publish` los copia a `storage/` | `storage/` no se commitea; así el despliegue es reproducible y revisable | R |
 
 ### Preguntas abiertas
 
 - Hora exacta de cierre de la ventana del proyecto.
 - Reparto final de tareas por persona.
-- Nombre exacto del repo (fija el `base` de Vite).
-- Fuente de población si WorldPop no es accesible.
+- Nombre exacto del repo: el remoto es `WGuillenDev/vantage`, así que `base` sería `/vantage/` (confirmar).
 - Cuántas pasadas compatibles de NISAR hay sobre el corredor (S1).
 
 ## Bloqueos

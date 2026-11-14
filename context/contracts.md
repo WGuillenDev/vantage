@@ -68,7 +68,7 @@ Describes what was computed from what, and where the overlay images go on the ma
 | `passes.*.date` | date | Acquisition date. |
 | `overlays[].bounds` | `[w, s, e, n]` | Georeferencing for the PNG. MapLibre needs the four corners: `[[w,n],[e,n],[e,s],[w,s]]`. Image must already be reprojected to match (EPSG:4326 corners are fine for a small area). |
 | `overlays[].kind` | `"delta_db"` \| `"backscatter"` | Lets the UI pick a legend. |
-| `overlays` | array | Remove `before`/`after` entries if the before/after toggle is cut; the UI must hide the toggle when absent. |
+| `overlays` | array | Must contain the `change` overlay. `before`/`after` are optional: remove them if the before/after toggle is cut; the UI must hide the toggle when absent. |
 | `attributions` | string[] | The UI footer renders these. OSM's ODbL credit is mandatory. |
 
 ## 3. `change.geojson`
@@ -108,7 +108,7 @@ Referenced by `meta.json → overlays[].file`, in the same folder.
 - Reprojected to match `bounds` (north-up, no rotation).
 - Change overlay: a continuous ΔdB color ramp. Before/After: grayscale backscatter.
 - Pipeline and UI agree on the ramp's range through `meta.json → overlays[].range_db` (`[min, max]`, only for `delta_db`); the legend is drawn from it.
-- Light files only. Raw NISAR data is never committed.
+- Light files only: each PNG is at most 2 MB (checked by `make validate`). Raw NISAR data is never committed.
 
 ## 5. `graph.json`
 
@@ -208,7 +208,7 @@ Header row is required. The pass dates in `meta.json` mark the interval on the c
    - Every `from`/`to`/`node` id exists in `graph.nodes`.
    - Every `scenarios.candidates[].edge_ids` exists in `graph.edges`; every `candidate_id` in the graph appears in `scenarios`.
    - `isolated_community_ids ⊆ affected_community_ids`; community and hospital ids exist.
-   - Overlay files named in `meta.json` exist and `bounds` has `west < east` and `south < north`.
+   - Overlay files named in `meta.json` exist, are at most 2 MB, and `bounds` has `west < east` and `south < north`; the `change` overlay is present.
    - `rain.csv` dates cover the period in `meta.json`.
    - `meta.files.rain_csv_schema` is present.
 3. **English error messages**: the validator names the file, the field and the rule that failed, in English.
@@ -238,6 +238,6 @@ Header row is required. The pass dates in `meta.json` mark the interval on the c
 | 3 | Speed model per road class for `time_s` | One constant speed per OSM class, in `meta.json → speed_model_kmh` |
 | 4 | Overlay legend range | `meta.json → overlays[].range_db` (`[min, max]`) |
 | 5 | Rain value: area mean or nearest cell | Area mean over the corridor, `meta.json → rain.aggregation: "area_mean"` |
-| 6 | Keep `before`/`after` overlays? | Optional; decide at the Sunday 14:00 feature freeze (G2); contract allows removing them |
+| 6 | Keep `before`/`after` overlays? | `change` is required; `before`/`after` are optional and decided at the Sunday 14:00 feature freeze (G2) |
 
 New `meta.json` fields to add to the schema (B4): `speed_model_kmh`, `overlays[].range_db`, `rain.aggregation`. The speed values themselves are set when the road graph is built (P3).

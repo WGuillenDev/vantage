@@ -100,9 +100,10 @@ Se gestiona con `uv`. Desde `projects/pipeline/`: `uv sync` instala, `uv run pyt
 | Comando | Qué hace |
 |---|---|
 | `make mock` | Reemplaza `projects/frontend/public/storage/` con los datos de ejemplo del contrato |
+| `make publish` | Reemplaza esa carpeta con la salida del pipeline (`projects/pipeline/output/`, sí se commitea) |
 | `make validate` | Valida esa carpeta contra los esquemas de `projects/contract/schemas/` |
 
-`public/storage/` no se commitea: hay que generarlo con `make mock` antes de `bun run dev`.
+`public/storage/` no se commitea: hay que generarlo con `make mock` (o `make publish`) antes de `bun run dev`.
 
 ### Pruebas en el navegador (opcional)
 
