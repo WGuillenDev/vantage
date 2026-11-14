@@ -96,9 +96,9 @@ Rules:
   If a road class on a kept edge has fewer than `MIN_TAGGED` tagged edges and no configured fallback speed, then road-graph exits non-zero with an English error that names the class and writes no `graph.json`.
 - INV-18 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   If the compact `graph.json` would exceed 3 MB, then road-graph exits non-zero with an English error that states the size and writes no `graph.json`.
-- INV-19 [none]
+- INV-19 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   If the hospital allowlist has no ids, then road-graph exits non-zero with an English error saying the allowlist is empty and writes no `graph.json`.
-- INV-20 [none]
+- INV-20 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When two edges join the same pair of OSM end nodes, road-graph numbers first the one with the smaller OSM way id.
 
 ## Deferred / Open questions
