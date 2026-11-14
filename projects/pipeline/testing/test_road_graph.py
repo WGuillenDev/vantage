@@ -1,6 +1,7 @@
 import dataclasses
 import json
 import math
+import shutil
 from pathlib import Path
 
 import networkx as nx
@@ -175,6 +176,22 @@ def test_inv17_class_without_speed_stops_the_run(env, monkeypatch):
 def test_inv18_oversized_graph_stops_the_run(env, monkeypatch):
     monkeypatch.setattr(road_graph, "MAX_GRAPH_BYTES", 100)
     fails_without_graph(env, "bytes")
+
+
+def test_inv19_empty_allowlist_stops_the_run(env):
+    (env / "allowlist.txt").write_text("# no ids yet\n\n", encoding="utf-8")
+    fails_without_graph(env, "allowlist is empty")
+
+
+def test_inv20_parallel_edges_ordered_by_way_id(env, monkeypatch):
+    osm = env / "osm"
+    osm.mkdir()
+    shutil.copy(FIXTURE / "roads_parallel.osm", osm / "roads.osm")
+    shutil.copy(FIXTURE / "features.osm", osm / "features.osm")
+    monkeypatch.setattr(road_graph, "OSM_DIR", osm)
+    roads = [e["road"] for e in run(env)["edges"]]
+    # (1, 2) is the lowest pair of OSM end ids, so its two parallel edges come first.
+    assert roads[:2] == ["Fixture Smaller Way Id", "Fixture Larger Way Id"]
 
 
 def test_acc01_ruta32_cut_in_braulio_carrillo_keeps_a_path(tmp_path):
