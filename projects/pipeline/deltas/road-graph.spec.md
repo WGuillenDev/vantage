@@ -105,7 +105,7 @@ Rules:
   If the local OSM extract is missing, then road-graph (without `--download`) exits non-zero with an English error that says how to obtain it (`make osm`) and writes no `graph.json`.
 - INV-22 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When the download step finishes, `work/osm/extract_date.txt` holds the UTC download date as `YYYY-MM-DD`.
-- INV-23 [none]\n  When road-graph runs with `--download`, it only downloads the extract and records its date, and writes no `graph.json`.
+- INV-23 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]\n  When road-graph runs with `--download`, it only downloads the extract and records its date, and writes no `graph.json`.
 
 ## Deferred / Open questions
 
