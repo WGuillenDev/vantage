@@ -1,15 +1,15 @@
 EXAMPLES := projects/contract/examples
-DATA     := projects/frontend/public/storage
+STORAGE  := projects/frontend/public/storage
 
 .PHONY: mock validate all
 
 mock:
-	rm -rf $(DATA)
-	mkdir -p $(DATA)
-	cp -r $(EXAMPLES)/. $(DATA)/
+	rm -rf $(STORAGE)
+	mkdir -p $(STORAGE)
+	cp -r $(EXAMPLES)/. $(STORAGE)/
 
 validate:
-	@echo "validate: not implemented yet"; exit 1
+	uv run --project projects/pipeline validate $(STORAGE)
 
 all:
 	@echo "all: not implemented yet"; exit 1
