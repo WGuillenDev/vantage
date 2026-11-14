@@ -1,38 +1,35 @@
 # VANTAGE — STATUS
 
-> Tablero vivo del equipo. Mantenelo corto y verdadero. Actualizalo **antes de cada relevo** y cada vez que una tarea cambie de estado.
-> Contexto: `approach.md` (el porqué), `structure.md` (arquitectura), `contracts.md` (archivos de datos), `functions.md` (funcionalidades). Spikes: `SPIKING.md` (orden, dependencias y fichas de resultados).
-> Horas de Costa Rica (UTC−6). Ventana: **sáb 14 nov, 09:00 → dom 15 nov, 23:59** (hora de cierre aún por confirmar).
+> Tablero vivo. Corto y verdadero: actualizalo cuando una tarea cambie de estado.
+> Contexto: `context/approach.md` (porqué y método), `structure.md`, `functions.md`, `contracts.md`. Resultados de spikes: `SPIKING.md`.
+> Horas de Costa Rica (UTC−6). Ventana: **sáb 14 nov 09:00 → dom 15 nov 23:59** (hora de cierre por confirmar).
+> **Modo solo (R) desde el sáb 14 nov por la tarde:** hoy todo lo hace R, por prioridad y sin relevos. La columna «Dueño» guarda el reparto original para cuando vuelva el equipo (R Ron · I Ian · W Wilberth · V Iván).
 
-## Cómo usar este archivo
-
-- Leyenda de estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecha · `[!]` bloqueada (explicá por qué en la tabla de Bloqueos).
-- Los dueños son **propuestos** (el reparto final sigue pendiente): `R` Ron · `I` Ian (pipeline) · `W` Wilberth · `V` Iván (frontend).
-- Un dueño por tarea. Si alguien la toma, cambia el dueño y agrega una línea en el registro de relevos.
-- No borrés tareas terminadas. Este archivo también sirve de registro para la presentación final.
-- Agentes: lean este archivo primero, trabajen solo en las tareas asignadas a su usuario y no marquen una tarea `[x]` hasta que se cumpla su "Terminada cuando".
+Leyenda: `[ ]` pendiente · `[~]` en curso · `[x]` hecha · `[-]` descartada (con motivo).
 
 ## Resumen de fases
 
 | # | Fase | Cuándo | Objetivo | Estado |
 |---|---|---|---|---|
-| 1 | **Bootstrap** | Sáb 09:00–11:00 | Repo, herramientas, contrato congelado y mocks, esqueleto desplegado | [x] |
-| 2 | **Spiking** | Sáb 11:00–15:00 | Probar los supuestos riesgosos. Decidir seguir o plan B en la **Puerta 1** | [ ] |
-| 3 | **Building** | Sáb 15:00 → dom 14:00 | Datos reales por el pipeline, UI completa sobre el contrato | [ ] |
+| 1 | **Bootstrap** | Sáb 09:00–11:00 | Repo, herramientas, contrato y mocks, esqueleto desplegado | [x] |
+| 2 | **Spiking** | Sáb 11:00–15:00 | Probar los supuestos riesgosos y decidir en la **Puerta 1** | [~] G1 decidida (NO-GO de detección); falta S2c (opcional) |
+| 3 | **Building** | Sáb ~17:00 → dom 14:00 | Datos reales por el pipeline y UI completa sobre el contrato | [ ] |
 | 4 | **Polish** | Dom 14:00 → cierre | Congelar, corregir errores, probar, desplegar, presentar | [ ] |
 
-Prioridad ahora: **contratos congelados** (desbloquea al frontend) y **spikes** (deciden el plan). Todo lo demás espera detrás de esas dos cosas.
+**G1 decidida (sáb 14 nov ~16:35): NO-GO** para detectar derrumbes con GCOV de NISAR (mínimo detectable ≈10×10 px ≈ 1 ha a −5 dB; detalle en `SPIKING.md` S2 y `context/approach.md` §5). El producto es **riesgo = consecuencia × exposición**: red vial + hospitales + población (calculada) y lluvia IMERG (+ SME2 si pasa). La capa de radar es opcional y puede ir vacía.
+
+Prioridad ahora: la mitad de datos reales (grafo → población → impacto → lluvia) y la UI sobre ellos.
 
 ## Progreso
 
-**11 / 41 tareas · 27 %** `█████░░░░░░░░░░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman)_
+**13 / 39 tareas · 33 %** `███████░░░░░░░░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman; las `[-]` descartadas no cuentan)_
 
 | Fase | Hechas | % |
 |---|---|---|
 | 1 · Bootstrap | 9 / 9 | 100 % |
-| 2 · Spiking | 2 / 8 | 25 % |
-| 3 · Building | 0 / 17 | 0 % |
-| 4 · Polish | 0 / 7 | 0 % |
+| 2 · Spiking | 4 / 9 | 44 % |
+| 3 · Building | 0 / 16 | 0 % |
+| 4 · Polish | 0 / 5 | 0 % |
 
 _Actualizá este bloque cada vez que marques una tarea `[x]`._
 
@@ -40,150 +37,112 @@ _Actualizá este bloque cada vez que marques una tarea `[x]`._
 
 | Puerta | Cuándo | Pregunta | Decisión |
 |---|---|---|---|
-| G1 | Sáb 15:00 | ¿Hay pasadas compatibles de NISAR y se nota el cambio? | _pendiente_ — seguir / plan B |
-| G2 | Dom 14:00 | Congelar funcionalidades: lo que no esté listo se corta | _pendiente_ |
+| G1 | Sáb 15:00 (decidida ~16:35) | ¿Hay pasadas compatibles de NISAR y se nota el cambio? | **NO-GO** en detección; el producto pasa a consecuencia × exposición (D1–D6) |
+| G2 | Dom 14:00 | Congelar funcionalidades: se corta lo que no esté listo | _pendiente_ |
 | G3 | Dom 18:00 | Congelar código: solo corrección de errores | _pendiente_ |
 
 ---
 
-## Fase 1 · Bootstrap (sáb 09:00–11:00)
+## Fase 1 · Bootstrap (sáb 09:00–11:00) — completa
 
-| ID | Tarea | Dueño | Estado | Terminada cuando |
+| ID | Tarea | Dueño | Estado |
+|---|---|---|---|
+| B1 | Repo público `vantage`, licencia MIT, README, `Makefile`, `.github/` | R | [x] |
+| B2 | Herramientas: `uv` (pipeline) y Bun + TypeScript estricto (frontend) | R | [x] |
+| B3 | Cerrar las 6 decisiones abiertas de `contracts.md` §11 | R | [x] |
+| B4 | JSON Schemas en `projects/contract/schemas/` (hoy 0.2) | R | [x] |
+| B5 | Mocks en `projects/contract/examples/`; `make mock` y `make validate` funcionando | R | [x] |
+| B6 | `CODEOWNERS` sobre `contract/` (ver pregunta abierta sobre trabajar solo) | R, W | [x] |
+| B7 | Esqueleto del frontend (React + Vite + MapLibre) cargando un mock | R, W | [x] |
+| B8 | Workflow de GitHub Pages (`make mock` → `make validate` → build → publicar) | R | [x] |
+| B9 | Archivos de contexto y `AGENTS.md` raíz | R | [x] |
+
+## Fase 2 · Spiking (sáb 11:00–15:00; detalle en `SPIKING.md`)
+
+| ID | Spike | Dueño | Estado | Resultado |
 |---|---|---|---|---|
-| B1 | Repo público `vantage` en GitHub, licencia MIT, README, `Makefile` base en la raíz, `.github/` | R | [x] | Repo público; estructura igual a `structure.md` — _Hecho: repo público (verificado), LICENSE MIT, README, `Makefile` (`mock` real; `validate` y `all` fallan a propósito hasta B5/P7), `.github/workflows/ci.yml` (frontend + `uv sync`)._ |
-| B2 | Herramientas: `uv` para el pipeline, Bun + TypeScript estricto para el frontend | R | [x] | `uv sync` y `bun install` funcionan en todas las máquinas — _Hecho: `bun install/lint/build` y `uv sync --locked` + `uv run pipeline` verificados en esta máquina; `projects/pipeline/` con `pyproject.toml`, `uv.lock` y `jsonschema`. Falta solo probarlo en las máquinas de los demás._ |
-| B3 | Cerrar las 6 decisiones abiertas de `contracts.md` §11 | R | [x] | Decisiones anotadas en el Registro de decisiones — _Hecho: las 6 cerradas el 14 nov y reflejadas en `contracts.md` §11._ |
-| B4 | Escribir los JSON Schemas en `projects/contract/schemas/` y **congelarlos** | R | [x] | Los 5 archivos de datos cubiertos, cada uno con `schema_version` — _Hecho: `meta`, `change`, `graph`, `scenarios` y `rain` (fila del CSV; su versión va en `meta.files.rain_csv_schema`), todos en `0.1`. La protección con CODEOWNERS llega con B6._ |
-| B5 | Mocks en `projects/contract/examples/`; `make mock` y `make validate` funcionando | R | [x] | Los mocks pasan la validación; incluye revisiones de referencias cruzadas — _Hecho: mocks con 4 candidatos, 3 hospitales, 5 comunidades (una aislada, una sin población) y variante sin antes/después; `make mock` y `make validate` verificados; 9 tests en `projects/pipeline/testing/`._ |
-| B6 | `CODEOWNERS` (una persona de backend y una de frontend sobre `contract/`) | R, W | [x] | Un PR que toque `contract/` exige ambas revisiones — _Hecho: `.github/CODEOWNERS` (@ronz204 backend, @WGuillenDev frontend) y «Require review from Code Owners» activo en la protección de `main` (verificado por API el 14 nov)._ |
-| B7 | Esqueleto del frontend (React + Vite + MapLibre) cargando un mock | R, W | [x] | El mapa se ve en local con datos mock — _Hecho: `App.tsx` con MapLibre 5, base OSM raster y overlay `change` leído de `storage/meta.json`. Verificado el 14 nov: mocks copiados y validados, `bun run lint` y `build` pasan, y `bun run dev` muestra el mapa con el overlay y sin errores de consola._ |
-| B8 | Workflow de GitHub Pages: `make validate` → `bun run build` → publicar `dist` | R | [x] | El esqueleto tiene URL pública; `base` de Vite y `BASE_URL` correctos (sin 404) — _Hecho: `.github/workflows/deploy.yml` (`make mock` → `make validate` → build → Pages) y `base: '/vantage/'` en Vite. Pages activado y despliegue confirmado por R el 14 nov._ |
-| B9 | Agregar los archivos de contexto (`approach`, `structure`, `functions`, `contracts`) y el `AGENTS.md` raíz | R | [x] | Archivos en el repo; AGENTS.md apunta a ellos — _Hecho: `context/*`, `CLAUDE.md` y `AGENTS.md`._ |
+| S1 | Cobertura de NISAR | R | [x] | PASA con reservas: 069 D 1→13 jul; GCOV desde el 19 jun |
+| S2 | Detectabilidad | R | [x] | **FALLA** → G1 NO-GO; mínimo detectable ≈1 ha a −5 dB |
+| S2c | SME2: ¿sube antes de los cierres? | R | [ ] | Opcional, máx. 40 min, criterios escritos antes. Si falla, exposición solo con IMERG |
+| S3 | Eventos de validación | R | [~] | PARCIAL: prensa que cita al MOPT; falta comunicado primario |
+| S4 | Red vial y métrica | I | [~] | PARCIAL: el grafo funciona; «hospital más cercano» da cero en el 43 % de los tramos |
+| S5 | IMERG | I | [ ] | Sin avanzar (se absorbe en E1) |
+| S6 | Humo del frontend | W, V | [x] | PASA |
+| S7 | WorldPop | W | [x] | PASA |
+| S8 | `graph.ts` | V | [~] | PASA en rama, no está en `main` |
 
-**Salida de la fase:** contrato congelado, mocks listos, el frontend ya puede trabajar con `make mock`.
-
-## Fase 2 · Spiking (sáb 11:00–15:00)
-
-Cada spike termina con un resultado de una línea en la tabla y luego una decisión. Si un spike falla, se pasa a su plan B.
-
-| ID | Spike | Dueño | Cuándo | Estado | Terminado cuando | Plan B | Resultado |
-|---|---|---|---|---|---|---|---|
-| S1 | Cobertura de NISAR sobre la Ruta 32 | R | 11:30–12:30 | [ ] | Dos fechas con el mismo track, dirección y CRID que encierran un cierre real, fuera del hueco del 27 jul–10 ago | Otro evento u otra zona dentro de Costa Rica | _—_ |
-| S2 | Resolución y detectabilidad | R | 12:30–14:00 | [ ] | Una mancha coherente de varios píxeles sobre un derrumbe conocido | Zonas de perturbación a escala de ladera | _—_ |
-| S3 | Evento de validación | R | 11:00–11:30 | [ ] | Una fuente oficial (MOPT, CONAVI, CNE) respalda la fecha del cierre | Presentar todo como «candidatos» | _—_ |
-| S4 | Red vial y métrica de impacto | I | 11:00–13:00 | [ ] | El grafo conecta; quitar un tramo da números razonables | Reducir al área del corredor | _—_ |
-| S5 | IMERG | I | 13:00–15:00 | [ ] | Un día de lluvia descargado y graficado | Lluvia solo como texto | _—_ |
-| S6 | Prueba de humo del frontend | W, V | 13:30–15:00 | [x] | MapLibre carga un mock del contrato, en local y desplegado | Resolver antes de seguir | PASA: mapa base y overlay de cambio visibles en dev, build/preview y Pages, sin errores de consola |
-
-También durante el spiking (frontend contra mocks, sin depender de los spikes):
-
-| ID | Tarea | Dueño | Estado | Terminada cuando |
-|---|---|---|---|---|
-| S7 | Comprobar acceso a población (WorldPop) | W | [x] | Funciona, o se elige el respaldo (solo tiempo extra y conteo de comunidades) — _Hecho: PASA. WorldPop CRI 2020 a 100 m se descarga por HTTPS (31,5 MB, sin streaming) y se recorta al `bbox`; ficha en `SPIKING.md`._ |
-| S8 | Empezar `graph.ts` (camino más corto al hospital más cercano, con conjunto de tramos cerrados) | V | [ ] | Coincide con el `scenarios.json` mock en la línea base |
-
-## Fase 3 · Building (sáb 15:00 → dom 14:00)
-
-Se empieza solo después de G1. Si G1 eligió el plan B, ajustá las tareas y anotalo en el Registro de decisiones.
+## Fase 3 · Building (sáb ~17:00 → dom 14:00)
 
 ### Pipeline
 
 | ID | Tarea | Dueño | Estado | Terminada cuando |
 |---|---|---|---|---|
-| P1 | Obtener dos pasadas GCOV de NISAR compatibles, en streaming y recortadas al corredor | R | [ ] | Arreglos guardados en local (sin commitear); pasadas registradas para `meta.json` |
-| P2 | Detección de cambio: ΔdB, filtro de speckle, máscara de agua/sombra, área mínima → polígonos | R | [ ] | `change.geojson` + PNG(s) de overlay validan |
-| P3 | Grafo vial desde OSM: tramos, hospitales, comunidades → `graph.json` | I | [ ] | Valida; los ids se cruzan bien |
-| P4 | Tramos candidatos (los que tocan zonas de cambio, con margen) | I | [ ] | Candidatos listados con ids de aristas |
-| P5 | Impacto: quitar un candidato a la vez → tiempo extra, población que depende, aisladas, ranking → `scenarios.json` | I | [ ] | Valida; números revisados a mano en un caso |
-| P6 | Contexto de lluvia → `rain.csv` | I | [ ] | Valida; las fechas cubren el periodo |
-| P7 | `meta.json` (pasadas, fuentes, atribuciones, límites de overlays) y `make all` de punta a punta | R | [ ] | `make all` regenera todos los archivos y `make validate` pasa |
+| P3 | Grafo vial de OSM para el área configurada: tramos, hospitales, comunidades → `graph.json` | I | [ ] | Valida; los ids se cruzan |
+| E4 | Población WorldPop sobre las comunidades (para que la criticidad deje de dar 0) | I | [ ] | `population` poblada donde hay dato |
+| E5 | Decidir la métrica de impacto (hospital de referencia vs. más cercano) y resolver la contradicción de S4 | I | [ ] | Una sola cifra por tramo y la decisión anotada abajo |
+| P5 | Impacto: quitar un tramo a la vez → tiempo extra, población, aisladas, ranking → `scenarios.json` (clave `candidates`, `source: "network_consequence"`) | I | [ ] | Valida; un caso revisado a mano |
+| E1 | IMERG: `rain.csv` y lluvia acumulada por tramo (`exposure.rain_mm_12d`) | I | [ ] | Valida; las fechas cubren el periodo |
+| E3 | Zona como parámetro (nombre o bbox en config → `meta.area`) | I | [ ] | Cambiar el bbox cambia la salida sin tocar código |
+| P7 | `meta.json` y `make all` de punta a punta | R | [ ] | `make all` regenera todo y `make validate` pasa |
 | P8 | **Primer despliegue con datos reales** | R, W | [ ] | El sitio publicado muestra datos reales (meta: sáb 21:00) |
+| E2 | S2c (SME2), solo si sobra tiempo | R | [ ] | Veredicto con criterios previos |
+
+Descartadas `[-]`: **P1** (obtener pasadas GCOV) y **P2** (detección de cambio como generador de candidatos): la detección no genera tramos (G1). **P4** (tramos candidatos por zona de cambio) se fundió en P5: los tramos salen de la red.
 
 ### Frontend
 
 | ID | Tarea | Dueño | Estado | Terminada cuando |
 |---|---|---|---|---|
-| F1 | Mapa con capa de cambio, control de opacidad, hospitales y comunidades | W | [ ] | Se dibuja desde datos del contrato |
-| F2 | Mostrar las pasadas (fechas antes/después desde `meta.json`) | W | [ ] | Lee `meta.json` |
-| F3 | Lista de candidatos por criticidad; clic selecciona en el mapa | V | [ ] | Coincide con el `rank` de `scenarios.json` |
-| F4 | Panel de detalle del tramo (tiempo extra, población, comunidades, alternas, ΔdB, etiqueta de candidato) | V | [ ] | Todos los campos manejan `null` |
-| F5 | Simulación de cierre (varios tramos, chips, restablecer, comunidades aisladas, recalcula en el navegador) | V | [ ] | Recálculo instantáneo; «aislada» solo si no hay camino |
-| F6 | Panel «¿Por qué?»: gráfico IMERG + lista de hipótesis, rotulada como hipótesis | W | [ ] | Lee `rain.csv`; la etiqueta siempre visible |
-| F7 | Diseño responsivo (panel lateral en escritorio; hoja inferior en móvil) | W | [ ] | Usable en celular; objetivos de 44 px |
-| F8 | Pie de atribuciones, aviso de candidatos, revisión de accesibilidad | V | [ ] | Se muestran NASA/JPL, IMERG y OSM |
-| F9 | Alternar antes/después (se corta en G2 si hay atraso) | W | [ ] | Se oculta sin romper si no hay overlays |
+| F1 | Mapa con tramos críticos, hospitales y comunidades; capa de cambio solo si existe | W | [ ] | Se dibuja desde el contrato, con o sin capa de cambio |
+| F3 | Lista de tramos críticos por criticidad; solo impacto > 0 y contador «N tramos sin impacto» | V | [ ] | Coincide con el `rank` |
+| F4 | Detalle del tramo: tiempo extra, población, comunidades, alternas, bloque «Exposición» (lluvia, humedad si existe, «evidencia de radar: no detectable a esta escala») | V | [ ] | Todos los campos manejan `null` |
+| F5 | Simulación de cierre (varios tramos, chips, restablecer, aisladas solo si no hay camino) | V | [ ] | Recálculo instantáneo en el navegador |
+| F6 | Panel «¿Por qué?»: exposición con gráfico IMERG, siempre como hipótesis | W | [ ] | La etiqueta siempre visible |
+| F7 | Responsivo (panel lateral en escritorio; hoja inferior en móvil) | W | [ ] | Usable en celular |
+| F8 | Atribuciones y aviso «tramos críticos por consecuencia; no son derrumbes confirmados» | V | [ ] | Se muestran NASA/JPL, IMERG y OSM |
+
+Cortadas `[-]`: **F2** (mostrar pasadas) y **F9** (alternar antes/después): dependen de una capa de radar que no tenemos.
 
 ## Fase 4 · Polish (dom 14:00 → cierre)
 
 | ID | Tarea | Dueño | Estado | Terminada cuando |
 |---|---|---|---|---|
-| X1 | Congelar funcionalidades (G2): cortar lo que no esté listo; anotar los cortes en el Registro de decisiones | todos | [ ] | Lista de cortes registrada |
-| X2 | Congelar código (G3): solo corrección de errores | todos | [ ] | Sin merges de funcionalidades después de las 18:00 |
-| X3 | Probar el sitio publicado en ventana privada y en un celular | W, V | [ ] | El flujo principal funciona en ambos |
-| X4 | Etiquetar `v1.0` y adjuntar el zip de `dist/` para uso sin conexión | W | [ ] | El zip abre sin conexión |
-| X5 | README final: cómo correrlo, `make all`, atribuciones, limitaciones | R | [ ] | Alguien nuevo puede correrlo |
-| X6 | Presentación y guion de demo; el texto se mantiene cauto («candidato», «hipótesis») | todos | [ ] | Ensayada al menos una vez |
-| X7 | Entrega a Space Apps con los enlaces finales | R | [ ] | Enviada antes del cierre |
+| X1 | G2 (dom 14:00): cortar lo que no esté listo y anotarlo en decisiones | todos | [ ] | Lista de cortes |
+| X2 | G3 (dom 18:00): solo errores; probar el sitio en ventana privada y en celular | todos | [ ] | El flujo principal funciona |
+| X3 | README final (cómo correrlo, `make all`, atribuciones, límites) y etiqueta `v1.0` | R, W | [ ] | Alguien nuevo puede correrlo |
+| X4 | Presentación: el resultado negativo de detectabilidad como hallazgo con su número; texto cauto | todos | [ ] | Ensayada una vez |
+| X5 | Entrega a Space Apps con los enlaces finales | R | [ ] | Enviada antes del cierre |
 
 ---
 
-## Resultados de spikes y decisiones
+## Resultados y decisiones
 
 ### Registro de decisiones
 
-| Fecha/hora | Decisión | Por qué | Quién |
-|---|---|---|---|
-| 13 nov | Un solo repo `vantage` (`project/` con `contract`, `frontend`, `pipeline`) | Más simple para 4 personas y 2 días | R |
-| 13 nov | Licencia MIT; atribución a NASA y OpenStreetMap | — | R |
-| 13 nov | Python con `uv`; Bun con TypeScript estricto | — | R |
-| 13 nov | GitHub Pages con GitHub Actions | Sitio estático, sin servidor | R |
-| 13 nov | Control de opacidad propio para antes/después | — | R |
-| 13 nov | Métrica titular: tiempo extra al hospital + población que depende del tramo | El aislamiento es poco frecuente; esta métrica es robusta | R |
-| 13 nov | Ramas cortas con squash a `main`; revisión de ambos lados solo para cambios al contrato | — | R |
-| 14 nov | `extra_time_s` = máximo de `extra_s` entre comunidades afectadas no aisladas | Simple de explicar y no depende de la población | R |
-| 14 nov | `criticality` = Σ población × `extra_s` (aisladas con penalización máxima); sin población, ordena por `extra_time_s` y aisladas | Pondera por gente afectada y degrada bien sin WorldPop | R |
-| 14 nov | `time_s` con una velocidad constante por clase de vía OSM, en `meta.json` (`speed_model_kmh`) | Navegador y pipeline dan los mismos números | R |
-| 14 nov | Rango de la leyenda de cambio en `meta.json` (`overlays[].range_db`) | Un solo lugar de verdad, sin números fijos en el frontend | R |
-| 14 nov | Lluvia = promedio de celdas IMERG del corredor (`rain.aggregation: "area_mean"`) | IMERG es de ~10 km; evita falsa precisión | R |
-| 14 nov | Overlays `before`/`after` opcionales; se decide en G2 | El contrato ya permite quitarlos (F9) | R |
-| 14 nov | `projects/frontend/public/storage/` va en `.gitignore`; el despliegue debe generar los datos (`make mock` o el pipeline) | Decisión de R; evita commitear datos | R |
-| 14 nov | `criticality`: una comunidad aislada usa como `extra_s` el mayor `extra_s` finito de todos los candidatos; población `null` suma 0 | Precisa «penalización máxima» para que el cálculo sea reproducible | R |
-| 14 nov | Overlay `change` obligatorio; `before`/`after` opcionales (G2). Cada PNG ≤ 2 MB, lo comprueba `make validate` | El radar es la evidencia que se muestra; los PNG pesados rompen el despliegue | R |
-| 14 nov | Población si WorldPop falla: se decide tras S7; respaldo ya soportado (`population: null`, tiempo extra y conteo) | No comprometer otra fuente a ciegas | R |
-| 14 nov | Los datos reales viven en `projects/pipeline/output/` (commiteado, solo artefactos livianos); `make publish` los copia a `storage/` | `storage/` no se commitea; así el despliegue es reproducible y revisable | R |
-
-| 14 nov | S3 pasa de I a R; S7 pasa de I a W; S3 va primero (11:00), luego S1 y S2; I adelanta S4 a las 11:00 | S1, S2 y S3 forman una cadena; un solo dueño evita relevos en el camino crítico | R |
+| Fecha | Decisión | Por qué |
+|---|---|---|
+| 13 nov | Repo único `vantage` (`projects/` con `contract`, `frontend`, `pipeline`); MIT con atribución a NASA y OSM; Python con `uv`; Bun con TypeScript estricto; GitHub Pages | Simple y estático |
+| 13–14 nov | Métrica titular: tiempo extra a hospital + población que depende; `extra_time_s` = máximo de `extra_s` de las afectadas no aisladas; `criticality` = Σ población × `extra_s` (aislada: el mayor `extra_s` finito; población `null` suma 0; sin población, ordena por `extra_time_s`) | Simple, reproducible, degrada sin WorldPop |
+| 14 nov | `time_s` con una velocidad constante por clase de vía OSM (`meta.speed_model_kmh`); lluvia = promedio de celdas IMERG (`area_mean`); leyenda de cambio en `overlays[].range_db` | Navegador y pipeline dan los mismos números |
+| 14 nov | Datos reales en `projects/pipeline/output/` (commiteado, livianos); `public/storage/` va en `.gitignore` y se llena con `make mock` o `make publish` | Despliegue reproducible |
+| 14 nov | WorldPop pasa (S7); el respaldo `population: null` sigue soportado | — |
+| 14 nov ~16:35 | **D1.** G1 = NO-GO para generar tramos detectando cicatrices con GCOV. Con GCOV a 10 m y este flujo no se ven derrumbes pequeños; GUNW, offsets y series por píxel siguen sin probar y no se afirma que NISAR no pueda | Resultado negativo con número (`SPIKING.md` S2) |
+| 14 nov ~16:35 | **D2.** Producto = riesgo = consecuencia × exposición. Consecuencia: red vial + hospitales + población. Exposición: IMERG y, si S2c pasa, SME2. Capa de radar opcional | La detección no genera tramos |
+| 14 nov ~16:35 | **D3.** Sin datos fijos como semilla (sitios de Lanamme, km del MOPT, coordenadas de prensa). Las fechas de prensa son solo etiquetas de validación | Los tramos salen de la red |
+| 14 nov ~16:35 | **D4.** La zona es un parámetro (config). Ruta 32 es el caso de demostración; «diseñado para generalizarse a corredores con red vial en OSM», nunca «funciona en cualquier lugar». Límites: calidad de OSM, hospitales mal registrados, SME2 en bosque denso | No se probó fuera de Ruta 32 |
+| 14 nov ~16:35 | **D5.** S2c (SME2) es opcional y de 40 min máx. | Si falla, exposición solo con IMERG |
+| 14 nov ~16:35 | **D6.** Texto al usuario: «tramo crítico». `candidates` sigue como clave de archivo. Nunca «confirmado» ni «causado por» | No romper el esquema |
+| 14 nov | Modo solo: sin turnos ni relevos; F2 y F9 cortadas; contrato 0.2 adoptado en el árbol (sin la regla de revisión de ambos lados) | Menos coordinación, más velocidad |
 
 ### Preguntas abiertas
 
-- Hora exacta de cierre de la ventana del proyecto.
-- Reparto final de tareas por persona.
-- Nombre exacto del repo: el remoto es `WGuillenDev/vantage`, así que `base` sería `/vantage/` (confirmar).
-- Cuántas pasadas compatibles de NISAR hay sobre el corredor (S1).
+- **Hospital de referencia vs. más cercano** (E5): ¿qué métrica evita que el 43 % de los tramos quede en cero?
+- **Revisión de código con CODEOWNERS:** `.github/CODEOWNERS` y la protección de `main` exigen revisión de un dueño de código; trabajando solo hay que decidir si se desactiva o se usa bypass. No se tocó.
+- **SME2 en bosque denso:** ¿es fiable? (S2c)
+- **`rain.start/end` sin pasadas:** sigue siendo obligatorio en `meta.json`; ¿qué periodo se usa?
+- Hora exacta de cierre de la ventana, y texto oficial del reto sin localizar.
 
-## Bloqueos
+### Contradicciones por resolver
 
-| Desde | Tarea | Bloqueo | Necesita | Estado |
-|---|---|---|---|---|
-| — | — | — | — | — |
-
-## Registro de relevos
-
-Escribí una línea al salir de tu turno. Quien entra lo lee primero.
-
-| Hora | Sale → Entra | Hecho | Sigue | Roto / ojo con |
-|---|---|---|---|---|
-| — | — | — | — | — |
-
-## Plan de turnos (propuesto)
-
-| Franja | Pipeline | Frontend |
-|---|---|---|
-| Sáb 09:00–15:00 | R + I, todos en bootstrap y luego spikes | W + V, esqueleto y luego prueba de humo |
-| Sáb 15:00–21:00 | Al volante: R, apoyo: I | Al volante: W, apoyo: V |
-| Sáb 21:00–03:00 | Al volante: I; R descansa | Al volante: V; W descansa |
-| Dom 03:00–08:00 | Entra R; duerme I | Entra W; duerme V |
-| Dom 08:00–14:00 | Ambos, cierran tareas P | Ambos, cierran tareas F |
-| Dom 14:00–cierre | Todos: polish, pruebas y presentación | Todos |
-
-Ajustalo como quieras. La idea es que cada lado siempre tenga a alguien con contexto despierto y que cada cuenta de Claude Code descanse.
+- **S4, comunidades aisladas:** una medición da 0 afectadas en el parque (áreas de corredor y regional) y otra 1 aislada en la red hasta Limón.
+- **Plan B de S4 («reducir al corredor»):** el informe de situación dice que empeora el resultado (18 aisladas sospechosas).
