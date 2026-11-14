@@ -17,7 +17,8 @@
 |---|---|---|
 | S1 | PASA con reservas | NISAR cubre la ruta desde el 19 jun 2026, pasada cada 12 días; los datos se leen sin bajar el archivo. Par principal: 069 D, 1→13 jul (`P05023`). |
 | S2 | **FALLA** | 3 pruebas + paso A sintético: sin separar evento de control. Mínimo detectable ≈10×10 px (≈1 ha) a −5 dB. B exploratorio negativo; C (GUNW) sin correr. |
-| S2c | pendiente | SME2: ¿sube la humedad del suelo antes de los cierres? Máx. 40 min, criterios escritos antes. |
+| S1′ | PASA con reserva | SME2: 55 granos desde el 19 jun; IMERG Late diario, 136 días. Ver ficha. |
+| S2c | **FALLA** | SME2 no sube antes de los cierres: 1 de 4 eventos sobre p75 (hacían falta 3); la mediana de eventos queda por debajo de la línea base. Ningún retrieval «recomendado» en la franja. |
 | S3 | PARCIAL | Cierres de 2026 con prensa que cita al MOPT; falta el comunicado primario. |
 | S4 | PARCIAL | Red regional conecta; un corte en el parque da +77,6 min San José→Guápiles por alterna. Con «hospital más cercano» el parque afecta a 0 comunidades; recortar al corredor crea aislamientos falsos (ver ficha). |
 | S5 | sin avanzar | IMERG sin probar. _Fuente: informe de situación._ |
@@ -66,6 +67,36 @@
 **Paso C (coherencia GUNW):** no se corrió porque A no pasó.
 
 **Lectura honesta:** con GCOV a 10 m y este flujo no se ven derrumbes pequeños. No se afirma que NISAR no pueda con otros productos; **siguen sin probar** GUNW, offsets, series por píxel y SME2 (S2c). El `mask` del producto no enmascara sombra ni capa invertida del relieve, y no hay prueba de que no hubiera cierre entre el 30 ago y el 11 sep (solo que no aparece en prensa).
+
+## S1′ · Cobertura de SME2 e IMERG (14 nov, tarde)
+
+**PASA con reserva.** CMR, bbox `-84.15,9.95,-83.75,10.25`: `NISAR_L3_SME2_PROVISIONAL_V1` 55 granos desde el 19 jun (uno por pasada de GCOV, 4 tracks: 069 D, 105 A, 170 D, 004 A; una observación cada 2 a 6 días); `NISAR_L3_SME2_BETA_V1` 0. IMERG Late diario `GPM_3IMERGDL` V07: 136 días del 1 jul al 14 nov. Reserva: sin SME2 antes del 19 jun, así que el evento A (feb) queda fuera.
+
+## S2c · SME2 antes de los cierres
+
+**Criterios (14 nov, escritos antes de calcular).**
+
+- Medida: humedad SME2 media en la franja de 500 m a cada lado del eje de la Ruta 32 en OSM, por fecha de paso; cada track y frame por separado.
+- Eventos: B (2 jul), C (17 ago), F (13 sep), D (5 oct); A queda fuera por falta de datos. Para cada uno, la última pasada anterior al cierre.
+- Línea base: la misma medida, por track, en las fechas sin cierre en prensa (ni los 3 días previos). Cada evento se compara con la línea base de su propio track.
+- PASA: en al menos 3 de los 4 eventos, la medida previa supera el percentil 75 de su línea base, y la mediana de los 4 eventos supera la mediana de la línea base.
+- FALLA: cualquier otro resultado; la exposición queda solo con IMERG (D5).
+- Límites previstos: 4 eventos son pocos (señal, no prueba); SME2 en bosque denso puede ser poco fiable; las fechas de prensa son etiquetas, no verdad de terreno.
+
+**Resultado (14 nov): FALLA.** Scripts y datos en `projects/pipeline/spikes/s2c/` (`measure.py`, `judge.py`, `sme2_strip.csv`). 53 pasadas únicas leídas por ventana (sin bajar los granos); franja de 65,7 km² (1 635 píxeles de 200 m, EASE-Grid 2.0).
+
+| Evento | Pasada previa (069 D f083 · 105 A f007) | Humedad (m³/m³) | Sobre p75 de su línea base |
+|---|---|---|---|
+| B · 2 jul | 30 jun (1 d antes) · 21 jun (10 d) | 0,366 · 0,351 | sí · sí |
+| C · 17 ago | 24 jul (23 d) · 27 jul (20 d) | 0,319 · 0,305 | no · no |
+| F · 13 sep | 10 sep (2 d) · 13 sep 05:12, 2 h antes (0 d) | 0,302 · 0,307 | no · no |
+| D · 5 oct | 4 oct (0 d) · 25 sep (10 d) | 0,312 · 0,303 | no · no |
+
+- Línea base (pasadas sin cierre ni los 3 días previos): mediana 0,324 (069 D f083, 6 pasadas) y 0,325 (105 A f007, 8). Mediana de los 4 eventos 0,310, **por debajo** de la línea base. Cumplen 1 de 4 (B); hacían falta 3. Con las 5 series con datos: B 4/5, C 0/5, F 0/5, D 0/5.
+- Lectura: el único evento que sube es B, justo cuando la humedad es más alta de toda la serie (19 jun–13 jul: 0,35–0,41) y luego baja; es compatible con la estacionalidad, no con una señal previa a los cierres.
+- **Las series principales (069 D f083 y 105 A f007, con ≥80 % de la franja válida) se eligieron al ver la cobertura, no antes**; el resultado no depende de eso (ver las 5 series arriba). 004 A y 069 D f084/105 A f006 cubren poco (138 a 620 píxeles, y 105 A f006 pierde cobertura en la serie); 170 D no tiene píxeles válidos en la franja.
+- Límites: **ningún píxel de la franja tiene retrieval «recomendado»** (`retrievalQualityFlag` LSB = 1 en todos; producto provisional), así que se promedió todo lo válido. Pasadas previas con 20 a 23 días de distancia en C por el hueco 27 jul–13 ago. Las horas de cierre de B, C y el final de D no están en la prensa (se usó inicio de día). 4 eventos; humedad a 200 m en bosque, no en el talud.
+- Qué no se probó: humedad de otra fuente, series por píxel, anomalía respecto a la climatología (solo hay 5 meses de datos).
 
 ## S3 · Eventos de validación
 

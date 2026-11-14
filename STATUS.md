@@ -12,7 +12,7 @@ Leyenda: `[ ]` pendiente · `[~]` en curso · `[x]` hecha · `[-]` descartada (c
 | # | Fase | Cuándo | Objetivo | Estado |
 |---|---|---|---|---|
 | 1 | **Bootstrap** | Sáb 09:00–11:00 | Repo, herramientas, contrato y mocks, esqueleto desplegado | [x] |
-| 2 | **Spiking** | Sáb 11:00–15:00 | Probar los supuestos riesgosos y decidir en la **Puerta 1** | [~] G1 decidida (NO-GO de detección); falta S2c (opcional) |
+| 2 | **Spiking** | Sáb 11:00–15:00 | Probar los supuestos riesgosos y decidir en la **Puerta 1** | [~] G1 decidida (NO-GO de detección); S2c FALLA; faltan S3 (parcial) y S5 |
 | 3 | **Building** | Sáb ~17:00 → dom 14:00 | Datos reales por el pipeline y UI completa sobre el contrato | [ ] |
 | 4 | **Polish** | Dom 14:00 → cierre | Congelar, corregir errores, probar, desplegar, presentar | [ ] |
 
@@ -22,13 +22,13 @@ Prioridad ahora: la mitad de datos reales (grafo → población → impacto → 
 
 ## Progreso
 
-**15 / 39 tareas · 38 %** `████████░░░░░░░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman; las `[-]` descartadas no cuentan)_
+**17 / 39 tareas · 44 %** `█████████░░░░░░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman; las `[-]` descartadas no cuentan)_
 
 | Fase | Hechas | % |
 |---|---|---|
 | 1 · Bootstrap | 9 / 9 | 100 % |
-| 2 · Spiking | 6 / 9 | 67 % |
-| 3 · Building | 0 / 16 | 0 % |
+| 2 · Spiking | 7 / 9 | 78 % |
+| 3 · Building | 1 / 16 | 6 % |
 | 4 · Polish | 0 / 5 | 0 % |
 
 _Actualizá este bloque cada vez que marques una tarea `[x]`._
@@ -63,7 +63,7 @@ _Actualizá este bloque cada vez que marques una tarea `[x]`._
 |---|---|---|---|---|
 | S1 | Cobertura de NISAR | R | [x] | PASA con reservas: 069 D 1→13 jul; GCOV desde el 19 jun |
 | S2 | Detectabilidad | R | [x] | **FALLA** → G1 NO-GO; mínimo detectable ≈1 ha a −5 dB |
-| S2c | SME2: ¿sube antes de los cierres? | R | [ ] | Opcional, máx. 40 min, criterios escritos antes. Si falla, exposición solo con IMERG |
+| S2c | SME2: ¿sube antes de los cierres? | R | [x] | **FALLA**: 1 de 4 eventos sobre p75 (hacían falta 3); exposición solo con IMERG (D7). SME2 sí existe y cubre la ruta (S1′ PASA) |
 | S3 | Eventos de validación | R | [~] | PARCIAL: prensa que cita al MOPT; falta comunicado primario |
 | S4 | Red vial y métrica | I | [x] | PARCIAL: la red regional conecta (+77,6 min por alterna al cortar el parque); con «hospital más cercano» el parque afecta a 0 comunidades; recortar al corredor crea aislamientos falsos (ver `SPIKING.md`) |
 | S5 | IMERG | I | [ ] | Sin avanzar (se absorbe en E1) |
@@ -85,7 +85,7 @@ _Actualizá este bloque cada vez que marques una tarea `[x]`._
 | E3 | Zona como parámetro (nombre o bbox en config → `meta.area`) | I | [ ] | Cambiar el bbox cambia la salida sin tocar código |
 | P7 | `meta.json` y `make all` de punta a punta | R | [ ] | `make all` regenera todo y `make validate` pasa |
 | P8 | **Primer despliegue con datos reales** | R, W | [ ] | El sitio publicado muestra datos reales (meta: sáb 21:00) |
-| E2 | S2c (SME2), solo si sobra tiempo | R | [ ] | Veredicto con criterios previos |
+| E2 | S2c (SME2), solo si sobra tiempo | R | [x] | FALLA (ver S2c); sin humedad en la exposición |
 
 Descartadas `[-]`: **P1** (obtener pasadas GCOV) y **P2** (detección de cambio como generador de candidatos): la detección no genera tramos (G1). **P4** (tramos candidatos por zona de cambio) se fundió en P5: los tramos salen de la red.
 
@@ -132,13 +132,14 @@ Cortadas `[-]`: **F2** (mostrar pasadas) y **F9** (alternar antes/después): dep
 | 14 nov ~16:35 | **D4.** La zona es un parámetro (config). Ruta 32 es el caso de demostración; «diseñado para generalizarse a corredores con red vial en OSM», nunca «funciona en cualquier lugar». Límites: calidad de OSM, hospitales mal registrados, SME2 en bosque denso | No se probó fuera de Ruta 32 |
 | 14 nov ~16:35 | **D5.** S2c (SME2) es opcional y de 40 min máx. | Si falla, exposición solo con IMERG |
 | 14 nov ~16:35 | **D6.** Texto al usuario: «tramo crítico». `candidates` sigue como clave de archivo. Nunca «confirmado» ni «causado por» | No romper el esquema |
+| 14 nov | **D7.** S2c = FALLA: la humedad SME2 no sube antes de los cierres (1 de 4). Exposición = solo IMERG; F4 sin humedad. SME2 no se descarta como dato, solo como señal previa | Resultado negativo con número (`SPIKING.md` S2c) |
 | 14 nov | Modo solo: sin turnos ni relevos; F2 y F9 cortadas; contrato 0.2 adoptado en el árbol (sin la regla de revisión de ambos lados) | Menos coordinación, más velocidad |
 
 ### Preguntas abiertas
 
 - **Hospital de referencia vs. más cercano** (E5): ¿qué métrica evita que muchos tramos queden en cero? (el informe de situación midió 43 % de 495 tramos de prueba en la red hasta Limón)
 - **Revisión de código con CODEOWNERS:** `.github/CODEOWNERS` y la protección de `main` exigen revisión de un dueño de código; trabajando solo hay que decidir si se desactiva o se usa bypass. No se tocó.
-- **SME2 en bosque denso:** ¿es fiable? (S2c)
+- **SME2 en bosque denso:** sin respuesta: ningún píxel de la franja tiene retrieval «recomendado» (producto provisional).
 - **`rain.start/end` sin pasadas:** sigue siendo obligatorio en `meta.json`; ¿qué periodo se usa?
 - Hora exacta de cierre de la ventana, y texto oficial del reto sin localizar.
 
