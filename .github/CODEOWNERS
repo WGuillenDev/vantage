@@ -1,0 +1,3 @@
+# Contract changes need one backend and one frontend review.
+# Pair with "Require review from Code Owners" in the branch protection of main.
+/projects/contract/ @ronz204 @WGuillenDev
