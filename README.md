@@ -15,7 +15,7 @@ El proyecto tiene dos partes conectadas solo por archivos de datos:
 
 ## Estado
 
-Proyecto en construcción durante el hackathon (14–15 de noviembre de 2026). Hoy existen el esqueleto del frontend y el del pipeline; el contrato de datos aún no tiene código.
+Proyecto en construcción durante el hackathon (14–15 de noviembre de 2026). Hoy existen el esqueleto del frontend y del pipeline, y el contrato de datos (esquemas, mocks y validador).
 
 ## Estructura
 
@@ -93,7 +93,16 @@ Desde `projects/frontend/`:
 
 ### Pipeline
 
-Se gestiona con `uv`. Desde `projects/pipeline/`: `uv sync` instala y `uv run pipeline` ejecuta. Por ahora solo imprime un saludo.
+Se gestiona con `uv`. Desde `projects/pipeline/`: `uv sync` instala, `uv run pytest` corre las pruebas y `uv run pipeline` ejecuta (por ahora solo imprime un saludo).
+
+### Datos (desde la raíz)
+
+| Comando | Qué hace |
+|---|---|
+| `make mock` | Reemplaza `projects/frontend/public/storage/` con los datos de ejemplo del contrato |
+| `make validate` | Valida esa carpeta contra los esquemas de `projects/contract/schemas/` |
+
+`public/storage/` no se commitea: hay que generarlo con `make mock` antes de `bun run dev`.
 
 ### Pruebas en el navegador (opcional)
 

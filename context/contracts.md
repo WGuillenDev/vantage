@@ -11,11 +11,11 @@
 | `scenarios.json` | Pipeline | SPA | JSON |
 | `rain.csv` | Pipeline | SPA | CSV |
 
-## 0. Status: DRAFT v0.1 — freeze in hours 0–2
+## 0. Status: FROZEN v0.1 (14 Nov)
 
-The project document fixes **which files exist and what they contain**, but not their exact fields. Everything below is a **proposal** to be reviewed by one backend and one frontend person and then frozen. The six open decisions are closed in §11; their fields still have to be added to the schemas.
+The schemas in `projects/contract/schemas/` are written and frozen at `schema_version` `"0.1"`; the six open decisions are closed in §11. Changes follow §10.
 
-Once frozen, this file must match `projects/contract/schemas/` exactly. If they differ, the schemas win; fix this file. Best practice: generate or check this reference from the schemas.
+This file must match the schemas exactly. If they differ, the schemas win; fix this file.
 
 ## 1. Global conventions
 
@@ -174,7 +174,7 @@ Per candidate segment: the result of removing it from the network (step 3 and 4 
 | `candidates[].rank` | 1 = most critical. Sort order for the list. |
 | `edge_ids` | Edges removed together when this candidate is closed. |
 | `extra_time_s` | The headline number: the maximum `extra_s` among affected, non-isolated communities. |
-| `criticality` | Sum over affected communities of `population × extra_s`; isolated communities count with the maximum penalty. If population is `null`, rank by `extra_time_s` and then by isolated count. |
+| `criticality` | Sum over affected communities of `population × extra_s`. An isolated community uses as `extra_s` the largest finite `extra_s` across all candidates (its penalty). A community with `population: null` adds 0. Ties, and the case where no population is known, rank by `extra_time_s` and then by isolated count. |
 | `population_dependent` | Integer or `null`. Total population of affected communities. |
 | `isolated_community_ids` | Communities with **no path** to any hospital. Subset of `affected_community_ids`. Their `per_community.time_s` is `null`. |
 | `per_community[].time_s`, `extra_s` | `time_s` is `null` if isolated; then `extra_s` is `null` too. |
@@ -217,7 +217,8 @@ Header row is required. The pass dates in `meta.json` mark the interval on the c
 
 - Mocks must satisfy the schemas and include: 4 candidates, 3 hospitals, 5 communities, one candidate with an isolated community, one community with `population: null`, and both `before`/`after` overlays absent in a second variant (to test the hidden toggle).
 - Mock values are **fake**. Mark them clearly (for example `meta.area.name: "MOCK — not real data"`) so they never reach the demo as if real.
-- `make mock` copies them into `frontend/public/storage/`.
+- Layout: `examples/` holds the default set (3 overlays); `variants/no-toggle/meta.json` is the second variant, to be used together with the same files minus `overlay_before.png` and `overlay_after.png`. `pipeline/tests/` validates both.
+- `make mock` copies `examples/` into `frontend/public/storage/`, replacing what was there. `storage/` is git-ignored.
 
 ## 10. Changing the contract
 

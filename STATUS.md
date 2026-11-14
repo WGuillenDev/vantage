@@ -25,11 +25,11 @@ Prioridad ahora: **contratos congelados** (desbloquea al frontend) y **spikes** 
 
 ## Progreso
 
-**3 / 41 tareas · 7 %** `█░░░░░░░░░░░░░░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman)_
+**6 / 41 tareas · 15 %** `███░░░░░░░░░░░░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman)_
 
 | Fase | Hechas | % |
 |---|---|---|
-| 1 · Bootstrap | 3 / 9 | 33 % |
+| 1 · Bootstrap | 6 / 9 | 67 % |
 | 2 · Spiking | 0 / 8 | 0 % |
 | 3 · Building | 0 / 17 | 0 % |
 | 4 · Polish | 0 / 7 | 0 % |
@@ -53,12 +53,12 @@ _Actualizá este bloque cada vez que marques una tarea `[x]`._
 | B1 | Repo público `vantage` en GitHub, licencia MIT, README, `Makefile` base en la raíz, `.github/` | R | [x] | Repo público; estructura igual a `structure.md` — _Hecho: repo público (verificado), LICENSE MIT, README, `Makefile` (`mock` real; `validate` y `all` fallan a propósito hasta B5/P7), `.github/workflows/ci.yml` (frontend + `uv sync`)._ |
 | B2 | Herramientas: `uv` para el pipeline, Bun + TypeScript estricto para el frontend | R | [x] | `uv sync` y `bun install` funcionan en todas las máquinas — _Hecho: `bun install/lint/build` y `uv sync --locked` + `uv run pipeline` verificados en esta máquina; `projects/pipeline/` con `pyproject.toml`, `uv.lock` y `jsonschema`. Falta solo probarlo en las máquinas de los demás._ |
 | B3 | Cerrar las 6 decisiones abiertas de `contracts.md` §11 | R | [x] | Decisiones anotadas en el Registro de decisiones — _Hecho: las 6 cerradas el 14 nov y reflejadas en `contracts.md` §11._ |
-| B4 | Escribir los JSON Schemas en `project/contract/schemas/` y **congelarlos** | R | [ ] | Los 5 archivos de datos cubiertos, cada uno con `schema_version` |
-| B5 | Mocks en `project/contract/examples/`; `make mock` y `make validate` funcionando | R | [ ] | Los mocks pasan la validación; incluye revisiones de referencias cruzadas |
-| B6 | `CODEOWNERS` (una persona de backend y una de frontend sobre `contract/`) | R | [ ] | Un PR que toque `contract/` exige ambas revisiones |
-| B7 | Esqueleto del frontend (React + Vite + MapLibre) cargando un mock | R | [~] | El mapa se ve en local con datos mock — _Hecho: scaffold React + Vite. Falta: MapLibre y carga de un mock._ |
+| B4 | Escribir los JSON Schemas en `projects/contract/schemas/` y **congelarlos** | R | [x] | Los 5 archivos de datos cubiertos, cada uno con `schema_version` — _Hecho: `meta`, `change`, `graph`, `scenarios` y `rain` (fila del CSV; su versión va en `meta.files.rain_csv_schema`), todos en `0.1`. La protección con CODEOWNERS llega con B6._ |
+| B5 | Mocks en `projects/contract/examples/`; `make mock` y `make validate` funcionando | R | [x] | Los mocks pasan la validación; incluye revisiones de referencias cruzadas — _Hecho: mocks con 4 candidatos, 3 hospitales, 5 comunidades (una aislada, una sin población) y variante sin antes/después; `make mock` y `make validate` verificados; 9 tests en `projects/pipeline/tests/`._ |
+| B6 | `CODEOWNERS` (una persona de backend y una de frontend sobre `contract/`) | R, W | [ ] | Un PR que toque `contract/` exige ambas revisiones |
+| B7 | Esqueleto del frontend (React + Vite + MapLibre) cargando un mock | R, W | [~] | El mapa se ve en local con datos mock — _Hecho: scaffold React + Vite. Falta: MapLibre y carga de un mock._ |
 | B8 | Workflow de GitHub Pages: `make validate` → `bun run build` → publicar `dist` | R | [ ] | El esqueleto tiene URL pública; `base` de Vite y `BASE_URL` correctos (sin 404) |
-| B9 | Agregar los archivos de contexto (`approach`, `structure`, `functions`, `contracts`) y el `AGENTS.md` raíz | R | [~] | Archivos en el repo; AGENTS.md apunta a ellos — _Hecho: `context/*` y `CLAUDE.md`. Falta: `AGENTS.md` raíz._ |
+| B9 | Agregar los archivos de contexto (`approach`, `structure`, `functions`, `contracts`) y el `AGENTS.md` raíz | R | [x] | Archivos en el repo; AGENTS.md apunta a ellos — _Hecho: `context/*`, `CLAUDE.md` y `AGENTS.md`._ |
 
 **Salida de la fase:** contrato congelado, mocks listos, el frontend ya puede trabajar con `make mock`.
 
@@ -146,6 +146,8 @@ Se empieza solo después de G1. Si G1 eligió el plan B, ajustá las tareas y an
 | 14 nov | Rango de la leyenda de cambio en `meta.json` (`overlays[].range_db`) | Un solo lugar de verdad, sin números fijos en el frontend | R |
 | 14 nov | Lluvia = promedio de celdas IMERG del corredor (`rain.aggregation: "area_mean"`) | IMERG es de ~10 km; evita falsa precisión | R |
 | 14 nov | Overlays `before`/`after` opcionales; se decide en G2 | El contrato ya permite quitarlos (F9) | R |
+| 14 nov | `projects/frontend/public/storage/` va en `.gitignore`; el despliegue debe generar los datos (`make mock` o el pipeline) | Decisión de R; evita commitear datos | R |
+| 14 nov | `criticality`: una comunidad aislada usa como `extra_s` el mayor `extra_s` finito de todos los candidatos; población `null` suma 0 | Precisa «penalización máxima» para que el cálculo sea reproducible | R |
 
 ### Preguntas abiertas
 
