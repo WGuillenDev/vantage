@@ -54,9 +54,9 @@ Rules:
 | Connectivity | Only the largest weakly connected component is kept, so a stray fragment cannot create a false "no path in baseline". |
 | `road` | `"Ruta <ref>"` from the first OSM `ref` when present, else the OSM `name`, else `null`. |
 | Hospitals | Exactly the allowlisted features, snapped to the nearest kept node; `name` is the OSM `name`. An allowlisted feature with no `name` stops the run (names are never made up). |
-| Communities | OSM `place` nodes of type `city`, `town`, `village` or `hamlet` that have a `name`, snapped to the nearest kept node; dropped when farther than `MAX_SNAP_M` (3000 m), and each drop is logged. |
-| Ids | Nodes `n1…` in ascending OSM node id, then the nodes created by splitting long edges, numbered after all OSM nodes in edge order and, within an edge, from `from` to `to`; edges `e1…` in ascending `(from, to)` OSM ids of their ends, then split order; hospitals `h1…` and communities `c1…` in ascending OSM id. |
-| Size | `graph.json` is at most 3 MB, written as compact JSON; a larger result stops the run without writing the file. |
+| Communities | OSM `place` nodes of type `city`, `town`, `village` or `hamlet` that have a `name`, snapped to the nearest kept node; dropped when farther than `MAX_SNAP_M` (3000 m), and each drop is logged. Accepted coverage limit (Ian, 14 Nov): the first real run dropped 73 communities, mostly in Talamanca and southern Limón, far from Ruta 32, because no `unclassified`-or-higher road passes within 3 km. |
+| Ids | Nodes `n1…` in ascending OSM node id, then the nodes created by splitting long edges, numbered after all OSM nodes in edge order and, within an edge, from `from` to `to`; edges `e1…` in ascending `(from, to)` OSM ids of their ends, then ascending smallest OSM way id of the edge (parallel edges), then split order; hospitals `h1…` and communities `c1…` in ascending OSM id. |
+| Size | `graph.json` is at most 3 MB, written as compact JSON; a larger result stops the run without writing the file. The first real run over the network area measured 2.29 MB (7 136 nodes, 8 715 edges, 758 communities), with `unclassified` kept. |
 
 ## Invariants
 
@@ -96,10 +96,13 @@ Rules:
   If a road class on a kept edge has fewer than `MIN_TAGGED` tagged edges and no configured fallback speed, then road-graph exits non-zero with an English error that names the class and writes no `graph.json`.
 - INV-18 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   If the compact `graph.json` would exceed 3 MB, then road-graph exits non-zero with an English error that states the size and writes no `graph.json`.
+- INV-19 [none]
+  If the hospital allowlist has no ids, then road-graph exits non-zero with an English error saying the allowlist is empty and writes no `graph.json`.
+- INV-20 [none]
+  When two edges join the same pair of OSM end nodes, road-graph numbers first the one with the smaller OSM way id.
 
 ## Deferred / Open questions
 
-- **Network area size** (Ian): the area is fixed, but no run has measured `graph.json` for it yet. If it is over 3 MB, drop `unclassified` first and update this spec.
 - **Hospital allowlist contents** (Ian, team review): which `amenity=hospital` features count (S4 found 27 in the corridor, including a dental clinic, a blood bank and a psychiatric hospital). The criterion and its source must be written next to the list. Hospital Guápiles (`way/326924912`) and Hospital Dr. Rafael Ángel Calderón Guardia (`way/1168011056`, the one ACC-01 needs) were seen in spike S4; Ian confirms whether they enter.
 - **`MIN_TAGGED` and fallback speeds** (Ian): S4 corridor medians were trunk 60, primary 40, secondary 40, tertiary 40; `unclassified` had 10 tags out of 317 edges, so it needs a fallback with a cited source.
 - **Speed table hand-off to `meta.json`** (Ron and Ian): file, function or entry point; also how `make all` invokes this stage (`pyproject.toml` scripts).
@@ -107,7 +110,7 @@ Rules:
 - **`MAX_EDGE_M`** (Ian): 1000 m is a starting value; revisit when P4 sees real change-zone sizes.
 - **OSM snapshot** (team): Overpass returns live data, so INV-12 only holds for the same download. Whether to keep the raw extract outside git, and where to record its date, is open.
 - **Parity with `graph.ts`** (Iván): the browser must reproduce P5's numbers from this file; integer costs make that exact, but it is checked in `impact-scoring`, not here.
-- **Testing gaps:** INV-01 to INV-18 and ACC-01 are `none` until `/builder road-graph` adds tests. ACC-01 needs the real network (downloaded once, outside git), so its test may run only when that download exists.
+- **Testing gaps:** INV-19 and INV-20 are `none` until `/builder road-graph` adds tests. ACC-01's test skips, with an explicit reason, when the real network download is absent (as in CI). ACC-02 stays `manual`.
 
 ## Acceptance criteria
 
