@@ -105,7 +105,8 @@ Rules:
   If the local OSM extract is missing, then road-graph (without `--download`) exits non-zero with an English error that says how to obtain it (`make osm`) and writes no `graph.json`.
 - INV-22 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When the download step finishes, `work/osm/extract_date.txt` holds the UTC download date as `YYYY-MM-DD`.
-- INV-23 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]\n  When road-graph runs with `--download`, it only downloads the extract and records its date, and writes no `graph.json`.
+- INV-23 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
+  When road-graph runs with `--download`, it only downloads the extract and records its date, and writes no `graph.json`.
 
 ## Deferred / Open questions
 
@@ -117,7 +118,7 @@ Rules:
 - **`MAX_EDGE_M`** (Ian): 1000 m is a starting value; revisit when P4 sees real change-zone sizes.
 - **OSM snapshot** (team): Overpass returns live data, so INV-12 only holds for the same download. Whether to keep the raw extract outside git, and where to record its date, is open.
 - **Parity with `graph.ts`** (Iván): the browser must reproduce P5's numbers from this file; integer costs make that exact, but it is checked in `impact-scoring`, not here.
-- **Testing gaps:** INV-23 is `none` until a test pins it (the behavior exists since 387c6af). ACC-01's test skips, with an explicit reason, when the real network download is absent (as in CI). ACC-02 stays `manual`.
+- **Testing gaps:** none left as `none`. ACC-01's test skips, with an explicit reason, when the real network download is absent (as in CI). ACC-02 stays `manual`.
 
 ## Acceptance criteria
 
