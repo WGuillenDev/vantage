@@ -47,11 +47,12 @@ Describes what was computed from what, and where the overlay images go on the ma
     "after":  { "date": "YYYY-MM-DD", "granule": "string", "track": 0, "direction": "ascending", "crid": "P05023" }
   },
   "overlays": [
-    { "id": "change", "label": "Change", "file": "overlay_change.png", "bounds": [-84.20, 9.95, -83.70, 10.30], "kind": "delta_db" },
+    { "id": "change", "label": "Change", "file": "overlay_change.png", "bounds": [-84.20, 9.95, -83.70, 10.30], "kind": "delta_db", "range_db": [-6, 6] },
     { "id": "before", "label": "Before", "file": "overlay_before.png", "bounds": [-84.20, 9.95, -83.70, 10.30], "kind": "backscatter" },
     { "id": "after",  "label": "After",  "file": "overlay_after.png",  "bounds": [-84.20, 9.95, -83.70, 10.30], "kind": "backscatter" }
   ],
-  "rain": { "product": "GPM_3IMERGDL", "version": "V07", "start": "YYYY-MM-DD", "end": "YYYY-MM-DD" },
+  "rain": { "product": "GPM_3IMERGDL", "version": "V07", "start": "YYYY-MM-DD", "end": "YYYY-MM-DD", "aggregation": "area_mean" },
+  "speed_model_kmh": { "trunk": "<km/h>", "primary": "<km/h>" },
   "attributions": [
     "Contains modified NISAR GCOV data (NASA/JPL)",
     "IMERG Late (NASA GPM)",
@@ -69,7 +70,8 @@ Describes what was computed from what, and where the overlay images go on the ma
 | `overlays[].bounds` | `[w, s, e, n]` | Georeferencing for the PNG. MapLibre needs the four corners: `[[w,n],[e,n],[e,s],[w,s]]`. Image must already be reprojected to match (EPSG:4326 corners are fine for a small area). |
 | `overlays[].kind` | `"delta_db"` \| `"backscatter"` | Lets the UI pick a legend. |
 | `overlays` | array | Must contain the `change` overlay. `before`/`after` are optional: remove them if the before/after toggle is cut; the UI must hide the toggle when absent. |
-| `attributions` | string[] | The UI footer renders these. OSM's ODbL credit is mandatory. |
+| `speed_model_kmh` | object | OSM road class → constant speed in km/h (> 0). The same values the pipeline used for `edges[].time_s`. |
+| `attributions` | string[] | The UI footer renders these. OSM's ODbL credit is mandatory and carries the extract date (`© OpenStreetMap contributors (ODbL), extracto del DD mmm AAAA`). |
 
 ## 3. `change.geojson`
 
@@ -174,7 +176,7 @@ Per candidate segment: the result of removing it from the network (step 3 and 4 
 | `candidates[].rank` | 1 = most critical. Sort order for the list. |
 | `edge_ids` | Edges removed together when this candidate is closed. |
 | `extra_time_s` | The headline number: the maximum `extra_s` among affected, non-isolated communities. |
-| `criticality` | Sum over affected communities of `population × extra_s`. An isolated community uses as `extra_s` the largest finite `extra_s` across all candidates (its penalty). A community with `population: null` adds 0. Ties, and the case where no population is known, rank by `extra_time_s` and then by isolated count. |
+| `criticality` | Sum over affected communities of `population × extra_s`. An isolated community uses as `extra_s` the largest finite `extra_s` across all candidates (its penalty). A community with `population: null` adds 0. Ties rank by isolated count (desc), then `extra_time_s` (desc, `null` last), then the lowest edge id number in `edge_ids` (`e2` before `e10`). Without population every `criticality` is 0, so this tie-break is the whole ranking. |
 | `population_dependent` | Integer or `null`. Total population of affected communities. |
 | `isolated_community_ids` | Communities with **no path** to any hospital. Subset of `affected_community_ids`. Their `per_community.time_s` is `null`. |
 | `per_community[].time_s`, `extra_s` | `time_s` is `null` if isolated; then `extra_s` is `null` too. |
@@ -234,10 +236,10 @@ Header row is required. The pass dates in `meta.json` mark the interval on the c
 | # | Decision | Resolution |
 |---|---|---|
 | 1 | How is `extra_time_s` aggregated across communities? | Max over affected non-isolated communities |
-| 2 | How is `criticality` computed? | Sum of `population × extra_s`, isolation as max penalty; falls back to `extra_time_s` then isolated count when population is `null` |
+| 2 | How is `criticality` computed? | Sum of `population × extra_s`, isolation as max penalty. Ties (and the no-population case, where the tie-break is the whole ranking): isolated count, then `extra_time_s` (`null` last), then lowest edge id. Tie-break order revised 14 Nov (isolating outweighs delaying) |
 | 3 | Speed model per road class for `time_s` | One constant speed per OSM class, in `meta.json → speed_model_kmh` |
 | 4 | Overlay legend range | `meta.json → overlays[].range_db` (`[min, max]`) |
 | 5 | Rain value: area mean or nearest cell | Area mean over the corridor, `meta.json → rain.aggregation: "area_mean"` |
 | 6 | Keep `before`/`after` overlays? | `change` is required; `before`/`after` are optional and decided at the Sunday 14:00 feature freeze (G2) |
 
-New `meta.json` fields to add to the schema (B4): `speed_model_kmh`, `overlays[].range_db`, `rain.aggregation`. The speed values themselves are set when the road graph is built (P3).
+`meta.json` fields added to the schema in B4: `speed_model_kmh`, `overlays[].range_db`, `rain.aggregation`. The speed values themselves are set when the road graph is built (P3).

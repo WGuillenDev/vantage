@@ -32,3 +32,6 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .DS_Store
 # data files served to the frontend (mock copy or pipeline output)
 projects/frontend/public/storage/
+
+# raw OSM extract and pipeline intermediates (never committed)
+projects/pipeline/work/

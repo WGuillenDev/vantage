@@ -26,7 +26,7 @@ Two pieces joined only by data files: an offline Python pipeline writes them, a 
 
 Frontend, from `projects/frontend/`: `bun install`, `bun run dev`, `bun run build`, `bun run lint`.
 
-The pipeline, the contract folder and the root `Makefile` do not exist yet; do not assume their commands.
+Pipeline, from the repo root: `uv sync --project projects/pipeline`, `uv run --project projects/pipeline pytest`. Root `Makefile`: `make mock`, `make publish`, `make validate`; `make all` fails on purpose until P7.
 
 ## Working method
 

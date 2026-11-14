@@ -73,7 +73,7 @@ R lleva toda la cadena S3 → S1 → S2, así no hay relevos entre personas en e
 | ¿Hay pasadas compatibles de NISAR? | S1 | Otro evento u otra zona dentro de Costa Rica |
 | ¿Se nota el cambio? | S2 | Zonas de perturbación a escala de ladera |
 | ¿El evento tiene respaldo oficial? | S3 | Presentar todo como «candidatos» |
-| ¿La red vial da números razonables? | S4 | Reducir al área del corredor |
+| ¿La red vial da números razonables? | S4 | Red regional hasta Limón; si es lenta, simplificar por clase de vía |
 
 S5, S6, S7 y S8 no deciden G1 por sí solos: si fallan, se aplica su plan B y se sigue.
 
@@ -149,7 +149,7 @@ Copiá la plantilla en cada ficha al terminar. Dejá `pendiente` en lo que no se
 ### S4 · Red vial y métrica de impacto
 
 - **Objetivo:** el grafo conecta; quitar un tramo da números razonables.
-- **Plan B:** reducir al área del corredor.
+- **Plan B:** red regional hasta Limón; si es lenta, simplificar por clase de vía en lugar de recortar el área.
 - **Depende de:** nada. **Desbloquea:** P3, P4, P5.
 
 | Campo | Valor |

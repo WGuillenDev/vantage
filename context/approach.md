@@ -95,7 +95,7 @@ If it is not in this table, it is out of scope. Do not add accounts, a backend s
 - Team of 4: **backend** Ron and Ian Angulo; **frontend** Wilberth Guillen and Iván Barboza. Task split: pending.
 - Times are Costa Rica time. Start Sat Nov 14 09:00; assumed close Sun Nov 15 23:59 (to confirm).
 - Gates: **Sat 15:00** (do compatible NISAR passes exist and is the change visible? if not, Plan B), **Sun 14:00** feature freeze, **Sun 18:00** code freeze (bug fixes only).
-- Six spikes on Saturday decide the path: NISAR coverage, resolution and detectability, validation event, road network and metric, rainfall, frontend smoke test.
+- Eight spikes on Saturday (S1–S8, owners and times in `STATUS.md`) decide the path: NISAR coverage, resolution and detectability, validation event, road network and metric, rainfall, frontend smoke test, population access and the browser shortest path.
 
 Decisions already made (Nov 13, 2026):
 

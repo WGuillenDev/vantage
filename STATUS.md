@@ -71,7 +71,7 @@ Cada spike termina con un resultado de una línea en la tabla y luego una decisi
 | S1 | Cobertura de NISAR sobre la Ruta 32 | R | 11:30–12:30 | [ ] | Dos fechas con el mismo track, dirección y CRID que encierran un cierre real, fuera del hueco del 27 jul–10 ago | Otro evento u otra zona dentro de Costa Rica | _—_ |
 | S2 | Resolución y detectabilidad | R | 12:30–14:00 | [ ] | Una mancha coherente de varios píxeles sobre un derrumbe conocido | Zonas de perturbación a escala de ladera | _—_ |
 | S3 | Evento de validación | R | 11:00–11:30 | [ ] | Una fuente oficial (MOPT, CONAVI, CNE) respalda la fecha del cierre | Presentar todo como «candidatos» | _—_ |
-| S4 | Red vial y métrica de impacto | I | 11:00–13:00 | [x] | El grafo conecta; quitar un tramo da números razonables | Reducir al área del corredor | PARCIAL: la red regional conecta; cortar la Ruta 32 en el parque da +77,6 min San José→Guápiles por alterna. Riesgo G1: 0 comunidades afectadas en el parque con «hospital más cercano» (redes hasta -83.40; hasta Limón, 1 aislada sin revisar); recortar al corredor crea aislamientos falsos (ver SPIKING.md) |
+| S4 | Red vial y métrica de impacto | I | 11:00–13:00 | [x] | El grafo conecta; quitar un tramo da números razonables | Red regional hasta Limón; si es lenta, simplificar por clase de vía en lugar de recortar el área | PARCIAL: la red regional conecta; cortar la Ruta 32 en el parque da +77,6 min San José→Guápiles por alterna. Riesgo G1: 0 comunidades afectadas en el parque con «hospital más cercano» (redes hasta -83.40; hasta Limón, 1 aislada sin revisar); recortar al corredor crea aislamientos falsos (ver SPIKING.md) |
 | S5 | IMERG | I | 13:00–15:00 | [ ] | Un día de lluvia descargado y graficado | Lluvia solo como texto | _—_ |
 | S6 | Prueba de humo del frontend | W, V | 13:30–15:00 | [x] | MapLibre carga un mock del contrato, en local y desplegado | Resolver antes de seguir | PASA: mapa base y overlay de cambio visibles en dev, build/preview y Pages, sin errores de consola |
 
@@ -133,7 +133,7 @@ Se empieza solo después de G1. Si G1 eligió el plan B, ajustá las tareas y an
 
 | Fecha/hora | Decisión | Por qué | Quién |
 |---|---|---|---|
-| 13 nov | Un solo repo `vantage` (`project/` con `contract`, `frontend`, `pipeline`) | Más simple para 4 personas y 2 días | R |
+| 13 nov | Un solo repo `vantage` (`projects/` con `contract`, `frontend`, `pipeline`) | Más simple para 4 personas y 2 días | R |
 | 13 nov | Licencia MIT; atribución a NASA y OpenStreetMap | — | R |
 | 13 nov | Python con `uv`; Bun con TypeScript estricto | — | R |
 | 13 nov | GitHub Pages con GitHub Actions | Sitio estático, sin servidor | R |
@@ -152,6 +152,10 @@ Se empieza solo después de G1. Si G1 eligió el plan B, ajustá las tareas y an
 | 14 nov | Población si WorldPop falla: se decide tras S7; respaldo ya soportado (`population: null`, tiempo extra y conteo) | No comprometer otra fuente a ciegas | R |
 | 14 nov | Los datos reales viven en `projects/pipeline/output/` (commiteado, solo artefactos livianos); `make publish` los copia a `storage/` | `storage/` no se commitea; así el despliegue es reproducible y revisable | R |
 
+| 14 nov | Desempate del ranking: aisladas (desc) → `extra_time_s` (desc, `null` al final) → menor id de arista; sin población es el ranking completo | Aislar pesa más que demorar; `contracts.md` §6 y §11 actualizados | R, I |
+| 14 nov | Ids `T-xx`: P4 deja ids provisionales; P5 asigna `T-01…` por rank y escribe `graph.json` y `scenarios.json` juntos. Los ids cambian entre corridas y no se citan en la presentación | Evita ids desfasados entre los dos archivos | R, I |
+| 14 nov | Plan B de S4: red regional hasta Limón (no recortar al corredor) | Recortar saca los hospitales de los extremos y crea aislamientos falsos (S4) | R, I |
+| 14 nov | Extracto OSM fuera de git (`projects/pipeline/work/`); su fecha va en `meta.json → attributions` | Reproducible sin cambiar el esquema | R, I |
 | 14 nov | S3 pasa de I a R; S7 pasa de I a W; S3 va primero (11:00), luego S1 y S2; I adelanta S4 a las 11:00 | S1, S2 y S3 forman una cadena; un solo dueño evita relevos en el camino crítico | R |
 
 ### Preguntas abiertas
