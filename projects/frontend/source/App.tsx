@@ -1,121 +1,94 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import maplibregl from 'maplibre-gl'
+import { useEffect, useRef, useState } from 'react'
+
+const STORAGE = `${import.meta.env.BASE_URL}storage/`
+
+type Bounds = [number, number, number, number] // west, south, east, north
+
+interface Meta {
+  area: { name: string; bbox: Bounds }
+  overlays: { id: string; file: string; bounds: Bounds }[]
+}
+
+async function loadMeta(): Promise<Meta> {
+  const response = await fetch(`${STORAGE}meta.json`)
+  if (!response.ok) {
+    throw new Error(`Could not load meta.json (${response.status}); run "make mock"`)
+  }
+  return (await response.json()) as Meta
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+  const container = useRef<HTMLDivElement>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [areaName, setAreaName] = useState<string | null>(null)
+
+  useEffect(() => {
+    let map: maplibregl.Map | undefined
+    let cancelled = false
+
+    loadMeta()
+      .then((meta) => {
+        const element = container.current
+        if (cancelled || !element) return
+        const overlay = meta.overlays.find((item) => item.id === 'change')
+        if (!overlay) throw new Error('meta.json has no "change" overlay')
+        setAreaName(meta.area.name)
+        const [west, south, east, north] = overlay.bounds
+
+        map = new maplibregl.Map({
+          container: element,
+          bounds: meta.area.bbox,
+          style: {
+            version: 8,
+            sources: {
+              osm: {
+                type: 'raster',
+                tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+                tileSize: 256,
+                maxzoom: 19,
+                attribution: '© colaboradores de OpenStreetMap',
+              },
+            },
+            layers: [{ id: 'osm', type: 'raster', source: 'osm' }],
+          },
+        })
+        map.on('load', () => {
+          map?.addSource('change', {
+            type: 'image',
+            url: `${STORAGE}${overlay.file}`,
+            coordinates: [
+              [west, north],
+              [east, north],
+              [east, south],
+              [west, south],
+            ],
+          })
+          map?.addLayer({
+            id: 'change',
+            type: 'raster',
+            source: 'change',
+            paint: { 'raster-opacity': 0.7 },
+          })
+        })
+      })
+      .catch((reason: unknown) => {
+        if (!cancelled) setError(reason instanceof Error ? reason.message : String(reason))
+      })
+
+    return () => {
+      cancelled = true
+      map?.remove()
+    }
+  }, [])
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <div className="relative h-full">
+      <div ref={container} className="h-full" />
+      <p className="absolute left-2 top-2 rounded bg-white/90 px-2 py-1 text-sm">
+        {error ?? `Señal de cambio candidata · ${areaName ?? 'cargando…'}`}
+      </p>
+    </div>
   )
 }
 
