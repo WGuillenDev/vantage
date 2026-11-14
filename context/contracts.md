@@ -217,7 +217,7 @@ Header row is required. The pass dates in `meta.json` mark the interval on the c
 
 - Mocks must satisfy the schemas and include: 4 candidates, 3 hospitals, 5 communities, one candidate with an isolated community, one community with `population: null`, and both `before`/`after` overlays absent in a second variant (to test the hidden toggle).
 - Mock values are **fake**. Mark them clearly (for example `meta.area.name: "MOCK — not real data"`) so they never reach the demo as if real.
-- Layout: `examples/` holds the default set (3 overlays); `variants/no-toggle/meta.json` is the second variant, to be used together with the same files minus `overlay_before.png` and `overlay_after.png`. `pipeline/tests/` validates both.
+- Layout: `examples/` holds the default set (3 overlays); `shared/no-toggle/meta.json` is the second variant, to be used together with the same files minus `overlay_before.png` and `overlay_after.png`. `pipeline/testing/` validates both.
 - `make mock` copies `examples/` into `frontend/public/storage/`, replacing what was there. `storage/` is git-ignored.
 
 ## 10. Changing the contract

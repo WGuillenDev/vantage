@@ -27,7 +27,7 @@ def test_examples_are_valid(data: Path):
 
 
 def test_variant_without_before_after_is_valid(data: Path):
-    shutil.copy(CONTRACT / "variants" / "no-toggle" / "meta.json", data / "meta.json")
+    shutil.copy(CONTRACT / "shared" / "no-toggle" / "meta.json", data / "meta.json")
     (data / "overlay_before.png").unlink()
     (data / "overlay_after.png").unlink()
     assert validate_dir(data) == []
