@@ -211,6 +211,27 @@ def test_inv22_download_records_utc_extract_date(env, monkeypatch):
     assert not (env / "output" / "graph.json").exists()  # downloading does not build
 
 
+def test_inv23_download_only_downloads(env, monkeypatch):
+    # Serve the fixture extract, so a build after downloading would succeed and leave a graph.json behind.
+    class FakeResponse(io.BytesIO):
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            return False
+
+    def fake_urlopen(request, **_):
+        name = "features.osm" if b"amenity" in request.data else "roads.osm"
+        return FakeResponse((FIXTURE / name).read_bytes())
+
+    monkeypatch.setattr(road_graph.urllib.request, "urlopen", fake_urlopen)
+    osm = env / "osm"
+    monkeypatch.setattr(road_graph, "OSM_DIR", osm)
+    road_graph.main(["--download"])
+    assert sorted(p.name for p in osm.iterdir()) == ["extract_date.txt", "features.osm", "roads.osm"]
+    assert not (env / "output" / "graph.json").exists()
+
+
 def test_acc01_ruta32_cut_in_braulio_carrillo_keeps_a_path(tmp_path):
     if not all((REAL_OSM / name).is_file() for name in ("roads.osm", "features.osm")):
         pytest.skip(f"ACC-01 needs the real OSM download in {REAL_OSM}; run `road-graph --download` first")
