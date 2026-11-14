@@ -25,12 +25,12 @@ Prioridad ahora: **contratos congelados** (desbloquea al frontend) y **spikes** 
 
 ## Progreso
 
-**12 / 41 tareas · 29%** _(solo cuentan las `[x]`; las `[~]` aún no suman)_
+**13 / 41 tareas · 32%** _(solo cuentan las `[x]`; las `[~]` aún no suman)_
 
 | Fase | Hechas | % |
 |---|---|---|
 | 1 · Bootstrap | 9 / 9 | 100 % |
-| 2 · Spiking | 3 / 8 | 38 % |
+| 2 · Spiking | 4 / 8 | 50 % |
 | 3 · Building | 0 / 17 | 0 % |
 | 4 · Polish | 0 / 7 | 0 % |
 
@@ -71,7 +71,7 @@ Cada spike termina con un resultado de una línea en la tabla y luego una decisi
 | S1 | Cobertura de NISAR sobre la Ruta 32 | R | 11:30–12:30 | [ ] | Dos fechas con el mismo track, dirección y CRID que encierran un cierre real, fuera del hueco del 27 jul–10 ago | Otro evento u otra zona dentro de Costa Rica | _—_ |
 | S2 | Resolución y detectabilidad | R | 12:30–14:00 | [ ] | Una mancha coherente de varios píxeles sobre un derrumbe conocido | Zonas de perturbación a escala de ladera | _—_ |
 | S3 | Evento de validación | R | 11:00–11:30 | [ ] | Una fuente oficial (MOPT, CONAVI, CNE) respalda la fecha del cierre | Presentar todo como «candidatos» | _—_ |
-| S4 | Red vial y métrica de impacto | I | 11:00–13:00 | [ ] | El grafo conecta; quitar un tramo da números razonables | Reducir al área del corredor | _—_ |
+| S4 | Red vial y métrica de impacto | I | 11:00–13:00 | [x] | El grafo conecta; quitar un tramo da números razonables | Reducir al área del corredor | PARCIAL: la red regional conecta; cortar la Ruta 32 en el parque da +77,6 min San José→Guápiles por alterna. Riesgo G1: 0 comunidades afectadas en el parque con «hospital más cercano» (redes hasta -83.40; hasta Limón, 1 aislada sin revisar); recortar al corredor crea aislamientos falsos (ver SPIKING.md) |
 | S5 | IMERG | I | 13:00–15:00 | [ ] | Un día de lluvia descargado y graficado | Lluvia solo como texto | _—_ |
 | S6 | Prueba de humo del frontend | W, V | 13:30–15:00 | [x] | MapLibre carga un mock del contrato, en local y desplegado | Resolver antes de seguir | PASA: mapa base y overlay de cambio visibles en dev, build/preview y Pages, sin errores de consola |
 
