@@ -61,27 +61,27 @@ Rules:
 
 ## Invariants
 
-- INV-01 [none]
+- INV-01 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_candidate_segments.py]
   When candidate-segments finishes, the `graph.json` it wrote passes the graph schema and every non-null `candidate_id` names a candidate in `candidates.json`.
-- INV-02 [none]
+- INV-02 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_candidate_segments.py]
   When candidate-segments marks an edge, that edge's geometry lies within `MARGIN_M` meters of at least one zone listed in its candidate's `zone_ids`.
-- INV-03 [none]
+- INV-03 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_candidate_segments.py]
   When an edge's geometry lies within `MARGIN_M` meters of any zone, candidate-segments puts it in exactly one candidate.
-- INV-04 [none]
+- INV-04 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_candidate_segments.py]
   When candidate-segments writes a candidate, all its edges have the same `road` value and form one connected chain through shared nodes.
-- INV-05 [none]
+- INV-05 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_candidate_segments.py]
   When two touched edges share a node and have the same `road` value, candidate-segments puts them in the same candidate.
-- INV-06 [none]
+- INV-06 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_candidate_segments.py]
   When candidate-segments writes a candidate, `mean_delta_db` equals the area-weighted mean of its zones' `mean_delta_db`, or their plain mean when their total area is 0.
-- INV-07 [none]
+- INV-07 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_candidate_segments.py]
   When candidate-segments assigns provisional ids, they are `T-01`, `T-02`, … in ascending order of each candidate's smallest edge id number.
-- INV-08 [none]
+- INV-08 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_candidate_segments.py]
   When candidate-segments writes `graph.json`, every field other than `candidate_id` equals the input `graph.json`, and edges outside every candidate keep `candidate_id: null`.
-- INV-09 [none]
+- INV-09 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_candidate_segments.py]
   If the input `graph.json` already has a non-null `candidate_id`, then candidate-segments exits non-zero with an English error naming the edge and writes no output.
-- INV-10 [none]
+- INV-10 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_candidate_segments.py]
   If `change.geojson` fails its schema, then candidate-segments exits non-zero with an English error from the validator and writes no output.
-- INV-11 [none]
+- INV-11 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_candidate_segments.py]
   When candidate-segments runs twice on the same inputs and `MARGIN_M`, both `candidates.json` and both `graph.json` files are byte-identical.
 
 ## Deferred / Open questions
@@ -93,9 +93,9 @@ Rules:
 
 ## Acceptance criteria
 
-- ACC-01 [none]
+- ACC-01 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_candidate_segments.py]
   Given a small fixture graph with one road crossed by one zone, when candidate-segments runs with `MARGIN_M` 50, then exactly the edges within 50 m of the zone form one candidate `T-01` with that zone's id and `mean_delta_db`.
-- ACC-02 [none]
+- ACC-02 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_candidate_segments.py]
   Given a fixture where one zone touches a `Ruta 32` edge and the side road joined to it at a shared node, when candidate-segments runs, then it writes two candidates, one per `road` value.
 - ACC-03 [none]
   Given the `candidates.json` and `graph.json` that candidate-segments wrote from a fixture, when `impact-scoring` reads them, then it accepts them without an input error.
