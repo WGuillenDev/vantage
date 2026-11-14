@@ -89,7 +89,7 @@ Se llena al terminar cada spike. Una línea por spike.
 | S4 | pendiente | — | — | — |
 | S5 | pendiente | — | — | — |
 | S6 | PASA | Mapa base y overlay de cambio visibles en local, build y Pages, sin errores de consola | — | W, V |
-| S7 | pendiente | — | — | — |
+| S7 | PASA | WorldPop CRI 2020 (100 m) se descarga completo y se recorta al corredor; hay población | 14:18 | W |
 | S8 | pendiente | — | — | — |
 
 ---
@@ -200,12 +200,12 @@ Copiá la plantilla en cada ficha al terminar. Dejá `pendiente` en lo que no se
 
 | Campo | Valor |
 |---|---|
-| Veredicto | pendiente |
-| Producto y resolución | pendiente |
-| Forma de acceso (descarga, API, recorte al corredor) | pendiente |
-| Población total del corredor (si se pudo) | pendiente |
-| Decisión: usar WorldPop o respaldo | pendiente |
-| Notas / riesgos | pendiente |
+| Veredicto | PASA |
+| Producto y resolución | WorldPop, Costa Rica 2020, personas por píxel (`cri_ppp_2020.tif`), ~100 m (3 arcseg), EPSG:4326, nodata −99999 |
+| Forma de acceso (descarga, API, recorte al corredor) | Descarga directa por HTTPS de `https://data.worldpop.org/GIS/Population/Global_2000_2020/2020/CRI/cri_ppp_2020.tif` (31,5 MB, sin cuenta ni clave). El servidor no admite lectura por rangos (responde 200, no 206), así que no hay streaming: se descarga entero y se recorta con `rasterio` (ventana por `bbox`). No se commitea el `.tif` |
+| Población total del corredor (si se pudo) | 946 290 personas dentro del `bbox` provisional `[-84.20, 9.95, -83.70, 10.30]` (600×420 px, 251 862 píxeles válidos, máximo 181,8 personas/píxel). Cifra del `bbox` de ejemplo, no del corredor final |
+| Decisión: usar WorldPop o respaldo | Usar WorldPop. El respaldo (`population: null`) sigue soportado por el contrato |
+| Notas / riesgos | La población por comunidad se asigna sumando píxeles cercanos al nodo (criterio de P5, por decidir). El `bbox` real sale de S1/P1. El producto es una estimación modelada de 2020, no un censo: rotular como estimación. `rasterio` no está en `pyproject.toml`; se añade en P5 si hace falta. Probado solo en esta máquina |
 
 ### S8 · `graph.ts`
 
