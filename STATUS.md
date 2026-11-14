@@ -64,9 +64,9 @@ _Actualizá este bloque cada vez que marques una tarea `[x]`._
 | S1 | Cobertura de NISAR | R | [x] | PASA con reservas: 069 D 1→13 jul; GCOV desde el 19 jun |
 | S2 | Detectabilidad | R | [x] | **FALLA** → G1 NO-GO; mínimo detectable ≈1 ha a −5 dB |
 | S2c | SME2: ¿sube antes de los cierres? | R | [x] | **FALLA**: 1 de 4 eventos sobre p75 (hacían falta 3); exposición solo con IMERG (D7). SME2 sí existe y cubre la ruta (S1′ PASA) |
-| S3 | Eventos de validación | R | [~] | PARCIAL: prensa que cita al MOPT; falta comunicado primario |
-| S4 | Red vial y métrica | I | [x] | PARCIAL: la red regional conecta (+77,6 min por alterna al cortar el parque); con «hospital más cercano» el parque afecta a 0 comunidades; recortar al corredor crea aislamientos falsos (ver `SPIKING.md`) |
-| S5 | IMERG | I | [ ] | Sin avanzar (se absorbe en E1) |
+| S3 | Eventos de validación | R | [~] | PARCIAL: prensa que cita al MOPT; sin comunicado primario en `mopt.go.cr` ni `conavi.go.cr`. Se corrigió la lista: el 17 jul sí hubo cierre; se añadieron el 8 oct y el 2.º episodio de feb |
+| S4 | Red vial y métrica | I | [x] | PARCIAL: la red regional conecta (+77,6 min por alterna al cortar el parque); con «hospital más cercano» el parque afecta a 0 comunidades; recortar al corredor crea aislamientos falsos (ver `SPIKING.md`). **S4′ (red real, 191 tramos):** con una calzada por cierre todo falla; con las dos calzadas (19 cierres) pasa solo «hospital nacional» (R2); ver `SPIKING.md` |
+| S5 | IMERG | I | [~] | **BLOQUEADO por una acción tuya**: autorizar la app «NASA GESDISC DATA ARCHIVE» en tu perfil de Earthdata (`https://urs.earthdata.nasa.gov/approve_app?client_id=e2WVk8Pw6weeLUKZYOxvTQ`). Criterios ya escritos en `SPIKING.md` |
 | S6 | Humo del frontend | W, V | [x] | PASA |
 | S7 | WorldPop | W | [x] | PASA |
 | S8 | `graph.ts` | V | [x] | PASA; ya está en `main` |
@@ -79,7 +79,7 @@ _Actualizá este bloque cada vez que marques una tarea `[x]`._
 |---|---|---|---|---|
 | P3 | Grafo vial de OSM para el área configurada: tramos, hospitales, comunidades → `graph.json` (spec: `projects/pipeline/deltas/road-graph.spec.md`) | I | [ ] | Valida; los ids se cruzan |
 | E4 | Población WorldPop sobre las comunidades (para que la criticidad deje de dar 0) | I | [ ] | `population` poblada donde hay dato |
-| E5 | Decidir la métrica de impacto (hospital de referencia vs. más cercano; con el más cercano el parque da 0 comunidades afectadas) y revisar a mano la 1 aislada hasta Limón | I | [ ] | Una sola cifra por tramo y la decisión anotada abajo |
+| E5 | Decidir la métrica de impacto (hospital de referencia vs. más cercano; con el más cercano el parque da 0 comunidades afectadas) y revisar a mano la 1 aislada hasta Limón | I | [ ] | Una sola cifra por tramo y la decisión anotada abajo — **recomendación S4′: R2, con límites; decisión pendiente** |
 | P5 | Impacto: quitar un tramo a la vez → tiempo extra, población, aisladas, ranking → `scenarios.json` (clave `candidates`, `source: "network_consequence"`; spec: `projects/pipeline/deltas/impact-scoring.spec.md`) | I | [ ] | Valida; un caso revisado a mano; sin aislamientos falsos (comunidades ajustadas a la vía cortada, `oneway`) |
 | E1 | IMERG: `rain.csv` y lluvia acumulada por tramo (`exposure.rain_mm_12d`) | I | [ ] | Valida; las fechas cubren el periodo |
 | E3 | Zona como parámetro (nombre o bbox en config → `meta.area`) | I | [ ] | Cambiar el bbox cambia la salida sin tocar código |
@@ -136,6 +136,9 @@ Cortadas `[-]`: **F2** (mostrar pasadas) y **F9** (alternar antes/después): dep
 | 14 nov | Modo solo: sin turnos ni relevos; F2 y F9 cortadas; contrato 0.2 adoptado en el árbol (sin la regla de revisión de ambos lados) | Menos coordinación, más velocidad |
 
 ### Preguntas abiertas
+
+- **Unidad de cierre y métrica (S4′, E5, P5):** sobre la red real, cortar una sola calzada produce aislamientos ficticios (87 % de Ruta 32 en OSM es de sentido único). Cerrando las dos calzadas, solo «hospital nacional» (R2) pasó los criterios, con cierres de hasta 61 km, hospitales provisionales y sin población. Hay que decidir métrica y granularidad antes de P5; ver `SPIKING.md` S4′.
+- **P3 y P5 ya existen en ramas remotas** (`origin/feat/road-graph`, `origin/feat/impact-scoring`, con pruebas) pero no en `main`, y este tablero los marca `[ ]`. Falta confirmar con quién los hizo y qué faltaría integrar.
 
 - **Hospital de referencia vs. más cercano** (E5): ¿qué métrica evita que muchos tramos queden en cero? (el informe de situación midió 43 % de 495 tramos de prueba en la red hasta Limón)
 - **Revisión de código con CODEOWNERS:** `.github/CODEOWNERS` y la protección de `main` exigen revisión de un dueño de código; trabajando solo hay que decidir si se desactiva o se usa bypass. No se tocó.
