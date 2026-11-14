@@ -90,7 +90,7 @@ Se llena al terminar cada spike. Una línea por spike.
 | S5 | pendiente | — | — | — |
 | S6 | PASA | Mapa base y overlay de cambio visibles en local, build y Pages, sin errores de consola | — | W, V |
 | S7 | PASA | WorldPop CRI 2020 (100 m) se descarga completo y se recorta al corredor; hay población | 14:18 | W |
-| S8 | pendiente | — | — | — |
+| S8 | PASA | `graph.ts` coincide con la línea base y con los 4 candidatos del mock, incluido el aislamiento de c4 en T-03 | — | V |
 
 ---
 
@@ -214,11 +214,11 @@ Copiá la plantilla en cada ficha al terminar. Dejá `pendiente` en lo que no se
 
 | Campo | Valor |
 |---|---|
-| Veredicto | pendiente |
-| ¿Coincide con el mock en la línea base? | pendiente |
-| Casos de cierre probados | pendiente |
-| Rendimiento (tiempo de recálculo) | pendiente |
-| Notas / riesgos | pendiente |
+| Veredicto | PASA |
+| ¿Coincide con el mock en la línea base? | Sí: `computeAccess(graph, [])` es idéntico al `baseline` de `scenarios.json` (5 comunidades, mismo `time_s` y `hospital_id`) |
+| Casos de cierre probados | Los 4 candidatos del mock coinciden con su `per_community`: T-01 (e2), T-02 (e3), T-03 (e9) y T-04 (e4). En T-03, c4 queda aislada (`time_s: null`, `hospital_id: null`). También se probó una vía de un solo sentido (`oneway: true`) |
+| Rendimiento (tiempo de recálculo) | Mock (9 nodos): ~0,03 ms por llamada (1000 llamadas en 27 ms). Grafo sintético de 10 000 nodos y 50 comunidades: ~230 ms, medido una vez con `bun`, no en navegador |
+| Notas / riesgos | Un Dijkstra por comunidad; si el grafo real es grande y el recálculo se nota al cerrar tramos, pasar a una sola búsqueda desde los hospitales. Con hospitales a igual tiempo gana el primero de la lista. Solo contrastado con el mock; falta cruzarlo con el grafo real de S4. `*.test.ts` queda fuera de `tsc -b` porque los tipos de `bun:test` no están instalados |
 
 ---
 
