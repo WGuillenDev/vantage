@@ -103,7 +103,7 @@ Decision notes:
   When impact-scoring writes a candidate, `alternates` is Ruta 126 (light) and Ruta 10 (freight) if any of its edges has `road: "Ruta 32"`, and empty otherwise.
 - INV-17 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   If the `contracts.md` §8 cross-reference checks fail on the pair it is about to write, then impact-scoring exits non-zero with an English error naming the failed check and writes neither `graph.json` nor `scenarios.json`.
-- INV-18 [none]\n  If an edge's `candidate_id` in the input `graph.json` differs from the candidate whose `edge_ids` list it, then impact-scoring exits non-zero with an English error naming the edge and writes neither file.\n- INV-19 [none]\n  When impact-scoring writes `graph.json`, every edge that is in no candidate's `edge_ids` has `candidate_id: null`.
+- INV-18 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]\n  If an edge's `candidate_id` in the input `graph.json` differs from the candidate whose `edge_ids` list it, then impact-scoring exits non-zero with an English error naming the edge and writes neither file.\n- INV-19 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]\n  When impact-scoring writes `graph.json`, every edge that is in no candidate's `edge_ids` has `candidate_id: null`.
 
 ## Deferred / Open questions
 
