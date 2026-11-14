@@ -4,5 +4,7 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  // Pages serves the site under /<repo>/.
+  base: '/vantage/',
   plugins: [react(), tailwindcss()],
 })
