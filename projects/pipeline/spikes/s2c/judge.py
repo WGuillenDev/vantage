@@ -1,5 +1,5 @@
 """Spike S2c: apply the criteria written in SPIKING.md to sme2_strip.csv.
-Usage: uv run --no-project --python 3.12 --with numpy python -I judge.py sme2_strip.csv
+Usage: uv run --no-project --python 3.12 --with numpy python -I judge.py sme2_strip.csv [v2]
 Times are UTC in the file, converted to Costa Rica time (UTC-6). Press gives no closure hour for B, C and the end of D, so day starts and ends are assumed."""
 import csv, numpy as np
 from datetime import datetime, timedelta
@@ -14,6 +14,9 @@ ev = {"B": (datetime(2026,7,2), datetime(2026,7,4,23,59)),
       "C": (datetime(2026,8,17), datetime(2026,8,18,23,59)),
       "F": (datetime(2026,9,13,7,30), datetime(2026,9,19,0,0)),   # incl. 18 Sep episode
       "D": (datetime(2026,10,5,18,0), datetime(2026,10,6,23,59))}
+if len(sys.argv) > 2 and sys.argv[2] == "v2":   # extra closures found in the S3 review
+    ev["B2"] = (datetime(2026,7,17,8,35), datetime(2026,7,17,15,3))
+    ev["D2"] = (datetime(2026,10,8,17,40), datetime(2026,10,10,23,59))  # end not reported: assumed
 D3 = timedelta(days=3)
 def excluded(t): return any(s-D3 <= t <= e for s,e in ev.values())
 series = {}
@@ -43,4 +46,4 @@ for e, v in res.items():
     print(f"  {e}: exceed p75 in {sum(x[1] for x in m)}/{len(m)} main series, all-series {sum(x[1] for x in v)}/{len(v)}")
 pre_vals = [np.mean([x[2] for x in v if x[0]]) for v in res.values()]
 base_meds = [np.mean([x[3] for x in v if x[0]]) for v in res.values()]
-print(f"events passing (all main series exceed p75): {passes}/4;  median event SM {np.median(pre_vals):.3f} vs median baseline {np.median(base_meds):.3f}")
+print(f"events passing (all main series exceed p75): {passes}/{len(res)};  median event SM {np.median(pre_vals):.3f} vs median baseline {np.median(base_meds):.3f}")

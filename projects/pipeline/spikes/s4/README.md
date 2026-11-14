@@ -10,6 +10,7 @@ Run every command from the repo root. Spike-only assumptions are written at the 
 | `spike.py` | Graph size and components, hospitals and places by tag, `maxspeed` medians, one Ruta 32 cut, San José→Guápiles time. Areas `corridor` `[-84.10, 9.90, -83.72, 10.25]` and `regional` `[-84.30, 9.80, -83.40, 10.45]` | `uv run --no-project --python 3.12 --with osmnx --with matplotlib python -I projects/pipeline/spikes/s4/spike.py <DL> <corridor\|regional> <cut_west> <cut_east>` |
 | `size.py` | Estimated `graph.json` size for a bbox | `uv run --no-project --python 3.12 --with osmnx python -I projects/pipeline/spikes/s4/size.py <DL> -84.10 9.90 -83.72 10.25` |
 | `g1_measure.py` | G1 measurement: 495 test segments on the network up to Limón | see below |
+| `e5_metric.py` | S4′ (E5): metric N, R and R2 over every Ruta 32 closure, v1 to v3; output summary in `e5_summary.json` | `uv run --project projects/pipeline python -I projects/pipeline/spikes/s4/e5_metric.py projects/pipeline/work/osm <OUT>` (branch `feat/road-graph`) |
 | `review_isolated.py` | Hand review of the 18 communities isolated by the Guápiles–Siquirres cut | see below |
 
 Cuts used in the card: park `-83.98 -83.92`, Guápiles–Siquirres `-83.70 -83.55`. Without the two cut arguments, `spike.py` uses the park cut.
