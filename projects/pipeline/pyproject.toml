@@ -13,6 +13,7 @@ dependencies = [
 [project.scripts]
 pipeline = "pipeline:main"
 validate = "pipeline.validate:main"
+candidate-segments = "pipeline.candidate_segments:main"
 
 [build-system]
 requires = ["uv_build>=0.12.1,<0.13.0"]
