@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1",
+  "schema_version": "0.2",
   "generated_at": "2026-11-14T12:00:00Z",
   "files": { "rain_csv_schema": "0.1" },
   "area": { "name": "MOCK — not real data", "bbox": [-84.2, 9.95, -83.7, 10.3] },
@@ -12,6 +12,12 @@
   ],
   "rain": { "product": "GPM_3IMERGDL", "version": "V07", "start": "2026-06-29", "end": "2026-07-11", "aggregation": "area_mean" },
   "speed_model_kmh": { "primary": 60, "secondary": 40, "tertiary": 30 },
+  "detection_limits": {
+    "min_detectable_area_ha": 1,
+    "min_delta_db": 5,
+    "note": "MOCK: GCOV change at 10 m was not detectable below about 1 ha at -5 dB in synthetic tests."
+  },
+  "exposure_sources": ["IMERG Late (NASA GPM)", "NISAR SME2 (optional)"],
   "attributions": [
     "Contains modified NISAR GCOV data (NASA/JPL)",
     "IMERG Late (NASA GPM)",

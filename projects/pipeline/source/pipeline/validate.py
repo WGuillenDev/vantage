@@ -60,11 +60,13 @@ def _load_rain(folder: Path, errors: list[str]) -> list[dict] | None:
 
 def _check_meta(folder: Path, meta: dict) -> list[str]:
     errors = []
-    before, after = meta["passes"]["before"], meta["passes"]["after"]
-    for key in ("track", "direction", "crid"):
-        if before[key] != after[key]:
-            errors.append(f"meta.json: passes.before.{key} and passes.after.{key} must be identical")
-    for o in meta["overlays"]:
+    passes = meta.get("passes")  # optional since 0.2: the radar change layer may be absent
+    if passes:
+        before, after = passes["before"], passes["after"]
+        for key in ("track", "direction", "crid"):
+            if before[key] != after[key]:
+                errors.append(f"meta.json: passes.before.{key} and passes.after.{key} must be identical")
+    for o in meta.get("overlays", []):
         w, s, e, n = o["bounds"]
         if not (w < e and s < n):
             errors.append(f"meta.json: overlays/{o['id']}/bounds: needs west < east and south < north")

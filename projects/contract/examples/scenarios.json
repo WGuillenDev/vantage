@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1",
+  "schema_version": "0.2",
   "baseline": [
     {
       "community_id": "c1",
@@ -31,6 +31,12 @@
     {
       "id": "T-02",
       "rank": 1,
+      "source": "network_consequence",
+      "exposure": {
+        "rain_mm_12d": 85.2,
+        "soil_moisture_pctl": 90,
+        "radar_evidence": "not_detectable_at_scale"
+      },
       "edge_ids": [
         "e3"
       ],
@@ -81,6 +87,12 @@
     {
       "id": "T-01",
       "rank": 2,
+      "source": "network_consequence",
+      "exposure": {
+        "rain_mm_12d": 85.2,
+        "soil_moisture_pctl": null,
+        "radar_evidence": "not_detectable_at_scale"
+      },
       "edge_ids": [
         "e2"
       ],
@@ -124,6 +136,12 @@
     {
       "id": "T-03",
       "rank": 3,
+      "source": "network_consequence",
+      "exposure": {
+        "rain_mm_12d": null,
+        "soil_moisture_pctl": null,
+        "radar_evidence": null
+      },
       "edge_ids": [
         "e9"
       ],
@@ -162,6 +180,8 @@
     {
       "id": "T-04",
       "rank": 4,
+      "source": "network_consequence",
+      "exposure": null,
       "edge_ids": [
         "e4"
       ],
