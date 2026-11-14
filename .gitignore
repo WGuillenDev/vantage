@@ -35,3 +35,8 @@ projects/frontend/public/storage/
 
 # raw OSM extract and pipeline intermediates (never committed)
 projects/pipeline/work/
+
+# personal notes and the project document (kept local)
+/PROMPTS-IAN.md
+/actions.md
+/VANTAGE*Documento de proyecto.pdf
