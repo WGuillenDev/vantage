@@ -1,7 +1,7 @@
 # VANTAGE — STATUS
 
 > Tablero vivo del equipo. Mantenelo corto y verdadero. Actualizalo **antes de cada relevo** y cada vez que una tarea cambie de estado.
-> Contexto: `approach.md` (el porqué), `structure.md` (arquitectura), `contracts.md` (archivos de datos), `functions.md` (funcionalidades).
+> Contexto: `approach.md` (el porqué), `structure.md` (arquitectura), `contracts.md` (archivos de datos), `functions.md` (funcionalidades). Spikes: `SPIKING.md` (orden, dependencias y fichas de resultados).
 > Horas de Costa Rica (UTC−6). Ventana: **sáb 14 nov, 09:00 → dom 15 nov, 23:59** (hora de cierre aún por confirmar).
 
 ## Cómo usar este archivo
@@ -16,7 +16,7 @@
 
 | # | Fase | Cuándo | Objetivo | Estado |
 |---|---|---|---|---|
-| 1 | **Bootstrap** | Sáb 09:00–11:00 | Repo, herramientas, contrato congelado y mocks, esqueleto desplegado | [~] |
+| 1 | **Bootstrap** | Sáb 09:00–11:00 | Repo, herramientas, contrato congelado y mocks, esqueleto desplegado | [x] |
 | 2 | **Spiking** | Sáb 11:00–15:00 | Probar los supuestos riesgosos. Decidir seguir o plan B en la **Puerta 1** | [ ] |
 | 3 | **Building** | Sáb 15:00 → dom 14:00 | Datos reales por el pipeline, UI completa sobre el contrato | [ ] |
 | 4 | **Polish** | Dom 14:00 → cierre | Congelar, corregir errores, probar, desplegar, presentar | [ ] |
@@ -25,11 +25,11 @@ Prioridad ahora: **contratos congelados** (desbloquea al frontend) y **spikes** 
 
 ## Progreso
 
-**8 / 41 tareas · 20 %** `███░░░░░░░░░░░░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman)_
+**9 / 41 tareas · 22 %** `████░░░░░░░░░░░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman)_
 
 | Fase | Hechas | % |
 |---|---|---|
-| 1 · Bootstrap | 8 / 9 | 89 % |
+| 1 · Bootstrap | 9 / 9 | 100 % |
 | 2 · Spiking | 0 / 8 | 0 % |
 | 3 · Building | 0 / 17 | 0 % |
 | 4 · Polish | 0 / 7 | 0 % |
@@ -57,7 +57,7 @@ _Actualizá este bloque cada vez que marques una tarea `[x]`._
 | B5 | Mocks en `projects/contract/examples/`; `make mock` y `make validate` funcionando | R | [x] | Los mocks pasan la validación; incluye revisiones de referencias cruzadas — _Hecho: mocks con 4 candidatos, 3 hospitales, 5 comunidades (una aislada, una sin población) y variante sin antes/después; `make mock` y `make validate` verificados; 9 tests en `projects/pipeline/testing/`._ |
 | B6 | `CODEOWNERS` (una persona de backend y una de frontend sobre `contract/`) | R, W | [x] | Un PR que toque `contract/` exige ambas revisiones — _Hecho: `.github/CODEOWNERS` (@ronz204 backend, @WGuillenDev frontend) y «Require review from Code Owners» activo en la protección de `main` (verificado por API el 14 nov)._ |
 | B7 | Esqueleto del frontend (React + Vite + MapLibre) cargando un mock | R, W | [x] | El mapa se ve en local con datos mock — _Hecho: `App.tsx` con MapLibre 5, base OSM raster y overlay `change` leído de `storage/meta.json`. Verificado el 14 nov: mocks copiados y validados, `bun run lint` y `build` pasan, y `bun run dev` muestra el mapa con el overlay y sin errores de consola._ |
-| B8 | Workflow de GitHub Pages: `make validate` → `bun run build` → publicar `dist` | R | [~] | El esqueleto tiene URL pública; `base` de Vite y `BASE_URL` correctos (sin 404) — _Hecho: `.github/workflows/deploy.yml` (`make mock` → `make validate` → build → Pages) y `base: '/vantage/'` en Vite. Falta: activar Pages con fuente «GitHub Actions» y verificar la URL tras el primer push a `main`._ |
+| B8 | Workflow de GitHub Pages: `make validate` → `bun run build` → publicar `dist` | R | [x] | El esqueleto tiene URL pública; `base` de Vite y `BASE_URL` correctos (sin 404) — _Hecho: `.github/workflows/deploy.yml` (`make mock` → `make validate` → build → Pages) y `base: '/vantage/'` en Vite. Pages activado y despliegue confirmado por R el 14 nov._ |
 | B9 | Agregar los archivos de contexto (`approach`, `structure`, `functions`, `contracts`) y el `AGENTS.md` raíz | R | [x] | Archivos en el repo; AGENTS.md apunta a ellos — _Hecho: `context/*`, `CLAUDE.md` y `AGENTS.md`._ |
 
 **Salida de la fase:** contrato congelado, mocks listos, el frontend ya puede trabajar con `make mock`.
@@ -68,18 +68,18 @@ Cada spike termina con un resultado de una línea en la tabla y luego una decisi
 
 | ID | Spike | Dueño | Cuándo | Estado | Terminado cuando | Plan B | Resultado |
 |---|---|---|---|---|---|---|---|
-| S1 | Cobertura de NISAR sobre la Ruta 32 | R | 11:00–12:00 | [ ] | Dos fechas con el mismo track, dirección y CRID que encierran un cierre real, fuera del hueco del 27 jul–10 ago | Otro evento u otra zona dentro de Costa Rica | _—_ |
-| S2 | Resolución y detectabilidad | R | 12:00–13:30 | [ ] | Una mancha coherente de varios píxeles sobre un derrumbe conocido | Zonas de perturbación a escala de ladera | _—_ |
-| S3 | Evento de validación | I | 12:00–13:30 | [ ] | Una fuente oficial (MOPT, CONAVI, CNE) respalda la fecha del cierre | Presentar todo como «candidatos» | _—_ |
-| S4 | Red vial y métrica de impacto | I | 13:30–15:00 | [ ] | El grafo conecta; quitar un tramo da números razonables | Reducir al área del corredor | _—_ |
-| S5 | IMERG | I | 13:30–15:00 | [ ] | Un día de lluvia descargado y graficado | Lluvia solo como texto | _—_ |
+| S1 | Cobertura de NISAR sobre la Ruta 32 | R | 11:30–12:30 | [ ] | Dos fechas con el mismo track, dirección y CRID que encierran un cierre real, fuera del hueco del 27 jul–10 ago | Otro evento u otra zona dentro de Costa Rica | _—_ |
+| S2 | Resolución y detectabilidad | R | 12:30–14:00 | [ ] | Una mancha coherente de varios píxeles sobre un derrumbe conocido | Zonas de perturbación a escala de ladera | _—_ |
+| S3 | Evento de validación | R | 11:00–11:30 | [ ] | Una fuente oficial (MOPT, CONAVI, CNE) respalda la fecha del cierre | Presentar todo como «candidatos» | _—_ |
+| S4 | Red vial y métrica de impacto | I | 11:00–13:00 | [ ] | El grafo conecta; quitar un tramo da números razonables | Reducir al área del corredor | _—_ |
+| S5 | IMERG | I | 13:00–15:00 | [ ] | Un día de lluvia descargado y graficado | Lluvia solo como texto | _—_ |
 | S6 | Prueba de humo del frontend | W, V | 13:30–15:00 | [ ] | MapLibre carga un mock del contrato, en local y desplegado | Resolver antes de seguir | _—_ |
 
 También durante el spiking (frontend contra mocks, sin depender de los spikes):
 
 | ID | Tarea | Dueño | Estado | Terminada cuando |
 |---|---|---|---|---|
-| S7 | Comprobar acceso a población (WorldPop) | I | [ ] | Funciona, o se elige el respaldo (solo tiempo extra y conteo de comunidades) |
+| S7 | Comprobar acceso a población (WorldPop) | W | [ ] | Funciona, o se elige el respaldo (solo tiempo extra y conteo de comunidades) |
 | S8 | Empezar `graph.ts` (camino más corto al hospital más cercano, con conjunto de tramos cerrados) | V | [ ] | Coincide con el `scenarios.json` mock en la línea base |
 
 ## Fase 3 · Building (sáb 15:00 → dom 14:00)
@@ -151,6 +151,8 @@ Se empieza solo después de G1. Si G1 eligió el plan B, ajustá las tareas y an
 | 14 nov | Overlay `change` obligatorio; `before`/`after` opcionales (G2). Cada PNG ≤ 2 MB, lo comprueba `make validate` | El radar es la evidencia que se muestra; los PNG pesados rompen el despliegue | R |
 | 14 nov | Población si WorldPop falla: se decide tras S7; respaldo ya soportado (`population: null`, tiempo extra y conteo) | No comprometer otra fuente a ciegas | R |
 | 14 nov | Los datos reales viven en `projects/pipeline/output/` (commiteado, solo artefactos livianos); `make publish` los copia a `storage/` | `storage/` no se commitea; así el despliegue es reproducible y revisable | R |
+
+| 14 nov | S3 pasa de I a R; S7 pasa de I a W; S3 va primero (11:00), luego S1 y S2; I adelanta S4 a las 11:00 | S1, S2 y S3 forman una cadena; un solo dueño evita relevos en el camino crítico | R |
 
 ### Preguntas abiertas
 
