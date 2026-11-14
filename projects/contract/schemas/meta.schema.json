@@ -3,9 +3,9 @@
   "title": "meta.json",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "generated_at", "files", "area", "passes", "overlays", "rain", "speed_model_kmh", "attributions"],
+  "required": ["schema_version", "generated_at", "files", "area", "rain", "speed_model_kmh", "attributions"],
   "properties": {
-    "schema_version": { "const": "0.1" },
+    "schema_version": { "const": "0.2" },
     "generated_at": { "type": "string", "format": "date-time" },
     "files": {
       "type": "object",
@@ -33,7 +33,6 @@
     },
     "overlays": {
       "type": "array",
-      "contains": { "properties": { "id": { "const": "change" } }, "required": ["id"] },
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -71,6 +70,20 @@
       "type": "object",
       "minProperties": 1,
       "additionalProperties": { "type": "number", "exclusiveMinimum": 0 }
+    },
+    "detection_limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["min_detectable_area_ha", "min_delta_db", "note"],
+      "properties": {
+        "min_detectable_area_ha": { "type": "number", "exclusiveMinimum": 0 },
+        "min_delta_db": { "type": "number", "exclusiveMinimum": 0 },
+        "note": { "type": "string", "minLength": 1 }
+      }
+    },
+    "exposure_sources": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
     },
     "attributions": {
       "type": "array",

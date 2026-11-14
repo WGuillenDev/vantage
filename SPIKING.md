@@ -1,235 +1,101 @@
 # VANTAGE — SPIKING
 
-> Guía de orden y registro de resultados de la fase 2 (sáb 14 nov, 11:00–15:00, hora de Costa Rica).
-> Sirve para tres cosas: **qué hacer y en qué orden**, **qué depende de qué**, y **dejar el resultado de cada spike en un solo lugar** para decidir en la Puerta 1 (G1, sáb 15:00).
-> `STATUS.md` sigue siendo el tablero (estado `[ ]`/`[~]`/`[x]` y dueños). Este archivo guarda el detalle y la evidencia. Si algo no coincide, `STATUS.md` manda para dueños y estado.
+> Registro de resultados de los spikes (sáb 14 nov 2026). El tablero vivo es `STATUS.md`; aquí está el detalle y la evidencia que no cabe allí.
+> **G1 ya se decidió (~16:35): NO-GO para detectar derrumbes con GCOV de NISAR.** El producto es riesgo = consecuencia × exposición. Ver `STATUS.md` (decisiones) y `context/approach.md`.
 
 ## Reglas
 
-- Un spike termina con un **veredicto** (`PASA`, `FALLA → plan B` o `PARCIAL`) y **evidencia** (enlace, comando, captura o archivo). Sin evidencia no se marca hecho.
-- No inventes datos: un valor desconocido se escribe `pendiente` o `null`, nunca un número o fecha supuesta.
-- Lenguaje cauto: «candidato», «señal», «hipótesis». Nunca «cierre confirmado» ni «causado por la lluvia».
-- No se commitean datos crudos de NISAR, rásters grandes ni credenciales. Solo se anota dónde están y cómo se obtuvieron.
-- Al terminar un spike: llená su ficha abajo, actualizá su fila en `STATUS.md` (columna «Resultado», una línea) y anotá el relevo si cambia de manos.
-- Si un spike falla, pasá a su plan B y registrá la decisión en el Registro de decisiones de `STATUS.md`.
+- Un spike termina con un **veredicto** (`PASA`, `FALLA`, `PARCIAL`) y su evidencia. Lo desconocido se escribe `pendiente` o `null`, nunca un número supuesto.
+- Criterios escritos **antes** de calcular; si cambian, se registra una versión nueva, nunca en silencio. Se reportan todos los resultados, también los negativos.
+- Lenguaje cauto: «señal», «hipótesis», «tramo crítico». Nunca «cierre confirmado» ni «causado por la lluvia».
+- No se commitean datos crudos de NISAR, rásters grandes ni credenciales.
+- Los scripts y salidas de S1/S2 (carpetas `s1` y `s2b`) nunca se versionaron y se retiraron del árbol. Lo que queda es esta ficha.
 
-## Dueños
+## Resumen
 
-| Spike | Dueño | Ventana |
+| Spike | Veredicto | Resultado en una línea |
 |---|---|---|
-| S3 Evento de validación | R | 11:00–11:30 |
-| S1 Cobertura de NISAR | R | 11:30–12:30 |
-| S2 Resolución y detectabilidad | R | 12:30–14:00 |
-| S4 Red vial y métrica | I | 11:00–13:00 |
-| S5 IMERG | I | 13:00–15:00 |
-| S6 Prueba de humo del frontend | W, V | 13:30–15:00 |
-| S7 Acceso a población (WorldPop) | W | durante el spiking |
-| S8 `graph.ts` | V | durante el spiking |
+| S1 | PASA con reservas | NISAR cubre la ruta desde el 19 jun 2026, pasada cada 12 días; los datos se leen sin bajar el archivo. Par principal: 069 D, 1→13 jul (`P05023`). |
+| S2 | **FALLA** | 3 pruebas + paso A sintético: sin separar evento de control. Mínimo detectable ≈10×10 px (≈1 ha) a −5 dB. B exploratorio negativo; C (GUNW) sin correr. |
+| S2c | pendiente | SME2: ¿sube la humedad del suelo antes de los cierres? Máx. 40 min, criterios escritos antes. |
+| S3 | PARCIAL | Cierres de 2026 con prensa que cita al MOPT; falta el comunicado primario. |
+| S4 | PARCIAL | Red regional conecta; un corte en el parque da +77,6 min San José→Guápiles por alterna. Con «hospital más cercano» el parque afecta a 0 comunidades; recortar al corredor crea aislamientos falsos (ver ficha). |
+| S5 | sin avanzar | IMERG sin probar. _Fuente: informe de situación._ |
+| S6 | PASA | MapLibre carga el mock en dev, build y Pages (https://wguillendev.github.io/vantage/), sin errores de consola. |
+| S7 | PASA | WorldPop CRI 2020 (100 m): 31,5 MB por HTTPS, sin streaming; se recorta con `rasterio`. 946 290 personas en el `bbox` provisional `[-84.20, 9.95, -83.70, 10.30]`. Es una estimación modelada, no un censo. |
+| S8 | PASA | `graph.ts` (ya en `main`) coincide con la línea base y con los 4 candidatos del mock, incluido el aislamiento de c4 en T-03. |
 
-## Dependencias
+---
 
-No son totalmente independientes. Hay un camino crítico y el resto corre en paralelo.
+## S1 · Cobertura de NISAR
 
-```
-S1 ──► S2            S2 necesita las dos pasadas que encuentra S1
- ▲
- └──── S3            se retroalimentan: S1 busca fechas que encierren el cierre real,
-                     S3 confirma con fuente oficial que ese cierre existió y cuándo
+- **Veredicto:** PASA con reservas.
+- **Par principal (frame 083, `P05023`):** 069 D, 1 jul → 13 jul 2026.
+- **Compatibles:** track 069 D, 10 fechas (19 jun–17 oct); track 105 A, 10 fechas (21 jun–19 oct). 8 pares de 12 días y 1 de 24 días (cruza el hueco del 27 jul–10 ago) por track. GCOV no existe antes del 19 jun.
+- **Cobertura del tramo de OSM:** 069 D frame 083 cubre 99–100 %; 105 A frame 007, 100 %; tracks 170 D y 004 A, 0 %. La pasada del 8 jul del track 170 es `SHSH`, distinta de `DHDH`: no se mezcla.
+- **Lectura:** rutas `science/LSAR/GCOV/grids/frequencyA/HHHH` y `HVHV`; píxel de 10 m, EPSG 32617, bloques de 512×512; un recorte de 200×200 se lee en unos 4 s con `earthaccess` (login Earthdata). Horas de paso (CR): 069 D a las 18:00, 105 A a las 05:12.
+- **Consulta:** CMR, `NISAR_L2_GCOV_PROVISIONAL_V1` (también `NISAR_L2_GCOV_V1`; `BETA` dio 0). `https://cmr.earthdata.nasa.gov/search/granules.json?short_name=NISAR_L2_GCOV_PROVISIONAL_V1&bounding_box=-84.15,9.95,-83.75,10.25&page_size=200&sort_key=start_date`. 67 granos el 14 nov.
+- **Granos del par:** `NISAR_L2_PR_GCOV_024_069_D_083_4005_DHDH_A_20260701T000051_20260701T000125_P05023_N_F_J_001` y `NISAR_L2_PR_GCOV_025_069_D_083_4005_DHDH_A_20260713T000050_20260713T000124_P05023_N_F_J_001`.
+- **Reserva:** OSM solo tiene un poste kilométrico, así que no hay km oficial para ubicar el tramo.
 
-S5  ·· (usa las fechas de S1, pero se puede probar con cualquier día de lluvia)
+## S2 · Detectabilidad
 
-S4   independiente (OSM, sin NISAR)
-S6   independiente (mock del contrato)
-S7   independiente (WorldPop)
-S8   independiente (usa el mock; después se contrasta con la salida de S4)
-```
+**Veredicto: FALLA.** G1 = NO-GO para generar tramos desde detección con GCOV.
 
-| Spike | Necesita | Desbloquea | ¿Puede empezar ya? |
+**Criterios (14 nov, antes de calcular).** ΔdB = dB(después) − dB(antes), HH y HV, boxcar 5×5 con el `mask` del producto. Zona: franja de 500 m a cada lado del eje de la Ruta 32 en OSM. Umbral: percentil 99.5 del |ΔdB| del control (069 D, 30 ago→11 sep). Mancha: píxeles contiguos sobre el umbral, mínimo 20. PASA si el evento tiene al menos el doble de manchas que el control y se repite en un segundo par.
+
+**Prueba 1 (contar manchas):** FALLA. B (1→13 jul): HH 10, HV 8. D (5→17 oct): HH 9, HV 9. Control: HH 14, HV 9. Para PASA hacían falta 28 y 18.
+
+**Prueba 2 (persistencia, solo B):** PARCIAL. HV 5 de 8 (62 %) contra 4 de 9 (44 %) en el control; HH 6 de 10 contra 8 de 14. No separa. La medida premia fechas «antes» anómalas; una exploración posterior no fijada de antemano dio señales contradictorias y no sirve como prueba.
+
+**Paso A (detección sintética; criterios escritos antes): FALLA.** Parches de cambio inyectados en la imagen «después» del par 069 D 1→13 jul (potencia lineal, antes del boxcar), 200 posiciones aleatorias en la franja (mitad cerca de la carretera, mitad en ladera), HV, umbral 3.5 dB, mancha mínima 9 px.
+
+| Parche | −3 dB | −5 dB | −8 dB |
 |---|---|---|---|
-| S1 | pista de S3 (fecha del evento) | S2, P1, fechas para S5 | Después de S3 (mismo dueño, 11:30) |
-| S2 | pasadas de S1 | P2 | No, espera a S1 |
-| S3 | — (idealmente S1 en paralelo) | acotar S1, el relato de validación | Sí |
-| S4 | — | P3, P4, P5 | Sí |
-| S5 | fechas de S1 (para el resultado final) | P6, F6 | Sí, con un día cualquiera |
-| S6 | — | F1, F7 | Sí |
-| S7 | — | P5 (población), F4 | Sí |
-| S8 | — | F3, F4, F5 | Sí |
+| 1×1 | 2.5 % | 2.5 % | 2.5 % |
+| 3×3 | 2.5 % | 2.5 % | 4 % |
+| 5×5 | 3.5 % | 13.5 % | 52 % |
+| 10×10 | 47.5 % | 100 % | 100 % |
 
-## Orden de trabajo sugerido
+- Criterio: 5×5 a −5 dB en ≥70 % con ≤5 falsos/km². Resultado: 13.5 % con 1.1 falsos/km² (el límite es de sensibilidad, no de ruido). **Mínimo detectable: ≈10×10 px (≈1 ha) a −5 dB.** 1×1 y 3×3 son solape casual con el ruido.
+- Sensibilidad (no cambia el veredicto, fijado en 9 px): con 3 px el 5×5 a −5 dB llega a 70 % con 3.1 falsos/km²; con 20 px, 2 %.
+- Límites: un derrumbe real no es un parche uniforme; solo HV y solo el par 069 D.
 
-R lleva toda la cadena S3 → S1 → S2, así no hay relevos entre personas en el camino crítico. I queda libre para S4 y S5.
+**Paso B (exploratorio, sin valor de prueba): negativo.** Manchas de 069 D con una de 105 A a menos de 100 m (HV, 9 px) contra 500 desplazamientos circulares ≥2 km a lo largo de la franja (observadas; media y p95 del nulo): B 0 (3.8; 7), C (25 jul→18 ago) 3 (9.6; 17), D 5 (2.4; 7), F (11→23 sep) 2 (2.5; 5), control 8 (4.6; 9). Ningún evento supera el p95 (tampoco en HH ni con 20 px) y el control queda tan por encima del azar como D.
 
-1. **11:00** Arrancan en paralelo: R con S3 (corto: solo la fecha y la fuente del evento), I con S4, W con S6 y S7, V con S8.
-2. **11:30** R pasa a S1 con la fecha de S3. Si S3 no da fecha, S1 busca con el evento candidato y se anota.
-3. **12:30** R pasa a S2 con las pasadas de S1. Si S1 aún no entrega pasadas, S2 espera; no la adivines.
-4. **13:00** I pasa a S5 con las fechas de S1/S3. W y V cierran S6 (meta 15:00).
-5. **14:00** Todos llenan sus fichas; R consolida la tabla de resultados.
-5. **15:00** G1: se decide con la tabla de abajo.
+**Paso C (coherencia GUNW):** no se corrió porque A no pasó.
 
-## Criterios de la Puerta 1
+**Lectura honesta:** con GCOV a 10 m y este flujo no se ven derrumbes pequeños. No se afirma que NISAR no pueda con otros productos; **siguen sin probar** GUNW, offsets, series por píxel y SME2 (S2c). El `mask` del producto no enmascara sombra ni capa invertida del relieve, y no hay prueba de que no hubiera cierre entre el 30 ago y el 11 sep (solo que no aparece en prensa).
 
-| Pregunta de G1 | Se responde con | Si no se cumple |
-|---|---|---|
-| ¿Hay pasadas compatibles de NISAR? | S1 | Otro evento u otra zona dentro de Costa Rica |
-| ¿Se nota el cambio? | S2 | Zonas de perturbación a escala de ladera |
-| ¿El evento tiene respaldo oficial? | S3 | Presentar todo como «candidatos» |
-| ¿La red vial da números razonables? | S4 | Reducir al área del corredor |
+## S3 · Eventos de validación
 
-S5, S6, S7 y S8 no deciden G1 por sí solos: si fallan, se aplica su plan B y se sigue.
+**PARCIAL.** Cada evento tiene prensa que atribuye el dato al MOPT, pero falta el comunicado primario (el MOPT publicó por Facebook). La CNE no aparece en ningún cierre de 2026. Estas fechas son **etiquetas de validación**, no sirven para elegir dónde mirar.
 
-## Resumen de resultados
+| Evento | Fechas según la fuente | Tramo (prensa) | Fuente |
+|---|---|---|---|
+| A · feb | Cierre la noche del 5 feb; reabre el 6 a las 10:15 y cierra 14:20; sigue cerrada el 8 feb | km 27 y 28, Zurquí | MOPT, vía [El Observador](https://observador.cr/ruta-32-seguira-cerrada-mopt-no-tiene-fecha-de-apertura/) y [Tico Times](https://ticotimes.net/2026/02/09/costa-ricas-key-highway-to-caribbean-remains-blocked-by-slides). Sin datos NISAR (GCOV desde el 19 jun) |
+| B · jul | Cierre el 2 jul; el 3 jul reabre 13:40 y cierra 6 h después; limpieza el 4 jul | Zurquí, sin km | MOPT y CONAVI, vía [La Nación](https://www.nacion.com/sucesos/ruta-32-vuelve-a-cerrar-por-caida-de-material/5A4NGHLQTFDGVNKRMWLSZ6YWAM/story/) |
+| C · ago | Cierra el 17 ago; el 18 ago sigue cerrada | 8 puntos, km 20 a 37 | MOPT, vía [La Nación](https://www.nacion.com/el-pais/ruta-32-sigue-cerrada-este-martes-mopt-encuentra/7UPYSHM4KFERLHQ3JJWVRMCD4I/story/) y [CRHoy](https://crhoy.com/nacionales/ruta-32-sigue-cerrada-por-8-derrumbes/) |
+| F · sep | 13 sep desde las 7:30 (reapertura no confirmada); 18 sep desde las 14:48 | km 26 (18 sep) | [CRHoy](https://crhoy.com/nacionales/cierran-ruta-32-por-lluvias-y-caida-de-material/), sin institución citada |
+| D · oct | Cierre la noche del lun 5 oct | km 33, Zurquí | MOPT, vía [CRHoy](https://crhoy.com/nacionales/cierran-la-ruta-32-por-caida-de-material-7/) |
 
-Se llena al terminar cada spike. Una línea por spike.
+- La Nación (24 ago) cuenta al menos 27 días de cierre en 17 eventos entre el 1 ene y el 23 ago; algunos son preventivos.
+- Descartados por no aparecer en ninguna nota: un cierre del 5 nov, y los de 21 jun, 17 jul y 20 jul.
+- La lista de eventos anterior del proyecto («8–11, 9, 16–17, 20 de julio») queda como no verificada y descartada.
 
-| Spike | Veredicto | Resultado en una línea | Hora | Quién |
-|---|---|---|---|---|
-| S1 | pendiente | — | — | — |
-| S2 | pendiente | — | — | — |
-| S3 | pendiente | — | — | — |
-| S4 | PARCIAL | Red regional conecta y un corte en el parque da +77,6 min San José→Guápiles por alterna; con área solo-corredor hay aislamientos falsos, y la métrica «hospital más cercano» da 0 comunidades afectadas en el parque (redes hasta -83.40; hasta Limón, 1 aislada sin revisar). Ninguna de las 18 aisladas del corte Guápiles–Siquirres es real (revisión a mano) | 13:40 | I (agente) |
-| S5 | pendiente | — | — | — |
-| S6 | PASA | Mapa base y overlay de cambio visibles en local, build y Pages, sin errores de consola | — | W, V |
-| S7 | PASA | WorldPop CRI 2020 (100 m) se descarga completo y se recorta al corredor; hay población | 14:18 | W |
-| S8 | PASA | `graph.ts` coincide con la línea base y con los 4 candidatos del mock, incluido el aislamiento de c4 en T-03 | — | V |
+## S4 · Red vial y métrica de impacto
 
----
+**PARCIAL.** El grafo y la métrica funcionan sobre un área regional; quedan aislamientos dudosos en los bordes. Scripts y comandos en `projects/pipeline/spikes/s4/` (README); las descargas no se commitean.
 
-## Fichas por spike
+- **Fuente:** OSM vía Overpass (OSMnx 2.1.1), 14 nov 2026. Clases `motorway`…`unclassified` (+ `_link`), sin `residential`. Áreas: corredor `[-84.10, 9.90, -83.72, 10.25]` y regional `[-84.30, 9.80, -83.40, 10.45]` (con Ruta 126 y Ruta 10). Ruta 32: `ref=32`, 281 vías `trunk`.
+- **Tamaño:** corredor 1 687 nodos, 2 216 aristas, 74 componentes (la mayor, 89,6 % de los nodos); regional 6 124 nodos, 7 068 aristas, 590 componentes (la mayor, 73,4 %). `graph.json` del corredor ~990 KB (~540 KB con geometría simplificada a ~10 m).
+- **Hospitales y comunidades:** `amenity=hospital` 27 (corredor) / 63 (regional), con ruido (clínica dental, banco de sangre, psiquiátrico, privados); comunidades `place=city/town/village/hamlet` 124 / 718. Distancia al nodo más cercano p50 / p90 / máx = 462 / 2 047 / 7 018 m (corredor) y 783 / 2 896 / 10 089 m (regional). Hospital Guápiles = `way/326924912`.
+- **Velocidades del spike:** mediana de `maxspeed` por clase (trunk 60; primary, secondary y tertiary 40; unclassified 30, con solo 20 de 2 319 aristas etiquetadas).
+- **Corte 1, Ruta 32 dentro del parque** (una arista simplificada de 34,5 km): 0 comunidades afectadas en las dos áreas del spike (borde este -83.72 y -83.40). En la red hasta Limón (borde -82.95) la medición para G1 dio 1 comunidad aislada, sin revisar a mano. Hospital Calderón Guardia → Guápiles pasa de 68,8 a 146,4 min en el regional (+77,6 min por alterna) y queda sin camino en el corredor. Las cifras 0 y 1 son de redes distintas, no una contradicción.
+- **Corte 2, Ruta 32 entre Guápiles y Siquirres** (20,3 km): 51 afectadas, 33 con tiempo extra (mediana 21,2 min, máx 72,8) y 18 aisladas. La revisión a mano (`review_isolated.py`) muestra que **ninguna de las 18 es real**: 3 quedan fuera del grafo (a más de 3 km de una vía), 2 dejan de estar aisladas, 6 están ajustadas a un nodo de la propia Ruta 32 cortada, y 7 no tienen ruta dirigida (probable artefacto de `oneway`).
+- **Razonable:** sí la línea base San José→Guápiles (68,8 min) y el desvío (+77,6 min).
+- **Riesgos para P3 y P5:** con «hospital más cercano» un corte en el parque no afecta a nadie (hospitales a ambos lados); recortar al corredor crea aislamientos falsos; ojo con comunidades ajustadas a un nodo de la vía cortada y con tramos de un solo sentido. Specs de las dos tareas: `projects/pipeline/deltas/road-graph.spec.md` y `impact-scoring.spec.md`.
 
-Copiá la plantilla en cada ficha al terminar. Dejá `pendiente` en lo que no sepas.
+## S8 · `graph.ts`
 
-### S1 · Cobertura de NISAR sobre la Ruta 32
-
-- **Objetivo:** dos fechas con el mismo track, dirección y CRID que encierren un cierre real, fuera del hueco del 27 jul–10 ago.
-- **Plan B:** otro evento u otra zona dentro de Costa Rica.
-- **Depende de:** S3 (fecha del evento). **Desbloquea:** S2, P1.
-- **Qué esperar:** pocas pasadas compatibles; la revisita no es diaria. Anotá también las que no sirvieron y por qué.
-
-| Campo | Valor |
-|---|---|
-| Veredicto | pendiente |
-| Pasada «antes» (fecha, track, dirección, CRID) | pendiente |
-| Pasada «después» (fecha, track, dirección, CRID) | pendiente |
-| Cuántas pasadas compatibles hay en total | pendiente |
-| Cómo se consultó (producto, herramienta, comando) | pendiente |
-| Evidencia (enlace/archivo) | pendiente |
-| Notas / riesgos | pendiente |
-
-### S2 · Resolución y detectabilidad
-
-- **Objetivo:** una mancha coherente de varios píxeles sobre un derrumbe conocido.
-- **Plan B:** zonas de perturbación a escala de ladera.
-- **Depende de:** S1. **Desbloquea:** P2.
-
-| Campo | Valor |
-|---|---|
-| Veredicto | pendiente |
-| Derrumbe o sitio de referencia usado | pendiente |
-| Tamaño aproximado de la mancha (píxeles) | pendiente |
-| ΔdB observado (rango) | pendiente |
-| Ruido de fondo / falsos positivos vistos | pendiente |
-| Evidencia (captura/archivo) | pendiente |
-| Notas / riesgos | pendiente |
-
-### S3 · Evento de validación
-
-- **Objetivo:** una fuente oficial (MOPT, CONAVI, CNE) respalda la fecha del cierre.
-- **Plan B:** presentar todo como «candidatos».
-- **Depende de:** nada. **Desbloquea:** acotar S1 y el relato de validación.
-
-| Campo | Valor |
-|---|---|
-| Veredicto | pendiente |
-| Evento (lugar y descripción) | pendiente |
-| Fecha(s) según la fuente | pendiente |
-| Fuente (institución, enlace, fecha de publicación) | pendiente |
-| ¿Cierra la fecha entre las pasadas de S1? | pendiente |
-| Notas / riesgos | pendiente |
-
-### S4 · Red vial y métrica de impacto
-
-- **Objetivo:** el grafo conecta; quitar un tramo da números razonables.
-- **Plan B:** reducir al área del corredor.
-- **Depende de:** nada. **Desbloquea:** P3, P4, P5.
-
-| Campo | Valor |
-|---|---|
-| Veredicto | PARCIAL: el grafo y la métrica funcionan sobre un área regional; quedan aislamientos dudosos en los bordes del área |
-| Área y fuente (OSM, fecha de descarga) | OSM vía Overpass (OSMnx 2.1.1), descargado el 14 nov 2026. Clases `motorway`…`unclassified` (+ `_link`), sin `residential`. Corredor `[-84.10, 9.90, -83.72, 10.25]` y regional `[-84.30, 9.80, -83.40, 10.45]` (con Ruta 126 y Ruta 10). Ruta 32 en OSM: `ref=32`, 281 vías `trunk`, de (-84.08, 9.94) a (-83.02, 10.22) |
-| Nodos / aristas / componentes conexas | Corredor: 1 687 nodos, 2 216 aristas, 74 componentes (la mayor tiene el 89,6 % de los nodos). Regional: 6 124 nodos, 7 068 aristas, 590 componentes (la mayor tiene el 73,4 %). `graph.json` estimado para el corredor: ~990 KB, o ~540 KB con geometría simplificada a ~10 m |
-| Hospitales y comunidades encontrados | `amenity=hospital`: 27 (corredor) / 63 (regional), con ruido (clínica dental, banco de sangre, psiquiátrico, privados); `amenity=clinic` 211 / 537; `amenity=doctors` 43 / 195. Hospital Guápiles = `way/326924912`. Comunidades `place=city/town/village/hamlet`: 124 / 718; distancia al nodo más cercano p50 / p90 / máx = 462 / 2 047 / 7 018 m (corredor) y 783 / 2 896 / 10 089 m (regional) |
-| Caso de prueba: tramo quitado → tiempo extra / aislamiento | (1) Ruta 32 dentro del parque (una sola arista simplificada de 34,5 km): 0 comunidades afectadas en las dos áreas de este spike, la del corredor (borde este -83.72) y la regional (borde este -83.40). Ninguna de las dos es la red del plan B (hasta Limón, borde este -82.95): ahí la medición para G1 da 1 comunidad afectada en ese tramo, aislada y sin revisar a mano; Hospital Calderón Guardia → Hospital Guápiles pasa de 68,8 a 146,4 min en el regional (+77,6 min por alterna) y queda SIN camino en el corredor. (2) Ruta 32 entre Guápiles y Siquirres (lon -83.70 a -83.55, 20,3 km), en la regional hasta -83.40: 51 afectadas, 33 con tiempo extra (mediana 21,2 min, máx 72,8 min) y 18 aisladas; la revisión a mano (fila siguiente) muestra que ninguna de las 18 es real |
-| ¿Los números son razonables? (revisado a mano) | Sí la línea base San José→Guápiles (68,8 min) y el desvío (+77,6 min). Revisión a mano de las 18 aisladas del caso 2 (`review_isolated.py`: red hasta Limón con aristas ≤ 1 km, mismos hospitales y mismo corte): **ninguna es un aislamiento real**. 3 (La Isleta, Las Colinas, La Argentina) quedan fuera del grafo por estar a más de 3 km de una vía. 2 dejan de estar aisladas: Portón de Iberia pasa a +67,5 min hacia el Hospital William Allen Taylor y Trinidad no se ve afectada. 6 (Parismina, Mercedes, Pocora, Altos de Germania, Germania, Herediana) están ajustadas a un nodo de la propia Ruta 32 cortada y quedan en un componente de 1 o 2 nodos, porque el grafo no tiene sus calles locales. 7 (Codela, Milano, Bellavista, El Cairo, Louisiana, El Peje, 3 Millas) siguen unidas a la red y a los hospitales sin mirar el sentido de las vías, pero no tienen ruta dirigida: probable artefacto de tramos de un solo sentido (`oneway`) |
-| Notas / riesgos | Velocidad del spike: mediana OSM `maxspeed` por clase (trunk 60; primary, secondary y tertiary 40; unclassified 30 con solo 20 de 2 319 aristas etiquetadas). Riesgo G1: con «hospital más cercano», un corte en el parque no afecta a ninguna comunidad (hospitales a ambos lados). El plan B «reducir al corredor» empeora el resultado: crea aislamientos falsos. Riesgo para P3 y P5 (fase 3): aislamientos falsos por comunidades ajustadas a un nodo de la vía cortada y por tramos de un solo sentido. Evidencia: scripts y comandos exactos en `projects/pipeline/spikes/s4/` (README); las descargas no se commitean |
-
-### S5 · IMERG
-
-- **Objetivo:** un día de lluvia descargado y graficado.
-- **Plan B:** lluvia solo como texto.
-- **Depende de:** fechas de S1 (para el resultado final). **Desbloquea:** P6, F6.
-
-| Campo | Valor |
-|---|---|
-| Veredicto | pendiente |
-| Producto y versión IMERG | pendiente |
-| Acceso (autenticación, herramienta) | pendiente |
-| Día(s) descargado(s) | pendiente |
-| Agregación (`area_mean` del corredor) | pendiente |
-| Evidencia (gráfico/archivo) | pendiente |
-| Notas / riesgos | pendiente |
-
-### S6 · Prueba de humo del frontend
-
-- **Objetivo:** MapLibre carga un mock del contrato, en local y desplegado.
-- **Plan B:** resolver antes de seguir.
-- **Depende de:** nada. **Desbloquea:** F1, F7.
-
-| Campo | Valor |
-|---|---|
-| Veredicto | PASA |
-| Local (`bun run dev`) | OK: mapa base y overlay de cambio visibles, sin errores de consola |
-| Build local (`bun run build` + `bun run preview`) | OK: mismo resultado que dev |
-| Desplegado (URL de Pages) | OK: https://wguillendev.github.io/vantage/ — overlay visible, sin errores de consola |
-| Errores de consola | Ninguno, en los tres casos |
-| Notas / riesgos | — |
-
-### S7 · Acceso a población (WorldPop)
-
-- **Objetivo:** funciona, o se elige el respaldo (solo tiempo extra y conteo de comunidades, con `population: null`).
-- **Depende de:** nada. **Desbloquea:** P5 (población), F4.
-
-| Campo | Valor |
-|---|---|
-| Veredicto | PASA |
-| Producto y resolución | WorldPop, Costa Rica 2020, personas por píxel (`cri_ppp_2020.tif`), ~100 m (3 arcseg), EPSG:4326, nodata −99999 |
-| Forma de acceso (descarga, API, recorte al corredor) | Descarga directa por HTTPS de `https://data.worldpop.org/GIS/Population/Global_2000_2020/2020/CRI/cri_ppp_2020.tif` (31,5 MB, sin cuenta ni clave). El servidor no admite lectura por rangos (responde 200, no 206), así que no hay streaming: se descarga entero y se recorta con `rasterio` (ventana por `bbox`). No se commitea el `.tif` |
-| Población total del corredor (si se pudo) | 946 290 personas dentro del `bbox` provisional `[-84.20, 9.95, -83.70, 10.30]` (600×420 px, 251 862 píxeles válidos, máximo 181,8 personas/píxel). Cifra del `bbox` de ejemplo, no del corredor final |
-| Decisión: usar WorldPop o respaldo | Usar WorldPop. El respaldo (`population: null`) sigue soportado por el contrato |
-| Notas / riesgos | La población por comunidad se asigna sumando píxeles cercanos al nodo (criterio de P5, por decidir). El `bbox` real sale de S1/P1. El producto es una estimación modelada de 2020, no un censo: rotular como estimación. `rasterio` no está en `pyproject.toml`; se añade en P5 si hace falta. Probado solo en esta máquina |
-
-### S8 · `graph.ts`
-
-- **Objetivo:** camino más corto al hospital más cercano, con conjunto de tramos cerrados; coincide con el `scenarios.json` mock en la línea base.
-- **Depende de:** nada (se contrasta con S4 después). **Desbloquea:** F3, F4, F5.
-
-| Campo | Valor |
-|---|---|
-| Veredicto | PASA |
-| ¿Coincide con el mock en la línea base? | Sí: `computeAccess(graph, [])` es idéntico al `baseline` de `scenarios.json` (5 comunidades, mismo `time_s` y `hospital_id`) |
-| Casos de cierre probados | Los 4 candidatos del mock coinciden con su `per_community`: T-01 (e2), T-02 (e3), T-03 (e9) y T-04 (e4). En T-03, c4 queda aislada (`time_s: null`, `hospital_id: null`). También se probó una vía de un solo sentido (`oneway: true`) |
-| Rendimiento (tiempo de recálculo) | Mock (9 nodos): ~0,03 ms por llamada (1000 llamadas en 27 ms). Grafo sintético de 10 000 nodos y 50 comunidades: ~230 ms, medido una vez con `bun`, no en navegador |
-| Notas / riesgos | Un Dijkstra por comunidad; si el grafo real es grande y el recálculo se nota al cerrar tramos, pasar a una sola búsqueda desde los hospitales. Con hospitales a igual tiempo gana el primero de la lista. Solo contrastado con el mock; falta cruzarlo con el grafo real de S4. `*.test.ts` queda fuera de `tsc -b` porque los tipos de `bun:test` no están instalados |
-
----
-
-## Decisión en G1
-
-Se llena el sáb 15:00 con el agente, leyendo la tabla de resultados.
-
-| Campo | Valor |
-|---|---|
-| Hora | pendiente |
-| Decisión | pendiente — seguir / plan B |
-| Planes B activados | pendiente |
-| Ajustes a las tareas de la fase 3 | pendiente |
-| Registrado en `STATUS.md` (Registro de decisiones) | pendiente |
+**PASA** (en `main`). `computeAccess(graph, [])` es idéntico al `baseline` de `scenarios.json`; los 4 candidatos del mock coinciden con su `per_community` (T-01 e2, T-02 e3, T-03 e9, T-04 e4; en T-03, c4 queda aislada); se probó una vía `oneway`. Rendimiento: ~0,03 ms por llamada en el mock (9 nodos); ~230 ms en un grafo sintético de 10 000 nodos y 50 comunidades (una medición con `bun`, no en navegador). Un Dijkstra por comunidad: si el grafo real es grande y el recálculo se nota, pasar a una sola búsqueda desde los hospitales. Falta cruzarlo con el grafo real de S4.

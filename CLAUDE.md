@@ -1,6 +1,6 @@
 # VANTAGE
 
-NISAR radar shows where a hillside moved near Ruta 32 (Costa Rica); VANTAGE shows which communities lose a good route to a hospital because of it. Entry for NASA Space Apps 2026, "Dancing with the SARs".
+VANTAGE shows which road segments of Ruta 32 (Costa Rica), if cut, leave communities without a good route to a hospital, and how exposed they are (rainfall, optional NISAR soil moisture): risk = consequence × exposure. Landslide-scale detection with NISAR GCOV was tested and is a NO-GO (G1, 14 Nov); the radar change layer is optional. Entry for NASA Space Apps 2026, "Dancing with the SARs".
 
 ## Read first
 
@@ -34,7 +34,8 @@ Specs are living contracts, written in three steps: `/drafter <slice>` interview
 
 ## Hard rules
 
-- Never overclaim: say "candidate", "signal", "hypothesis". Never "confirmed closure" or "caused by rain".
+- Never overclaim: say "critical segment" (*tramo crítico*), "signal", "hypothesis". Never "confirmed closure", "caused by rain" or "works anywhere". "Candidate" stays only as a key name in the data files.
+- No fixed data as a seed (no Lanamme sites, MOPT kilometres or press coordinates to pick segments); the analysis area is a config parameter.
 - Do not invent data: unknown values stay pending or `null`, never made-up numbers, dates or names.
 - Never commit raw NISAR data, large rasters or credentials.
 - No backend, accounts or other regions without a team decision.

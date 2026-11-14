@@ -6,7 +6,7 @@
   "required": ["type", "schema_version", "features"],
   "properties": {
     "type": { "const": "FeatureCollection" },
-    "schema_version": { "const": "0.1" },
+    "schema_version": { "const": "0.2" },
     "features": {
       "type": "array",
       "items": {

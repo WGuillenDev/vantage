@@ -69,9 +69,20 @@ def test_rain_must_cover_period(data: Path):
     assert any("must cover" in e for e in validate_dir(data))
 
 
-def test_change_overlay_is_required(data: Path):
-    edit(data, "meta.json", lambda m: m.update(overlays=[o for o in m["overlays"] if o["id"] != "change"]))
-    assert any("meta.json: overlays" in e for e in validate_dir(data))
+def test_change_layer_is_optional(data: Path):
+    def drop(m):
+        m.pop("passes")
+        m.pop("overlays")
+
+    edit(data, "meta.json", drop)
+    edit(data, "change.geojson", lambda c: c.update(features=[]))
+    edit(data, "scenarios.json", lambda s: [c.update(zone_ids=[], mean_delta_db=None) for c in s["candidates"]])
+    assert validate_dir(data) == []
+
+
+def test_exposure_radar_evidence_is_restricted(data: Path):
+    edit(data, "scenarios.json", lambda s: s["candidates"][0]["exposure"].update(radar_evidence="detected"))
+    assert any("radar_evidence" in e for e in validate_dir(data))
 
 
 def test_oversized_overlay_is_rejected(data: Path):
