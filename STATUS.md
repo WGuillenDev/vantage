@@ -25,12 +25,12 @@ Prioridad ahora: **contratos congelados** (desbloquea al frontend) y **spikes** 
 
 ## Progreso
 
-**10 / 41 tareas · 24 %** `█████░░░░░░░░░░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman)_
+**11 / 41 tareas · 27 %** `█████░░░░░░░░░░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman)_
 
 | Fase | Hechas | % |
 |---|---|---|
 | 1 · Bootstrap | 9 / 9 | 100 % |
-| 2 · Spiking | 1 / 8 | 12 % |
+| 2 · Spiking | 2 / 8 | 25 % |
 | 3 · Building | 0 / 17 | 0 % |
 | 4 · Polish | 0 / 7 | 0 % |
 
@@ -79,7 +79,7 @@ También durante el spiking (frontend contra mocks, sin depender de los spikes):
 
 | ID | Tarea | Dueño | Estado | Terminada cuando |
 |---|---|---|---|---|
-| S7 | Comprobar acceso a población (WorldPop) | W | [ ] | Funciona, o se elige el respaldo (solo tiempo extra y conteo de comunidades) |
+| S7 | Comprobar acceso a población (WorldPop) | W | [x] | Funciona, o se elige el respaldo (solo tiempo extra y conteo de comunidades) — _Hecho: PASA. WorldPop CRI 2020 a 100 m se descarga por HTTPS (31,5 MB, sin streaming) y se recorta al `bbox`; ficha en `SPIKING.md`._ |
 | S8 | Empezar `graph.ts` (camino más corto al hospital más cercano, con conjunto de tramos cerrados) | V | [ ] | Coincide con el `scenarios.json` mock en la línea base |
 
 ## Fase 3 · Building (sáb 15:00 → dom 14:00)
