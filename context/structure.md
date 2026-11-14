@@ -6,10 +6,10 @@
 
 ```mermaid
 flowchart TD
-    src["<b>External sources</b><br/>NISAR GCOV · OSM roads · IMERG rain · WorldPop"]
+    src["<b>External sources</b><br/>OSM roads · WorldPop · IMERG rain · NISAR SME2 (optional) · NISAR GCOV (optional, experimental)"]
     pipe["<b>pipeline/</b><br/>Python, offline"]
     out["<b>pipeline/output/</b><br/>committed, light artifacts"]
-    data["<b>frontend/public/storage/</b><br/>meta.json<br/>change.geojson + PNGs<br/>graph.json<br/>scenarios.json<br/>rain.csv"]
+    data["<b>frontend/public/storage/</b><br/>meta.json<br/>graph.json<br/>scenarios.json<br/>rain.csv<br/>change.geojson + PNGs (optional, may be empty)"]
     spa["<b>frontend/</b><br/>Static SPA, no server<br/>MapLibre + graph.ts"]
     contract["<b>contract/</b><br/>JSON Schemas + mocks"]
 
@@ -59,19 +59,18 @@ The exact subfolders inside `pipeline/` and `frontend/source/` are not fixed. Pr
 
 | File | Contents |
 |---|---|
-| `meta.json` | `schema_version`, sources, passes used (dates, track, direction, CRID) |
-| `change.geojson` + overlay PNGs | Change polygons with ΔdB per zone, and the raster image for the map |
+| `meta.json` | `schema_version` (0.2), `area` (name and bbox, a parameter), sources, `exposure_sources`, `detection_limits`; `passes` only if a change layer exists |
+| `change.geojson` + overlay PNGs | **Optional.** Change polygons with ΔdB per zone and the raster image; the file may be an empty FeatureCollection and the PNGs may be absent |
 | `graph.json` | Road network (nodes and edges), hospitals, communities and travel times, so closures can be simulated in the browser |
-| `scenarios.json` | Per candidate segment: extra time, dependent population, affected communities, rank |
+| `scenarios.json` | Per critical segment (key `candidates`): extra time, dependent population, affected communities, rank, `source`, `exposure` |
 | `rain.csv` | Date and daily IMERG rainfall |
 
 ### Rules
 
-1. Schemas and mocks are written in hours 0–2 and then **frozen**. Every file carries `schema_version`.
+1. Schemas and mocks were frozen at 0.1 and moved to 0.2 after G1 (`context/contracts.md` §12). Every file carries `schema_version`.
 2. The frontend works from minute one with `make mock`, which copies `contract/examples/` into `frontend/public/storage/`. When the pipeline produces real data (`make all`), it writes to `pipeline/output/` (committed), and `make publish` copies that into `storage/`; the web does not change. `storage/` is git-ignored.
 3. `make validate` checks the data folder against the schemas (using `jsonschema` in Python). It runs in CI and before every deploy.
-4. Changing a schema requires review by one backend and one frontend person, enforced with **CODEOWNERS**.
-5. **Raw NISAR data is never committed**, only light artifacts. GitHub rejects files over 100 MB.
+4. **Raw NISAR data is never committed**, only light artifacts. GitHub rejects files over 100 MB.
 
 ### Changing a data shape
 
@@ -81,35 +80,39 @@ In one PR: update the schema, update the mock, bump `schema_version`, update bot
 
 Runs offline and is deterministic. Managed with **uv**.
 
+**Zone is a parameter.** The analysis area (an area name or a bbox) comes from config and is written to `meta.json → area`; it is never fixed in code. Ruta 32 is the demonstration case. Config shape (proposed, not built yet):
+
+```toml
+[area]
+name = "Ruta 32 corridor"        # shown in the UI and meta.json
+bbox = [-84.20, 9.95, -83.70, 10.30]   # [w, s, e, n], placeholder values
+```
+
 | Stage | Input | Output |
 |---|---|---|
-| Acquire | ASF catalog (`asf.search`, or `earthaccess`) | Clipped GCOV arrays for two compatible passes (stream and clip; never whole scenes) |
-| Change detection | Two GCOV passes | ΔdB raster with speckle filtered, water and shadow masked, small blobs removed → change polygons + overlay PNG |
-| Road graph | OSM corridor | Segment network, hospitals and communities → `graph.json` |
-| Candidate segments | Change polygons + graph | Segments touching a change zone (with buffer) |
-| Impact | Graph + candidates + population | Remove one candidate at a time and recompute shortest paths to the nearest hospital → extra time, dependent population, isolated communities, criticality ranking → `scenarios.json` |
-| Rain context | IMERG Late daily | `rain.csv` |
+| Road graph | OSM for the configured area | Segment network, hospitals and communities → `graph.json` |
+| Impact (consequence) | Graph + population | Remove one segment at a time and recompute shortest paths to the nearest (or reference) hospital → extra time, dependent population, isolated communities, criticality ranking → `scenarios.json` |
+| Exposure layer | IMERG Late daily; NISAR SME2 if test S2c passes | `rain.csv`, and per-segment `exposure` in `scenarios.json` (`rain_mm_12d`, `soil_moisture_pctl`, `radar_evidence`) |
+| Change detection (optional, experimental) | Two GCOV passes | ΔdB change polygons + overlay PNG. At landslide scale the test was negative (`approach.md` §5), so this stage may produce an empty layer. Not a generator of critical segments |
 | Export | All of the above | Files in `pipeline/output/`, then `make publish` and `make validate` |
 
 ### Constraints
 
-- Same **track, direction and CRID** for both passes. Never mix.
-- Pixel is 10 or 20 m depending on location; do not assume one resolution.
-- Respect the data gap **Jul 27 – Aug 10** and the 12-day repeat.
-- Provisional CRID `P05023` and validated `P05036` are never mixed in one comparison.
+- Population (WorldPop) may be unavailable or not yet joined; the pipeline must degrade to extra time plus the count of communities.
 - IMERG Late (`GPM_3IMERGDL` V07): 0.1°, latency of at least 14 h.
-- Population (WorldPop) may be unavailable; the pipeline must degrade to extra time plus the count of communities.
+- For the optional radar stages: same **track, direction and CRID** for both passes, never mix provisional `P05023` and validated `P05036`; pixel is 10 or 20 m; respect the data gap **Jul 27 – Aug 10** and the 12-day repeat; stream and clip, never whole scenes.
 - OSM data requires ODbL attribution; carry it into `meta.json` and the UI footer.
+- Generalization: designed for corridors with an OSM road network, not tested outside Ruta 32. Known limits: OSM quality, hospital registration, SME2 in dense forest.
 
 ## 5. Frontend (static SPA)
 
 Stack: **Bun**, **strict TypeScript**, **React + Vite**, **MapLibre GL JS**, **Zustand**, **Recharts**, plus `graph.ts` for the client-side closure simulation.
 
 - No server, no accounts. Contract files are fetched from `import.meta.env.BASE_URL`.
-- **Map:** corridor, change layer (opacity control or before/after), candidate segments, hospitals, communities.
-- **State (Zustand):** selected segment, set of closed segments, layer mode and opacity, selected passes.
+- **Map:** corridor, critical segments, hospitals, communities; the change layer (opacity control) only when it exists.
+- **State (Zustand):** selected segment, set of closed segments, and layer mode, opacity and selected passes when a change layer exists.
 - **`graph.ts`:** loads `graph.json`, runs the shortest path to the nearest hospital and recomputes when segments are closed. Runs fully in the browser.
-- **Charts (Recharts):** daily rainfall from `rain.csv` for the "Why?" panel.
+- **Charts (Recharts):** daily rainfall from `rain.csv` for the "Why?" (exposure) panel.
 - Never hardcode numbers that come from the pipeline; read them from `scenarios.json` and `meta.json`.
 
 ### Design reference
@@ -135,7 +138,6 @@ Frontend prototypes (side-panel layout versus full-bleed map, closure simulation
 ## 7. Workflow and conventions
 
 - Short-lived branches, **squash merge to `main`**.
-- Two-sided review (backend and frontend, via CODEOWNERS) only for contract changes.
 - License: MIT for code; credit NASA and OpenStreetMap.
 - Tooling: `uv` for Python; Bun with strict TypeScript for the frontend.
 - Timeline gates (Costa Rica time): Sat 15:00 go/no-go on NISAR data, Sun 14:00 feature freeze, Sun 18:00 code freeze (bug fixes only).
@@ -146,6 +148,9 @@ Frontend prototypes (side-panel layout versus full-bleed map, closure simulation
 2. Any change to a data file shape means schema, mock, `schema_version` and `make validate`, in one PR.
 3. Do not commit raw NISAR data, large rasters or credentials (ASF and Earthdata tokens stay in environment variables).
 4. Do not invent data. Unknown values stay pending or placeholders; never fabricate coordinates, populations, dates or closure events.
-5. Keep user-facing language hedged: "candidate segment", "signal", "hypothesis". Never "confirmed" or "caused by".
-6. Prefer cutting scope over breaking the demo. Do not add a backend, auth or other regions without a team decision.
-7. Do not guess file layouts that are left open; propose them and ask.
+5. **No fixed data as a seed.** Never use the Lanamme sites, MOPT kilometres or press coordinates to decide which segments or places matter. Press dates are validation labels only.
+6. Radar detection is optional and experimental. Do not build features that assume a change layer exists; handle an empty or absent one.
+7. The analysis area is a config parameter, not a constant in code.
+8. Keep user-facing language hedged: "critical segment" (*tramo crítico*), "signal", "hypothesis". Never "confirmed" or "caused by". Never "works anywhere".
+9. Prefer cutting scope over breaking the demo. Do not add a backend, auth or other regions without a team decision.
+10. Do not guess file layouts that are left open; propose them and ask.

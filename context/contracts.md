@@ -11,9 +11,11 @@
 | `scenarios.json` | Pipeline | SPA | JSON |
 | `rain.csv` | Pipeline | SPA | CSV |
 
-## 0. Status: FROZEN v0.1 (14 Nov)
+## 0. Status: v0.2 (14 Nov, after G1)
 
-The schemas in `projects/contract/schemas/` are written and frozen at `schema_version` `"0.1"`; the six open decisions are closed in §11. Changes follow §10.
+The schemas in `projects/contract/schemas/`, the mocks and the validator are at `schema_version` `"0.2"` in the working tree (not committed yet). The six decisions are closed in §11; the 0.2 change is in §12. Changes follow §10.
+
+Key names are kept (`candidates`, `zone_ids`, ...) so the frozen shape does not break. In the UI a "candidate" is a *critical segment* (*tramo crítico*).
 
 This file must match the schemas exactly. If they differ, the schemas win; fix this file.
 
@@ -38,7 +40,7 @@ Describes what was computed from what, and where the overlay images go on the ma
 
 ```json
 {
-  "schema_version": "0.1",
+  "schema_version": "0.2",
   "generated_at": "2026-11-14T20:00:00Z",
   "files": { "rain_csv_schema": "0.1" },
   "area": { "name": "Ruta 32 corridor", "bbox": [-84.20, 9.95, -83.70, 10.30] },
@@ -64,23 +66,26 @@ Describes what was computed from what, and where the overlay images go on the ma
 |---|---|---|
 | `files.rain_csv_schema` | string | Version of the `rain.csv` layout, since a CSV cannot carry `schema_version`. |
 | `area.bbox` | `[w, s, e, n]` | Corridor extent the pipeline clipped to. Values above are **placeholders**. |
+| `passes` | object, **optional since 0.2**. Absent when there is no radar change layer. |
+| `detection_limits` | object, optional (0.2): `min_detectable_area_ha` (1), `min_delta_db` (5), `note`. The negative detectability result as data. |
+| `exposure_sources` | string[], optional (0.2): sources used for exposure (for example IMERG, SME2). |
 | `passes.*.track`, `direction`, `crid` | int, `"ascending"` \| `"descending"`, string | `before` and `after` **must be identical** in track, direction and CRID. The validator should check it. |
 | `passes.*.date` | date | Acquisition date. |
 | `overlays[].bounds` | `[w, s, e, n]` | Georeferencing for the PNG. MapLibre needs the four corners: `[[w,n],[e,n],[e,s],[w,s]]`. Image must already be reprojected to match (EPSG:4326 corners are fine for a small area). |
 | `overlays[].kind` | `"delta_db"` \| `"backscatter"` | Lets the UI pick a legend. |
-| `overlays` | array | Must contain the `change` overlay. `before`/`after` are optional: remove them if the before/after toggle is cut; the UI must hide the toggle when absent. |
+| `overlays` | array | **Optional since 0.2** (may be absent or empty). If present, items follow the table above; the UI hides overlay controls that have no overlay. |
 | `attributions` | string[] | The UI footer renders these. OSM's ODbL credit is mandatory. |
 
 ## 3. `change.geojson`
 
-Detected change zones from step 1 of the method.
+**Optional layer** (v0.2): radar change zones, which may be an **empty FeatureCollection**. At landslide scale the detectability test was negative (`approach.md` §5).
 
 GeoJSON `FeatureCollection`, with `schema_version` as a top-level foreign member.
 
 ```json
 {
   "type": "FeatureCollection",
-  "schema_version": "0.1",
+  "schema_version": "0.2",
   "features": [
     {
       "type": "Feature",
@@ -95,7 +100,7 @@ GeoJSON `FeatureCollection`, with `schema_version` as a top-level foreign member
 |---|---|---|
 | `id` | string | Zone id (`z1`, …). |
 | `area_m2` | number | After removing blobs below the minimum area. |
-| `mean_delta_db` | number | Mean ΔdB inside the zone. The UI shows it as "mean backscatter change". |
+| `mean_delta_db` | number | Mean ΔdB inside the zone (only if the layer has zones). The UI shows it as "mean backscatter change". |
 | `min_delta_db` | number | Optional; strongest change. |
 
 Polygons are `Polygon` or `MultiPolygon`; no holes required. This is a **signal**, not a confirmed landslide.
@@ -116,7 +121,7 @@ Road network and facilities. The browser runs shortest-path on this to simulate 
 
 ```json
 {
-  "schema_version": "0.1",
+  "schema_version": "0.2",
   "nodes": [ { "id": "n1", "lon": -83.9, "lat": 10.1 } ],
   "edges": [
     { "id": "e1", "from": "n1", "to": "n2", "length_m": 0, "time_s": 0, "road": "Ruta 32", "oneway": false, "candidate_id": null, "geometry": [[-83.9, 10.1], [-83.89, 10.11]] }
@@ -130,7 +135,7 @@ Road network and facilities. The browser runs shortest-path on this to simulate 
 |---|---|
 | `edges[].time_s` | Free-flow travel time. Same cost model as the pipeline, so the browser and the pipeline give the same numbers. One constant speed per OSM road class, listed in `meta.json → speed_model_kmh` (class → km/h). |
 | `edges[].oneway` | `false` = traversable both ways. Edges are otherwise directed `from → to`. |
-| `edges[].candidate_id` | The `T-xx` id if this edge belongs to a candidate segment, else `null`. |
+| `edges[].candidate_id` | The `T-xx` id if this edge belongs to a critical segment (key `candidates`), else `null`. |
 | `edges[].geometry` | Polyline for drawing; endpoints equal the `from`/`to` node coordinates. |
 | `hospitals[].node`, `communities[].node` | Snapped node ids. |
 | `communities[].population` | Integer or `null`. Never `0` for "unknown". |
@@ -143,11 +148,11 @@ Rules:
 
 ## 6. `scenarios.json`
 
-Per candidate segment: the result of removing it from the network (step 3 and 4 of the method).
+Per critical segment (key `candidates`): the result of removing it from the network (step 3 and 4 of the method).
 
 ```json
 {
-  "schema_version": "0.1",
+  "schema_version": "0.2",
   "baseline": [ { "community_id": "c1", "time_s": 0, "hospital_id": "h1" } ],
   "candidates": [
     {
@@ -173,6 +178,10 @@ Per candidate segment: the result of removing it from the network (step 3 and 4 
 | `baseline[]` | Time to the nearest hospital with **no** closures. `time_s` and `hospital_id` are `null` for a community with no path even before any closure. |
 | `candidates[].rank` | 1 = most critical. Sort order for the list. |
 | `edge_ids` | Edges removed together when this candidate is closed. |
+| `zone_ids` | May be empty (no change zone). Already allowed in 0.1. |
+| `mean_delta_db` | `null` when there is no zone. Already allowed in 0.1. |
+| `source` | Optional (0.2). Only value: `"network_consequence"` (the segment was chosen by consequence, not by detection). |
+| `exposure` | Optional, nullable (0.2): `rain_mm_12d` (number or `null`), `soil_moisture_pctl` (0–100 or `null`), `radar_evidence` (`"not_detectable_at_scale"` or `null`). Unknown stays `null`. |
 | `extra_time_s` | The headline number: the maximum `extra_s` among affected, non-isolated communities. |
 | `criticality` | Sum over affected communities of `population × extra_s`. An isolated community uses as `extra_s` the largest finite `extra_s` across all candidates (its penalty). A community with `population: null` adds 0. Ties, and the case where no population is known, rank by `extra_time_s` and then by isolated count. |
 | `population_dependent` | Integer or `null`. Total population of affected communities. |
@@ -204,11 +213,11 @@ Header row is required. The pass dates in `meta.json` mark the interval on the c
 
 1. **Schema checks** for every file above, including `schema_version`.
 2. **Consistency checks**, which JSON Schema cannot express (add as small Python tests):
-   - `passes.before` and `passes.after` share track, direction and CRID.
+   - If `passes` exists, `passes.before` and `passes.after` share track, direction and CRID.
    - Every `from`/`to`/`node` id exists in `graph.nodes`.
    - Every `scenarios.candidates[].edge_ids` exists in `graph.edges`; every `candidate_id` in the graph appears in `scenarios`.
    - `isolated_community_ids ⊆ affected_community_ids`; community and hospital ids exist.
-   - Overlay files named in `meta.json` exist, are at most 2 MB, and `bounds` has `west < east` and `south < north`; the `change` overlay is present.
+   - Overlay files named in `meta.json` (if any) exist, are at most 2 MB, and `bounds` has `west < east` and `south < north`. The `change` overlay is no longer required (0.2).
    - `rain.csv` dates cover the period in `meta.json`.
    - `meta.files.rain_csv_schema` is present.
 3. **English error messages**: the validator names the file, the field and the rule that failed, in English.
@@ -227,7 +236,6 @@ Header row is required. The pass dates in `meta.json` mark the interval on the c
 3. Bump `schema_version`.
 4. Update producer (pipeline) and consumer (frontend) in the same PR.
 5. Run `make validate`.
-6. Get review from one backend and one frontend person (CODEOWNERS).
 
 ## 11. Decisions closed before freezing (14 Nov)
 
@@ -241,3 +249,18 @@ Header row is required. The pass dates in `meta.json` mark the interval on the c
 | 6 | Keep `before`/`after` overlays? | `change` is required; `before`/`after` are optional and decided at the Sunday 14:00 feature freeze (G2) |
 
 New `meta.json` fields to add to the schema (B4): `speed_model_kmh`, `overlays[].range_db`, `rain.aggregation`. The speed values themselves are set when the road graph is built (P3).
+
+## 12. Change 0.2 (after G1)
+
+| Area | Change | Why |
+|---|---|---|
+| All schemas and mocks | `schema_version` `"0.1"` → `"0.2"`. `rain_csv_schema` stays `"0.1"` (the CSV layout did not change). | Contract versioning rule (§10). |
+| `meta.json` | `passes` and `overlays` no longer required; the "must contain `change`" rule is removed. | The radar change layer is optional (G1). |
+| `meta.json` | New optional `detection_limits` and `exposure_sources`. `area` already existed; now documented as the pipeline's zone parameter. | Show the negative result as data; zone as a parameter. |
+| `change.geojson` | No shape change; an empty FeatureCollection is the expected "no layer" value. | Optional layer. |
+| `scenarios.json` | New optional `candidates[].source` and nullable `candidates[].exposure`. `zone_ids` and `mean_delta_db` may be empty or `null` (already allowed). | Critical segments by consequence plus exposure. |
+| `validate.py` and tests | `passes` and `overlays` read as optional; two tests added or changed. | Validator must match the schema. |
+
+Not decided here: how `rain.start/end` is chosen when there are no passes (it is still required and `rain.csv` must cover it).
+
+The UI infers "no change layer" from empty `change.geojson` and absent `overlays`; there is no explicit flag.

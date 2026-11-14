@@ -1,21 +1,24 @@
 # VANTAGE
 
-> NISAR ve dónde se movió la montaña; VANTAGE dice a quién deja sin salida.
+> Versión provisional (lluvia y consecuencia): VANTAGE muestra qué tramos de la Ruta 32, si se cortan, dejan a comunidades sin una buena ruta a un hospital, y qué tan expuestos están a la lluvia.
+> Solo si la prueba SME2 pasa: «NISAR muestra dónde la ladera está saturada y VANTAGE dice a quién deja sin salida.»
 
-VANTAGE usa datos de radar de NISAR para mostrar **dónde se movió una ladera cerca de la Ruta 32 (Costa Rica)** y **qué comunidades pierden una buena ruta hacia un hospital** por ese movimiento. Es nuestra propuesta para el reto **"Dancing with the SARs"** de NASA Space Apps 2026.
+VANTAGE responde dos preguntas para la Ruta 32 (Costa Rica): **¿quién pierde el acceso a un hospital si se corta este tramo?** (consecuencia, calculada con la red vial de OSM, hospitales y población) y **¿qué tan expuesto está?** (lluvia IMERG y, si la prueba SME2 funciona, humedad del suelo de NISAR). Es nuestra propuesta para el reto **"Dancing with the SARs"** de NASA Space Apps 2026.
 
-Un cambio de radar es una **señal, no una confirmación**: los resultados son *tramos candidatos* que hay que verificar en campo.
+**Resultado negativo.** Probamos si NISAR GCOV a 10 m detecta cambio a escala de derrumbe pequeño y **no**: el mínimo detectable fue de unos 10×10 píxeles (≈1 ha) a −5 dB. No afirmamos que NISAR no pueda con otros productos (GUNW, offsets, series por píxel); quedan sin probar. Detalle en [`context/approach.md`](context/approach.md).
+
+Los resultados son **tramos críticos por consecuencia**, no derrumbes confirmados; la exposición es una **hipótesis**, nunca una causa. Está diseñado para generalizarse a corredores con red vial en OSM, pero solo se demuestra en la Ruta 32.
 
 ## Cómo funciona
 
 El proyecto tiene dos partes conectadas solo por archivos de datos:
 
-1. **Pipeline (Python, sin conexión):** detecta cambios en la superficie con NISAR, los cruza con la red vial de OpenStreetMap y calcula el efecto en el acceso a hospitales.
+1. **Pipeline (Python, sin conexión):** red vial de OpenStreetMap → impacto en el acceso a hospitales (consecuencia) → capa de exposición (IMERG, SME2 opcional). La detección de cambio por radar es opcional y experimental, y la zona de análisis es un parámetro.
 2. **Aplicación web (estática):** muestra los resultados en un mapa y permite simular el cierre de un tramo, recalculado en el navegador y sin servidor.
 
 ## Estado
 
-Proyecto en construcción durante el hackathon (14–15 de noviembre de 2026). Hoy existen el esqueleto del frontend y del pipeline, y el contrato de datos (esquemas, mocks y validador).
+Proyecto en construcción durante el hackathon (14–15 de noviembre de 2026). Hoy existen el esqueleto del frontend y del pipeline, y el contrato de datos (esquemas, mocks y validador). Tras la puerta G1 (sáb 14 nov, ~16:35: NO-GO para detectar cicatrices con GCOV) el producto pasó a riesgo = consecuencia × exposición; ver `STATUS.md`. El contrato está en 0.2.
 
 ## Estructura
 
@@ -134,6 +137,7 @@ Las funcionalidades se describen como especificaciones vivas en la carpeta `delt
 
 Código bajo licencia MIT. Los datos provienen de:
 
-- NISAR GCOV (NASA/JPL)
+- NISAR (NASA/JPL): GCOV para el resultado de detectabilidad; SME2 para exposición si la prueba pasa
 - IMERG Late (NASA GPM)
+- WorldPop (población)
 - © colaboradores de OpenStreetMap (ODbL)
