@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1",
+  "generated_at": "2026-11-14T12:00:00Z",
+  "files": { "rain_csv_schema": "0.1" },
+  "area": { "name": "MOCK — not real data", "bbox": [-84.2, 9.95, -83.7, 10.3] },
+  "passes": {
+    "before": { "date": "2026-06-29", "granule": "MOCK-BEFORE", "track": 1, "direction": "ascending", "crid": "P05023" },
+    "after": { "date": "2026-07-11", "granule": "MOCK-AFTER", "track": 1, "direction": "ascending", "crid": "P05023" }
+  },
+  "overlays": [
+    { "id": "change", "label": "Change", "file": "overlay_change.png", "bounds": [-84.2, 9.95, -83.7, 10.3], "kind": "delta_db", "range_db": [-6, 6] }
+  ],
+  "rain": { "product": "GPM_3IMERGDL", "version": "V07", "start": "2026-06-29", "end": "2026-07-11", "aggregation": "area_mean" },
+  "speed_model_kmh": { "primary": 60, "secondary": 40, "tertiary": 30 },
+  "attributions": [
+    "Contains modified NISAR GCOV data (NASA/JPL)",
+    "IMERG Late (NASA GPM)",
+    "© OpenStreetMap contributors (ODbL)"
+  ]
+}

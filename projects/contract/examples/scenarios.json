@@ -1,0 +1,199 @@
+{
+  "schema_version": "0.1",
+  "baseline": [
+    {
+      "community_id": "c1",
+      "time_s": 960,
+      "hospital_id": "h1"
+    },
+    {
+      "community_id": "c2",
+      "time_s": 300,
+      "hospital_id": "h1"
+    },
+    {
+      "community_id": "c3",
+      "time_s": 720,
+      "hospital_id": "h3"
+    },
+    {
+      "community_id": "c4",
+      "time_s": 1680,
+      "hospital_id": "h1"
+    },
+    {
+      "community_id": "c5",
+      "time_s": 900,
+      "hospital_id": "h1"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "T-02",
+      "rank": 1,
+      "edge_ids": [
+        "e3"
+      ],
+      "zone_ids": [
+        "z1"
+      ],
+      "mean_delta_db": -4.2,
+      "extra_time_s": 1140,
+      "population_dependent": 2300,
+      "affected_community_ids": [
+        "c1",
+        "c2",
+        "c4"
+      ],
+      "isolated_community_ids": [],
+      "per_community": [
+        {
+          "community_id": "c1",
+          "time_s": 2100,
+          "extra_s": 1140,
+          "hospital_id": "h3"
+        },
+        {
+          "community_id": "c2",
+          "time_s": 1440,
+          "extra_s": 1140,
+          "hospital_id": "h3"
+        },
+        {
+          "community_id": "c4",
+          "time_s": 2820,
+          "extra_s": 1140,
+          "hospital_id": "h3"
+        }
+      ],
+      "alternates": [
+        {
+          "name": "Ruta 126",
+          "vehicles": "light"
+        },
+        {
+          "name": "Ruta 10",
+          "vehicles": "freight"
+        }
+      ],
+      "criticality": 2622000
+    },
+    {
+      "id": "T-01",
+      "rank": 2,
+      "edge_ids": [
+        "e2"
+      ],
+      "zone_ids": [
+        "z1"
+      ],
+      "mean_delta_db": -4.2,
+      "extra_time_s": 1200,
+      "population_dependent": 1500,
+      "affected_community_ids": [
+        "c1",
+        "c4"
+      ],
+      "isolated_community_ids": [],
+      "per_community": [
+        {
+          "community_id": "c1",
+          "time_s": 2160,
+          "extra_s": 1200,
+          "hospital_id": "h3"
+        },
+        {
+          "community_id": "c4",
+          "time_s": 2880,
+          "extra_s": 1200,
+          "hospital_id": "h3"
+        }
+      ],
+      "alternates": [
+        {
+          "name": "Ruta 126",
+          "vehicles": "light"
+        },
+        {
+          "name": "Ruta 10",
+          "vehicles": "freight"
+        }
+      ],
+      "criticality": 1800000
+    },
+    {
+      "id": "T-03",
+      "rank": 3,
+      "edge_ids": [
+        "e9"
+      ],
+      "zone_ids": [
+        "z2"
+      ],
+      "mean_delta_db": -3.1,
+      "extra_time_s": null,
+      "population_dependent": 300,
+      "affected_community_ids": [
+        "c4"
+      ],
+      "isolated_community_ids": [
+        "c4"
+      ],
+      "per_community": [
+        {
+          "community_id": "c4",
+          "time_s": null,
+          "extra_s": null,
+          "hospital_id": null
+        }
+      ],
+      "alternates": [
+        {
+          "name": "Ruta 126",
+          "vehicles": "light"
+        },
+        {
+          "name": "Ruta 10",
+          "vehicles": "freight"
+        }
+      ],
+      "criticality": 360000
+    },
+    {
+      "id": "T-04",
+      "rank": 4,
+      "edge_ids": [
+        "e4"
+      ],
+      "zone_ids": [
+        "z3"
+      ],
+      "mean_delta_db": -5.0,
+      "extra_time_s": 900,
+      "population_dependent": null,
+      "affected_community_ids": [
+        "c5"
+      ],
+      "isolated_community_ids": [],
+      "per_community": [
+        {
+          "community_id": "c5",
+          "time_s": 1800,
+          "extra_s": 900,
+          "hospital_id": "h2"
+        }
+      ],
+      "alternates": [
+        {
+          "name": "Ruta 126",
+          "vehicles": "light"
+        },
+        {
+          "name": "Ruta 10",
+          "vehicles": "freight"
+        }
+      ],
+      "criticality": 0
+    }
+  ]
+}

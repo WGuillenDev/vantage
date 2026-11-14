@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "graph.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "nodes", "edges", "hospitals", "communities"],
+  "properties": {
+    "schema_version": { "const": "0.1" },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "lon", "lat"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^n\\d+$" },
+          "lon": { "type": "number", "minimum": -180, "maximum": 180 },
+          "lat": { "type": "number", "minimum": -90, "maximum": 90 }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "from", "to", "length_m", "time_s", "road", "oneway", "candidate_id", "geometry"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^e\\d+$" },
+          "from": { "type": "string", "pattern": "^n\\d+$" },
+          "to": { "type": "string", "pattern": "^n\\d+$" },
+          "length_m": { "type": "number", "minimum": 0 },
+          "time_s": { "type": "number", "minimum": 0 },
+          "road": { "type": ["string", "null"] },
+          "oneway": { "type": "boolean" },
+          "candidate_id": { "type": ["string", "null"], "pattern": "^T-\\d{2,}$" },
+          "geometry": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": { "type": "number" }
+            }
+          }
+        }
+      }
+    },
+    "hospitals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "node"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^h\\d+$" },
+          "name": { "type": "string", "minLength": 1 },
+          "node": { "type": "string", "pattern": "^n\\d+$" }
+        }
+      }
+    },
+    "communities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "node", "population"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^c\\d+$" },
+          "name": { "type": "string", "minLength": 1 },
+          "node": { "type": "string", "pattern": "^n\\d+$" },
+          "population": { "type": ["integer", "null"], "minimum": 1 }
+        }
+      }
+    }
+  }
+}

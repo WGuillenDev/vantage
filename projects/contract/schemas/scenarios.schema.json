@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "scenarios.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "baseline", "candidates"],
+  "properties": {
+    "schema_version": { "const": "0.1" },
+    "baseline": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["community_id", "time_s", "hospital_id"],
+        "properties": {
+          "community_id": { "$ref": "#/$defs/communityId" },
+          "time_s": { "type": ["number", "null"], "minimum": 0 },
+          "hospital_id": { "type": ["string", "null"], "pattern": "^h\\d+$" }
+        }
+      }
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id", "rank", "edge_ids", "zone_ids", "mean_delta_db", "criticality", "extra_time_s",
+          "population_dependent", "affected_community_ids", "isolated_community_ids", "per_community", "alternates"
+        ],
+        "properties": {
+          "id": { "type": "string", "pattern": "^T-\\d{2,}$" },
+          "rank": { "type": "integer", "minimum": 1 },
+          "edge_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^e\\d+$" } },
+          "zone_ids": { "type": "array", "items": { "type": "string", "pattern": "^z\\d+$" } },
+          "mean_delta_db": { "type": ["number", "null"] },
+          "criticality": { "type": "number", "minimum": 0 },
+          "extra_time_s": { "type": ["number", "null"], "minimum": 0 },
+          "population_dependent": { "type": ["integer", "null"], "minimum": 0 },
+          "affected_community_ids": { "type": "array", "items": { "$ref": "#/$defs/communityId" } },
+          "isolated_community_ids": { "type": "array", "items": { "$ref": "#/$defs/communityId" } },
+          "per_community": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["community_id", "time_s", "extra_s", "hospital_id"],
+              "properties": {
+                "community_id": { "$ref": "#/$defs/communityId" },
+                "time_s": { "type": ["number", "null"], "minimum": 0 },
+                "extra_s": { "type": ["number", "null"], "minimum": 0 },
+                "hospital_id": { "type": ["string", "null"], "pattern": "^h\\d+$" }
+              }
+            }
+          },
+          "alternates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["name", "vehicles"],
+              "properties": {
+                "name": { "type": "string", "minLength": 1 },
+                "vehicles": { "enum": ["light", "freight"] }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "communityId": { "type": "string", "pattern": "^c\\d+$" }
+  }
+}
