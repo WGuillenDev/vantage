@@ -65,8 +65,8 @@ _Actualizá este bloque cada vez que marques una tarea `[x]`._
 | S2 | Detectabilidad | R | [x] | **FALLA** → G1 NO-GO; mínimo detectable ≈1 ha a −5 dB |
 | S2c | SME2: ¿sube antes de los cierres? | R | [x] | **FALLA**: 1 de 4 eventos sobre p75 (hacían falta 3); exposición solo con IMERG (D7). SME2 sí existe y cubre la ruta (S1′ PASA) |
 | S3 | Eventos de validación | R | [~] | PARCIAL: prensa que cita al MOPT; sin comunicado primario en `mopt.go.cr` ni `conavi.go.cr`. Se corrigió la lista: el 17 jul sí hubo cierre; se añadieron el 8 oct y el 2.º episodio de feb |
-| S4 | Red vial y métrica | I | [x] | PARCIAL: la red regional conecta (+77,6 min por alterna al cortar el parque); con «hospital más cercano» el parque afecta a 0 comunidades; recortar al corredor crea aislamientos falsos (ver `SPIKING.md`). **S4′ (red real, 191 tramos):** con una calzada por cierre todo falla; con las dos calzadas (19 cierres) pasa solo «hospital nacional» (R2); ver `SPIKING.md` |
-| S5 | IMERG | I | [x] | Lectura PASA (317 días); señal FALLA: 3 de 8 cierres sobre p75 de lluvia de 12 días (hacían falta 6), todos de ago–oct. La lluvia va como contexto, «hipótesis» (ver `SPIKING.md` S5) |
+| S4 | Red vial y métrica | R | [x] | PARCIAL: la red regional conecta (+77,6 min por alterna al cortar el parque); con «hospital más cercano» el parque afecta a 0 comunidades; recortar al corredor crea aislamientos falsos (ver `SPIKING.md`). **S4′ (red real, 191 tramos):** con una calzada por cierre todo falla; con las dos calzadas (19 cierres) pasa solo «hospital nacional» (R2); ver `SPIKING.md` |
+| S5 | IMERG | R | [x] | Lectura PASA (317 días); señal FALLA: 3 de 8 cierres sobre p75 de lluvia de 12 días (hacían falta 6), todos de ago–oct. La lluvia va como contexto, «hipótesis» (ver `SPIKING.md` S5) |
 | S6 | Humo del frontend | W, V | [x] | PASA |
 | S7 | WorldPop | W | [x] | PASA |
 | S8 | `graph.ts` | V | [x] | PASA; ya está en `main` |
