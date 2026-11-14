@@ -89,7 +89,8 @@ Rules:
 - **`MARGIN_M`** (Ian, after S2 from Ron): 50 m is provisional; Ron delivers the real `change.geojson` and the typical zone size from S2.
 - **Real `change.geojson`** (Ron, P2): until then, runs use `projects/contract/examples/change.geojson`, whose zones are fake.
 - **Candidates on parallel roads** (Ian): a zone between two parallel roads marks both; this spec accepts it, because the ranking decides which matters.
-- **Testing gaps:** INV-01 to INV-11 and ACC-01 to ACC-03 are `none` until `/builder candidate-segments` adds tests.
+- **Testing gaps:** ACC-03 is `none` until `feat/candidate-segments` and `feat/impact-scoring` are merged, since its test needs `impact_scoring.py`.
+- **Contract mock coherence** (Ron and the frontend CODEOWNER, `contracts.md` §10): run on the mock, this slice groups `e2`, `e3`, `e4` into one candidate (same `road`, contiguous), while the mock `scenarios.json` lists them as three. The mock is hand-made and is not an oracle for this slice; making it coherent end to end is a contract-examples change, not this slice's job.
 
 ## Acceptance criteria
 
