@@ -22,7 +22,7 @@
 | S3 | PARCIAL | Cierres de 2026 con prensa que cita al MOPT; sigue sin comunicado primario (se revisó `mopt.go.cr` y `conavi.go.cr`). Se reincorporó el cierre del 17 jul y se añadieron el 8 oct y el segundo episodio de feb. |
 | S4′ | **R2 PASA; N y R FALLAN** | Sobre la red real (191 tramos de Ruta 32), con cierre de una calzada todo falla; cerrando las dos calzadas (19 cierres) pasa solo «hospital nacional» (R2), con límites. Ver ficha. |
 | S4 | PARCIAL | Red regional conecta; un corte en el parque da +77,6 min San José→Guápiles por alterna. Con «hospital más cercano» el parque afecta a 0 comunidades; recortar al corredor crea aislamientos falsos (ver ficha). |
-| S5 | **BLOQUEADO** | IMERG existe, pero GES DISC rechaza la lectura: falta autorizar la app «NASA GESDISC DATA ARCHIVE» en Earthdata. Criterios escritos; sin valores. |
+| S5 | **Lectura PASA; señal FALLA** | IMERG diario leído sin problema (317 días, 9 celdas). La lluvia de 12 días previa supera el p75 en 3 de 8 cierres (hacían falta 6); los tres son de ago–oct. Se muestra como contexto, no como señal. |
 | S6 | PASA | MapLibre carga el mock en dev, build y Pages (https://wguillendev.github.io/vantage/), sin errores de consola. |
 | S7 | PASA | WorldPop CRI 2020 (100 m): 31,5 MB por HTTPS, sin streaming; se recorta con `rasterio`. 946 290 personas en el `bbox` provisional `[-84.20, 9.95, -83.70, 10.30]`. Es una estimación modelada, no un censo. |
 | S8 | PASA | `graph.ts` (ya en `main`) coincide con la línea base y con los 4 candidatos del mock, incluido el aislamiento de c4 en T-03. |
@@ -173,7 +173,25 @@
 
 ## S5 · IMERG
 
-**BLOQUEADO (14 nov).** La cobertura existe (S1′), pero GES DISC rechaza la lectura (HTTP 401/403 `access_denied`, «Pre authorization required for this application»): la cuenta de Earthdata debe autorizar la aplicación **NASA GESDISC DATA ARCHIVE** (`https://urs.earthdata.nasa.gov/approve_app?client_id=e2WVk8Pw6weeLUKZYOxvTQ`). Es una acción de la persona dueña de la cuenta. Hasta entonces no hay valores de IMERG ni veredicto.
+**Lectura PASA; señal FALLA (14 nov).** Primero GES DISC rechazó la lectura (HTTP 401/403, «Pre authorization required»): hubo que autorizar la aplicación **NASA GESDISC DATA ARCHIVE** en Earthdata. Autorizada, se leyó sin problema. Scripts y datos en `projects/pipeline/spikes/s5/` (`measure.py`, `judge.py`, `imerg_daily.csv`).
+
+- **Lectura:** 317 días completos (1 ene–13 nov; el 14 nov aún no estaba publicado), 9 celdas de 0,1° por día (el borde del bbox cae sobre centros de celda y el redondeo incluyó 3×3; los criterios decían «centro dentro del bbox» sin precisar los bordes), 36 bytes por día en el recorte. Sin días faltantes ni parciales.
+- **Señal:** línea base de 258 sumas de 12 días (mediana 104,5 mm; p75 149,2 mm). Eventos sobre p75: **3 de 8** (hacían falta 6). Mediana de eventos 81,3 mm, **por debajo** de la línea base.
+
+| Evento | Suma de 12 días previos | Percentil en la línea base | Sobre p75 |
+|---|---|---|---|
+| A · 5 feb | 52,5 mm | 26 | no |
+| A2 · 14 feb | 37,3 mm | 16 | no |
+| B · 2 jul | 36,9 mm | 16 | no |
+| B2 · 17 jul | 59,1 mm | 33 | no |
+| C · 17 ago | 199,3 mm | 93 | sí |
+| F · 13 sep | 103,4 mm | 49 | no |
+| D · 5 oct | 253,2 mm | 97 | sí |
+| D2 · 8 oct | 245,4 mm | 96 | sí |
+
+- **Lectura honesta:** los tres que superan el p75 (C, D, D2) son de ago–oct, con lluvia previa en el percentil 93–97; los de febrero y julio ocurrieron con poca lluvia en los 12 días previos. Así que la lluvia reciente no explica por sí sola los cierres, aunque los de ago–oct son compatibles con ella. Es una señal parcial, no una regla.
+- **Límites:** media de ~1 000 km² a 0,1° sobre un corredor de ladera estrecha; IMERG Late (no el final); día UTC contra horas de cierre en hora CR; horas de inicio asumidas donde la prensa no las da (A al anochecer del 5 feb, A2 ~20:00); fin de ventana de D2 asumido; 8 eventos; no se probó otra duración de acumulación (3, 7 días) porque no estaba en los criterios y probarla ahora sería elegir la que salga mejor.
+- **Consecuencia:** el bloque «Exposición» muestra la lluvia como **contexto con la etiqueta «hipótesis»**, sin afirmar relación con los cierres.
 
 **Criterios (escritos antes de leer ningún valor).** Lectura de `GPM_3IMERGDL` V07 (precipitación diaria, día UTC) en las celdas con centro dentro de `[-84.15, 9.95, -83.75, 10.25]`, 1 ene–14 nov. PASA lectura si el recorte pesa menos de 1 MB por día y no faltan días. PASA señal si la lluvia acumulada en los 12 días anteriores al inicio del cierre (A feb 5, A2 feb 14, B, B2, C, F, D, D2) supera el p75 de la misma suma móvil en fechas sin cierre (ni los 3 días previos) en al menos el 75 % de los eventos y la mediana de eventos supera la mediana de la línea base. Si falla, el bloque «Exposición» queda con la lluvia como contexto y sin afirmar relación con los cierres.
 

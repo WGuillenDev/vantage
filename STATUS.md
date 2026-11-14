@@ -12,7 +12,7 @@ Leyenda: `[ ]` pendiente · `[~]` en curso · `[x]` hecha · `[-]` descartada (c
 | # | Fase | Cuándo | Objetivo | Estado |
 |---|---|---|---|---|
 | 1 | **Bootstrap** | Sáb 09:00–11:00 | Repo, herramientas, contrato y mocks, esqueleto desplegado | [x] |
-| 2 | **Spiking** | Sáb 11:00–15:00 | Probar los supuestos riesgosos y decidir en la **Puerta 1** | [~] G1 decidida (NO-GO de detección); S2c FALLA; faltan S3 (parcial) y S5 |
+| 2 | **Spiking** | Sáb 11:00–15:00 | Probar los supuestos riesgosos y decidir en la **Puerta 1** | [~] G1 decidida (NO-GO de detección); S2c y S5 (señal) FALLAN; falta cerrar S3 (parcial) |
 | 3 | **Building** | Sáb ~17:00 → dom 14:00 | Datos reales por el pipeline y UI completa sobre el contrato | [ ] |
 | 4 | **Polish** | Dom 14:00 → cierre | Congelar, corregir errores, probar, desplegar, presentar | [ ] |
 
@@ -22,12 +22,12 @@ Prioridad ahora: la mitad de datos reales (grafo → población → impacto → 
 
 ## Progreso
 
-**17 / 39 tareas · 44 %** `█████████░░░░░░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman; las `[-]` descartadas no cuentan)_
+**18 / 39 tareas · 46 %** `█████████░░░░░░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman; las `[-]` descartadas no cuentan)_
 
 | Fase | Hechas | % |
 |---|---|---|
 | 1 · Bootstrap | 9 / 9 | 100 % |
-| 2 · Spiking | 7 / 9 | 78 % |
+| 2 · Spiking | 8 / 9 | 89 % |
 | 3 · Building | 1 / 16 | 6 % |
 | 4 · Polish | 0 / 5 | 0 % |
 
@@ -66,7 +66,7 @@ _Actualizá este bloque cada vez que marques una tarea `[x]`._
 | S2c | SME2: ¿sube antes de los cierres? | R | [x] | **FALLA**: 1 de 4 eventos sobre p75 (hacían falta 3); exposición solo con IMERG (D7). SME2 sí existe y cubre la ruta (S1′ PASA) |
 | S3 | Eventos de validación | R | [~] | PARCIAL: prensa que cita al MOPT; sin comunicado primario en `mopt.go.cr` ni `conavi.go.cr`. Se corrigió la lista: el 17 jul sí hubo cierre; se añadieron el 8 oct y el 2.º episodio de feb |
 | S4 | Red vial y métrica | I | [x] | PARCIAL: la red regional conecta (+77,6 min por alterna al cortar el parque); con «hospital más cercano» el parque afecta a 0 comunidades; recortar al corredor crea aislamientos falsos (ver `SPIKING.md`). **S4′ (red real, 191 tramos):** con una calzada por cierre todo falla; con las dos calzadas (19 cierres) pasa solo «hospital nacional» (R2); ver `SPIKING.md` |
-| S5 | IMERG | I | [~] | **BLOQUEADO por una acción tuya**: autorizar la app «NASA GESDISC DATA ARCHIVE» en tu perfil de Earthdata (`https://urs.earthdata.nasa.gov/approve_app?client_id=e2WVk8Pw6weeLUKZYOxvTQ`). Criterios ya escritos en `SPIKING.md` |
+| S5 | IMERG | I | [x] | Lectura PASA (317 días); señal FALLA: 3 de 8 cierres sobre p75 de lluvia de 12 días (hacían falta 6), todos de ago–oct. La lluvia va como contexto, «hipótesis» (ver `SPIKING.md` S5) |
 | S6 | Humo del frontend | W, V | [x] | PASA |
 | S7 | WorldPop | W | [x] | PASA |
 | S8 | `graph.ts` | V | [x] | PASA; ya está en `main` |
@@ -81,7 +81,7 @@ _Actualizá este bloque cada vez que marques una tarea `[x]`._
 | E4 | Población WorldPop sobre las comunidades (para que la criticidad deje de dar 0) | I | [ ] | `population` poblada donde hay dato |
 | E5 | Decidir la métrica de impacto (hospital de referencia vs. más cercano; con el más cercano el parque da 0 comunidades afectadas) y revisar a mano la 1 aislada hasta Limón | I | [ ] | Una sola cifra por tramo y la decisión anotada abajo — **recomendación S4′: R2, con límites; decisión pendiente** |
 | P5 | Impacto: quitar un tramo a la vez → tiempo extra, población, aisladas, ranking → `scenarios.json` (clave `candidates`, `source: "network_consequence"`; spec: `projects/pipeline/deltas/impact-scoring.spec.md`) | I | [ ] | Valida; un caso revisado a mano; sin aislamientos falsos (comunidades ajustadas a la vía cortada, `oneway`) |
-| E1 | IMERG: `rain.csv` y lluvia acumulada por tramo (`exposure.rain_mm_12d`) | I | [ ] | Valida; las fechas cubren el periodo |
+| E1 | IMERG: `rain.csv` y lluvia acumulada por tramo (`exposure.rain_mm_12d`) | I | [ ] | Valida; las fechas cubren el periodo. Lectura ya probada en S5; no afirmar relación con los cierres |
 | E3 | Zona como parámetro (nombre o bbox en config → `meta.area`) | I | [ ] | Cambiar el bbox cambia la salida sin tocar código |
 | P7 | `meta.json` y `make all` de punta a punta | R | [ ] | `make all` regenera todo y `make validate` pasa |
 | P8 | **Primer despliegue con datos reales** | R, W | [ ] | El sitio publicado muestra datos reales (meta: sáb 21:00) |
