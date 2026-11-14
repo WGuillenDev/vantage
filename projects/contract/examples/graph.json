@@ -1,0 +1,321 @@
+{
+  "schema_version": "0.1",
+  "nodes": [
+    {
+      "id": "n1",
+      "lon": -83.95,
+      "lat": 10.05
+    },
+    {
+      "id": "n2",
+      "lon": -83.9,
+      "lat": 10.1
+    },
+    {
+      "id": "n3",
+      "lon": -83.85,
+      "lat": 10.12
+    },
+    {
+      "id": "n4",
+      "lon": -83.8,
+      "lat": 10.15
+    },
+    {
+      "id": "n5",
+      "lon": -83.9,
+      "lat": 10.2
+    },
+    {
+      "id": "n6",
+      "lon": -83.75,
+      "lat": 10.25
+    },
+    {
+      "id": "n7",
+      "lon": -84.0,
+      "lat": 10.15
+    },
+    {
+      "id": "n8",
+      "lon": -83.85,
+      "lat": 10.25
+    },
+    {
+      "id": "n9",
+      "lon": -83.88,
+      "lat": 10.22
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "n1",
+      "to": "n2",
+      "length_m": 6000,
+      "time_s": 360,
+      "road": "Ruta 32",
+      "oneway": false,
+      "candidate_id": null,
+      "geometry": [
+        [
+          -83.95,
+          10.05
+        ],
+        [
+          -83.9,
+          10.1
+        ]
+      ]
+    },
+    {
+      "id": "e2",
+      "from": "n2",
+      "to": "n3",
+      "length_m": 5000,
+      "time_s": 300,
+      "road": "Ruta 32",
+      "oneway": false,
+      "candidate_id": "T-01",
+      "geometry": [
+        [
+          -83.9,
+          10.1
+        ],
+        [
+          -83.85,
+          10.12
+        ]
+      ]
+    },
+    {
+      "id": "e3",
+      "from": "n3",
+      "to": "n4",
+      "length_m": 5000,
+      "time_s": 300,
+      "road": "Ruta 32",
+      "oneway": false,
+      "candidate_id": "T-02",
+      "geometry": [
+        [
+          -83.85,
+          10.12
+        ],
+        [
+          -83.8,
+          10.15
+        ]
+      ]
+    },
+    {
+      "id": "e4",
+      "from": "n4",
+      "to": "n6",
+      "length_m": 15000,
+      "time_s": 900,
+      "road": "Ruta 32",
+      "oneway": false,
+      "candidate_id": "T-04",
+      "geometry": [
+        [
+          -83.8,
+          10.15
+        ],
+        [
+          -83.75,
+          10.25
+        ]
+      ]
+    },
+    {
+      "id": "e5",
+      "from": "n2",
+      "to": "n5",
+      "length_m": 12000,
+      "time_s": 1080,
+      "road": "Ruta 126",
+      "oneway": false,
+      "candidate_id": null,
+      "geometry": [
+        [
+          -83.9,
+          10.1
+        ],
+        [
+          -83.9,
+          10.2
+        ]
+      ]
+    },
+    {
+      "id": "e6",
+      "from": "n5",
+      "to": "n9",
+      "length_m": 8000,
+      "time_s": 720,
+      "road": null,
+      "oneway": false,
+      "candidate_id": null,
+      "geometry": [
+        [
+          -83.9,
+          10.2
+        ],
+        [
+          -83.88,
+          10.22
+        ]
+      ]
+    },
+    {
+      "id": "e7",
+      "from": "n9",
+      "to": "n8",
+      "length_m": 10000,
+      "time_s": 900,
+      "road": null,
+      "oneway": false,
+      "candidate_id": null,
+      "geometry": [
+        [
+          -83.88,
+          10.22
+        ],
+        [
+          -83.85,
+          10.25
+        ]
+      ]
+    },
+    {
+      "id": "e8",
+      "from": "n8",
+      "to": "n6",
+      "length_m": 20000,
+      "time_s": 1800,
+      "road": "Ruta 10",
+      "oneway": false,
+      "candidate_id": null,
+      "geometry": [
+        [
+          -83.85,
+          10.25
+        ],
+        [
+          -83.75,
+          10.25
+        ]
+      ]
+    },
+    {
+      "id": "e9",
+      "from": "n7",
+      "to": "n2",
+      "length_m": 9000,
+      "time_s": 1080,
+      "road": null,
+      "oneway": false,
+      "candidate_id": "T-03",
+      "geometry": [
+        [
+          -84.0,
+          10.15
+        ],
+        [
+          -83.9,
+          10.1
+        ]
+      ]
+    },
+    {
+      "id": "e10",
+      "from": "n1",
+      "to": "n5",
+      "length_m": 14000,
+      "time_s": 1680,
+      "road": null,
+      "oneway": false,
+      "candidate_id": null,
+      "geometry": [
+        [
+          -83.95,
+          10.05
+        ],
+        [
+          -83.9,
+          10.2
+        ]
+      ]
+    },
+    {
+      "id": "e11",
+      "from": "n3",
+      "to": "n9",
+      "length_m": 12000,
+      "time_s": 1440,
+      "road": null,
+      "oneway": false,
+      "candidate_id": null,
+      "geometry": [
+        [
+          -83.85,
+          10.12
+        ],
+        [
+          -83.88,
+          10.22
+        ]
+      ]
+    }
+  ],
+  "hospitals": [
+    {
+      "id": "h1",
+      "name": "Hospital Mock A",
+      "node": "n4"
+    },
+    {
+      "id": "h2",
+      "name": "Hospital Mock B",
+      "node": "n8"
+    },
+    {
+      "id": "h3",
+      "name": "Hospital Mock C",
+      "node": "n9"
+    }
+  ],
+  "communities": [
+    {
+      "id": "c1",
+      "name": "Comunidad Mock 1",
+      "node": "n1",
+      "population": 1200
+    },
+    {
+      "id": "c2",
+      "name": "Comunidad Mock 2",
+      "node": "n3",
+      "population": 800
+    },
+    {
+      "id": "c3",
+      "name": "Comunidad Mock 3",
+      "node": "n5",
+      "population": 450
+    },
+    {
+      "id": "c4",
+      "name": "Comunidad Mock 4",
+      "node": "n7",
+      "population": 300
+    },
+    {
+      "id": "c5",
+      "name": "Comunidad Mock 5",
+      "node": "n6",
+      "population": null
+    }
+  ]
+}
