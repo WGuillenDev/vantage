@@ -15,7 +15,7 @@ El proyecto tiene dos partes conectadas solo por archivos de datos:
 
 ## Estado
 
-Proyecto en construcción durante el hackathon (14–15 de noviembre de 2026). Hoy existe el esqueleto del frontend; el pipeline y el contrato de datos aún no tienen código.
+Proyecto en construcción durante el hackathon (14–15 de noviembre de 2026). Hoy existen el esqueleto del frontend y el del pipeline; el contrato de datos aún no tiene código.
 
 ## Estructura
 
@@ -36,7 +36,7 @@ vantage/
 | Git | Control de versiones |
 | Bun | Frontend (TypeScript, React, Vite) |
 | uv | Pipeline (Python y dependencias) |
-| make | Comandos del repositorio (cuando exista el `Makefile`) |
+| make | Comandos del repositorio (`Makefile` en la raíz) |
 
 Los comandos de abajo son para Windows con [Scoop](https://scoop.sh).
 
@@ -93,7 +93,7 @@ Desde `projects/frontend/`:
 
 ### Pipeline
 
-Aún no hay código. Cuando exista, se gestionará con `uv` (`uv sync` para instalar, `uv run` para ejecutar).
+Se gestiona con `uv`. Desde `projects/pipeline/`: `uv sync` instala y `uv run pipeline` ejecuta. Por ahora solo imprime un saludo.
 
 ### Pruebas en el navegador (opcional)
 
