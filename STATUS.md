@@ -25,12 +25,12 @@ Prioridad ahora: **contratos congelados** (desbloquea al frontend) y **spikes** 
 
 ## Progreso
 
-**9 / 41 tareas · 22 %** `████░░░░░░░░░░░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman)_
+**10 / 41 tareas · 24 %** `█████░░░░░░░░░░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman)_
 
 | Fase | Hechas | % |
 |---|---|---|
 | 1 · Bootstrap | 9 / 9 | 100 % |
-| 2 · Spiking | 0 / 8 | 0 % |
+| 2 · Spiking | 1 / 8 | 12 % |
 | 3 · Building | 0 / 17 | 0 % |
 | 4 · Polish | 0 / 7 | 0 % |
 
@@ -80,7 +80,7 @@ También durante el spiking (frontend contra mocks, sin depender de los spikes):
 | ID | Tarea | Dueño | Estado | Terminada cuando |
 |---|---|---|---|---|
 | S7 | Comprobar acceso a población (WorldPop) | W | [ ] | Funciona, o se elige el respaldo (solo tiempo extra y conteo de comunidades) |
-| S8 | Empezar `graph.ts` (camino más corto al hospital más cercano, con conjunto de tramos cerrados) | V | [ ] | Coincide con el `scenarios.json` mock en la línea base |
+| S8 | Empezar `graph.ts` (camino más corto al hospital más cercano, con conjunto de tramos cerrados) | V | [x] | Coincide con el `scenarios.json` mock en la línea base — _Hecho: PASA. `projects/frontend/source/graph.ts` (`computeAccess`, `loadGraph`) coincide con el baseline y con los 4 candidatos del mock, incluido c4 aislada en T-03; `bun test` pasa. Falta contrastarlo con el grafo real (S4)._ |
 
 ## Fase 3 · Building (sáb 15:00 → dom 14:00)
 
