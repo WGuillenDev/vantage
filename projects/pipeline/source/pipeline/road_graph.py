@@ -8,6 +8,7 @@ import sys
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from itertools import pairwise
 from pathlib import Path
 
@@ -268,24 +269,25 @@ def download(bbox: tuple, osm_dir: Path) -> None:
         )
         with urllib.request.urlopen(request, timeout=900) as response:
             (osm_dir / name).write_bytes(response.read())
+    # P7 writes this date into the OSM line of meta.json -> attributions.
+    (osm_dir / "extract_date.txt").write_text(datetime.now(UTC).date().isoformat() + "\n", encoding="utf-8")
 
 
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="road-graph", description="Build graph.json from OpenStreetMap data.")
-    parser.add_argument("--download", action="store_true", help="fetch OSM data from Overpass into work/osm first")
+    parser.add_argument("--download", action="store_true", help="only fetch the OSM extract from Overpass into work/osm")
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
+    if args.download:
+        download(SETTINGS.bbox, OSM_DIR)
+        log.info("Saved the OSM extract in %s", OSM_DIR)
+        return
     try:
-        if args.download:
-            download(SETTINGS.bbox, OSM_DIR)
         roads, features = OSM_DIR / "roads.osm", OSM_DIR / "features.osm"
         if not (roads.is_file() and features.is_file()):
-            raise RoadGraphError(f"OSM data not found in {OSM_DIR}; run `road-graph --download` first")
+            raise RoadGraphError(f"OSM extract not found in {OSM_DIR}; run `make osm` to download it")
         graph = build(roads, features, SETTINGS)
         write_graph(graph, OUTPUT / "graph.json")
-        # shortcut: speed table hand-off to meta.json (P7) is not agreed with Ron yet; it waits in work/ until then.
-        WORK.mkdir(parents=True, exist_ok=True)
-        (WORK / "speed_model_kmh.json").write_text(json.dumps(speeds, sort_keys=True) + "\n", encoding="utf-8")
     except RoadGraphError as exc:
         sys.exit(f"road-graph: {exc}")
     log.info("Wrote %s (%d nodes, %d edges)", OUTPUT / "graph.json", len(graph["nodes"]), len(graph["edges"]))
