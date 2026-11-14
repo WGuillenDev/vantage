@@ -25,11 +25,11 @@ Prioridad ahora: **contratos congelados** (desbloquea al frontend) y **spikes** 
 
 ## Progreso
 
-**6 / 41 tareas · 15 %** `███░░░░░░░░░░░░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman)_
+**8 / 41 tareas · 20 %** `███░░░░░░░░░░░░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman)_
 
 | Fase | Hechas | % |
 |---|---|---|
-| 1 · Bootstrap | 6 / 9 | 67 % |
+| 1 · Bootstrap | 8 / 9 | 89 % |
 | 2 · Spiking | 0 / 8 | 0 % |
 | 3 · Building | 0 / 17 | 0 % |
 | 4 · Polish | 0 / 7 | 0 % |
@@ -55,8 +55,8 @@ _Actualizá este bloque cada vez que marques una tarea `[x]`._
 | B3 | Cerrar las 6 decisiones abiertas de `contracts.md` §11 | R | [x] | Decisiones anotadas en el Registro de decisiones — _Hecho: las 6 cerradas el 14 nov y reflejadas en `contracts.md` §11._ |
 | B4 | Escribir los JSON Schemas en `projects/contract/schemas/` y **congelarlos** | R | [x] | Los 5 archivos de datos cubiertos, cada uno con `schema_version` — _Hecho: `meta`, `change`, `graph`, `scenarios` y `rain` (fila del CSV; su versión va en `meta.files.rain_csv_schema`), todos en `0.1`. La protección con CODEOWNERS llega con B6._ |
 | B5 | Mocks en `projects/contract/examples/`; `make mock` y `make validate` funcionando | R | [x] | Los mocks pasan la validación; incluye revisiones de referencias cruzadas — _Hecho: mocks con 4 candidatos, 3 hospitales, 5 comunidades (una aislada, una sin población) y variante sin antes/después; `make mock` y `make validate` verificados; 9 tests en `projects/pipeline/testing/`._ |
-| B6 | `CODEOWNERS` (una persona de backend y una de frontend sobre `contract/`) | R, W | [~] | Un PR que toque `contract/` exige ambas revisiones — _Hecho: `.github/CODEOWNERS` (@ronz204 backend, @WGuillenDev frontend). Falta: activar «Require review from Code Owners» en la protección de `main` (Settings → Branches)._ |
-| B7 | Esqueleto del frontend (React + Vite + MapLibre) cargando un mock | R, W | [~] | El mapa se ve en local con datos mock — _Hecho: scaffold React + Vite. Falta: MapLibre y carga de un mock._ |
+| B6 | `CODEOWNERS` (una persona de backend y una de frontend sobre `contract/`) | R, W | [x] | Un PR que toque `contract/` exige ambas revisiones — _Hecho: `.github/CODEOWNERS` (@ronz204 backend, @WGuillenDev frontend) y «Require review from Code Owners» activo en la protección de `main` (verificado por API el 14 nov)._ |
+| B7 | Esqueleto del frontend (React + Vite + MapLibre) cargando un mock | R, W | [x] | El mapa se ve en local con datos mock — _Hecho: `App.tsx` con MapLibre 5, base OSM raster y overlay `change` leído de `storage/meta.json`. Verificado el 14 nov: mocks copiados y validados, `bun run lint` y `build` pasan, y `bun run dev` muestra el mapa con el overlay y sin errores de consola._ |
 | B8 | Workflow de GitHub Pages: `make validate` → `bun run build` → publicar `dist` | R | [~] | El esqueleto tiene URL pública; `base` de Vite y `BASE_URL` correctos (sin 404) — _Hecho: `.github/workflows/deploy.yml` (`make mock` → `make validate` → build → Pages) y `base: '/vantage/'` en Vite. Falta: activar Pages con fuente «GitHub Actions» y verificar la URL tras el primer push a `main`._ |
 | B9 | Agregar los archivos de contexto (`approach`, `structure`, `functions`, `contracts`) y el `AGENTS.md` raíz | R | [x] | Archivos en el repo; AGENTS.md apunta a ellos — _Hecho: `context/*`, `CLAUDE.md` y `AGENTS.md`._ |
 
