@@ -103,6 +103,7 @@ Decision notes:
   When impact-scoring writes a candidate, `alternates` is Ruta 126 (light) and Ruta 10 (freight) if any of its edges has `road: "Ruta 32"`, and empty otherwise.
 - INV-17 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   If the `contracts.md` §8 cross-reference checks fail on the pair it is about to write, then impact-scoring exits non-zero with an English error naming the failed check and writes neither `graph.json` nor `scenarios.json`.
+- INV-18 [none]\n  If an edge's `candidate_id` in the input `graph.json` differs from the candidate whose `edge_ids` list it, then impact-scoring exits non-zero with an English error naming the edge and writes neither file.\n- INV-19 [none]\n  When impact-scoring writes `graph.json`, every edge that is in no candidate's `edge_ids` has `candidate_id: null`.
 
 ## Deferred / Open questions
 
@@ -110,7 +111,7 @@ Decision notes:
 - **Population source and method** (Wilberth via S7, then Ian or team): until decided every population is `null`, so `criticality` is 0 everywhere and the ranking runs on isolated count and `extra_time_s`.
 - **Parity with `graph.ts`** (Iván): the browser must use the same route direction (community → hospital), the same tie rule for hospitals and the same "affected" rule. A shared fixture (the contract mock) is the proposed check; agree with Iván.
 - **Metric fit for G1** (team, at G1): the S4 measurement on the real network found 215 of 495 test segments (43 %) affecting nobody and `criticality` 0 everywhere without population. A corridor-connectivity metric may be added after G1 as an additive field with one schema bump (`contracts.md` §10). Until then this spec keeps the current metric.
-- **Testing gaps:** INV-01 to INV-17 and ACC-01 to ACC-04 are `none` until `/builder impact-scoring` adds tests.
+- **Testing gaps:** INV-18 and INV-19 are `none` until a test pins them (the behavior exists since 2c9f37a).
 
 ## Acceptance criteria
 
