@@ -33,7 +33,7 @@
     },
     "overlays": {
       "type": "array",
-      "minItems": 1,
+      "contains": { "properties": { "id": { "const": "change" } }, "required": ["id"] },
       "items": {
         "type": "object",
         "additionalProperties": false,

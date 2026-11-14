@@ -6,6 +6,7 @@ from pathlib import Path
 
 from jsonschema import Draft202012Validator
 
+MAX_OVERLAY_BYTES = 2 * 1024 * 1024
 SCHEMAS = Path(__file__).resolve().parents[3] / "contract" / "schemas"
 JSON_FILES = {
     "meta.json": "meta.schema.json",
@@ -67,8 +68,11 @@ def _check_meta(folder: Path, meta: dict) -> list[str]:
         w, s, e, n = o["bounds"]
         if not (w < e and s < n):
             errors.append(f"meta.json: overlays/{o['id']}/bounds: needs west < east and south < north")
-        if not (folder / o["file"]).is_file():
+        path = folder / o["file"]
+        if not path.is_file():
             errors.append(f"meta.json: overlays/{o['id']}/file: {o['file']} does not exist")
+        elif path.stat().st_size > MAX_OVERLAY_BYTES:
+            errors.append(f"meta.json: overlays/{o['id']}/file: {o['file']} is larger than {MAX_OVERLAY_BYTES} bytes")
     return errors
 
 

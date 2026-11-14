@@ -67,3 +67,13 @@ def test_rain_must_cover_period(data: Path):
     rows = (data / "rain.csv").read_text(encoding="utf-8").splitlines()
     (data / "rain.csv").write_text("\n".join(rows[:-1]) + "\n", encoding="utf-8")
     assert any("must cover" in e for e in validate_dir(data))
+
+
+def test_change_overlay_is_required(data: Path):
+    edit(data, "meta.json", lambda m: m.update(overlays=[o for o in m["overlays"] if o["id"] != "change"]))
+    assert any("meta.json: overlays" in e for e in validate_dir(data))
+
+
+def test_oversized_overlay_is_rejected(data: Path):
+    (data / "overlay_change.png").write_bytes(b"0" * (2 * 1024 * 1024 + 1))
+    assert any("is larger than" in e for e in validate_dir(data))
