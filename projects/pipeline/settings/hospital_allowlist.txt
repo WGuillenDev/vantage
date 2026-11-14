@@ -1,0 +1,8 @@
+# Hospital allowlist for road-graph (P3): one OSM element id per line (way/…, node/…, relation/…).
+# Only amenity=hospital features reviewed by hand enter this list.
+# Criterion: pending (Ian).
+# Source: pending (Ian).
+#
+# Seen in spike S4, waiting for Ian's confirmation before they enter:
+#   way/326924912   Hospital Guápiles
+#   way/1168011056  Hospital Dr. Rafael Ángel Calderón Guardia

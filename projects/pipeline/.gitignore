@@ -1,3 +1,6 @@
 .venv/
 __pycache__/
 *.pyc
+
+# OSM downloads, caches and intermediate files (never committed)
+work/
