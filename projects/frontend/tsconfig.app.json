@@ -22,5 +22,6 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["source"]
+  "include": ["source"],
+  "exclude": ["source/**/*.test.ts"]
 }
