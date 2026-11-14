@@ -13,7 +13,7 @@
 
 ## 0. Status: DRAFT v0.1 — freeze in hours 0–2
 
-The project document fixes **which files exist and what they contain**, but not their exact fields. Everything below is a **proposal** to be reviewed by one backend and one frontend person and then frozen. Items marked **OPEN** need a team decision before freezing.
+The project document fixes **which files exist and what they contain**, but not their exact fields. Everything below is a **proposal** to be reviewed by one backend and one frontend person and then frozen. The six open decisions are closed in §11; their fields still have to be added to the schemas.
 
 Once frozen, this file must match `projects/contract/schemas/` exactly. If they differ, the schemas win; fix this file. Best practice: generate or check this reference from the schemas.
 
@@ -107,7 +107,7 @@ Referenced by `meta.json → overlays[].file`, in the same folder.
 - RGBA PNG with transparency where there is no data or no change.
 - Reprojected to match `bounds` (north-up, no rotation).
 - Change overlay: a continuous ΔdB color ramp. Before/After: grayscale backscatter.
-- Pipeline and UI must agree on the ramp's range; put the min/max in `meta.json` if the UI draws a legend (**OPEN**).
+- Pipeline and UI agree on the ramp's range through `meta.json → overlays[].range_db` (`[min, max]`, only for `delta_db`); the legend is drawn from it.
 - Light files only. Raw NISAR data is never committed.
 
 ## 5. `graph.json`
@@ -128,7 +128,7 @@ Road network and facilities. The browser runs shortest-path on this to simulate 
 
 | Field | Notes |
 |---|---|
-| `edges[].time_s` | Free-flow travel time. Same cost model as the pipeline, so the browser and the pipeline give the same numbers. **OPEN:** speed assumptions per road class (document them in `meta.json`). |
+| `edges[].time_s` | Free-flow travel time. Same cost model as the pipeline, so the browser and the pipeline give the same numbers. One constant speed per OSM road class, listed in `meta.json → speed_model_kmh` (class → km/h). |
 | `edges[].oneway` | `false` = traversable both ways. Edges are otherwise directed `from → to`. |
 | `edges[].candidate_id` | The `T-xx` id if this edge belongs to a candidate segment, else `null`. |
 | `edges[].geometry` | Polyline for drawing; endpoints equal the `from`/`to` node coordinates. |
@@ -173,8 +173,8 @@ Per candidate segment: the result of removing it from the network (step 3 and 4 
 | `baseline[]` | Time to the nearest hospital with **no** closures. `time_s` and `hospital_id` are `null` for a community with no path even before any closure. |
 | `candidates[].rank` | 1 = most critical. Sort order for the list. |
 | `edge_ids` | Edges removed together when this candidate is closed. |
-| `extra_time_s` | **OPEN:** the single headline number must be defined. Proposal: the maximum `extra_s` among affected, non-isolated communities. State the definition in `meta.json` or here. |
-| `criticality` | **OPEN:** definition. Proposal: sum over affected communities of `population × extra_s` (use only communities with `extra_s`; count isolated ones as "maximum penalty"). If population is `null`, rank by `extra_time_s` and isolated count. |
+| `extra_time_s` | The headline number: the maximum `extra_s` among affected, non-isolated communities. |
+| `criticality` | Sum over affected communities of `population × extra_s`; isolated communities count with the maximum penalty. If population is `null`, rank by `extra_time_s` and then by isolated count. |
 | `population_dependent` | Integer or `null`. Total population of affected communities. |
 | `isolated_community_ids` | Communities with **no path** to any hospital. Subset of `affected_community_ids`. Their `per_community.time_s` is `null`. |
 | `per_community[].time_s`, `extra_s` | `time_s` is `null` if isolated; then `extra_s` is `null` too. |
@@ -194,7 +194,7 @@ YYYY-MM-DD,0.0
 | Column | Notes |
 |---|---|
 | `date` | One row per day, ascending, no gaps. |
-| `precip_mm` | Daily precipitation in mm (area mean or nearest cell; state which in `meta.json`, **OPEN**). IMERG is 0.1° (~10 km), so it is context only. |
+| `precip_mm` | Daily precipitation in mm, mean of the IMERG cells inside the corridor (`meta.json → rain.aggregation: "area_mean"`). IMERG is 0.1° (~10 km), so it is context only. |
 
 Header row is required. The pass dates in `meta.json` mark the interval on the chart.
 
@@ -228,13 +228,15 @@ Header row is required. The pass dates in `meta.json` mark the interval on the c
 5. Run `make validate`.
 6. Get review from one backend and one frontend person (CODEOWNERS).
 
-## 11. Open decisions to close before freezing
+## 11. Decisions closed before freezing (14 Nov)
 
-| # | Decision | Proposal |
+| # | Decision | Resolution |
 |---|---|---|
 | 1 | How is `extra_time_s` aggregated across communities? | Max over affected non-isolated communities |
-| 2 | How is `criticality` computed? | Population-weighted extra time, isolation as max penalty |
-| 3 | Speed model per road class for `time_s` | Document constants in `meta.json` |
-| 4 | Overlay legend range | Put min/max dB in `meta.json` |
-| 5 | Rain value: area mean or nearest cell | Area mean over corridor, stated in `meta.json` |
-| 6 | Keep `before`/`after` overlays? | Decide at the Sunday 14:00 feature freeze; contract allows removing them |
+| 2 | How is `criticality` computed? | Sum of `population × extra_s`, isolation as max penalty; falls back to `extra_time_s` then isolated count when population is `null` |
+| 3 | Speed model per road class for `time_s` | One constant speed per OSM class, in `meta.json → speed_model_kmh` |
+| 4 | Overlay legend range | `meta.json → overlays[].range_db` (`[min, max]`) |
+| 5 | Rain value: area mean or nearest cell | Area mean over the corridor, `meta.json → rain.aggregation: "area_mean"` |
+| 6 | Keep `before`/`after` overlays? | Optional; decide at the Sunday 14:00 feature freeze (G2); contract allows removing them |
+
+New `meta.json` fields to add to the schema (B4): `speed_model_kmh`, `overlays[].range_db`, `rain.aggregation`. The speed values themselves are set when the road graph is built (P3).
