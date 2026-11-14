@@ -81,7 +81,7 @@ Rules:
   If a community's nearest kept node is farther than 3000 m, then road-graph leaves it out of `graph.json` and logs its name and distance in English.
 - INV-10 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes `graph.json`, every community has `population: null`.
-- INV-11 [none]
+- INV-11 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph computes `time_s`, it uses the speed of `SPEED_MODEL_KMH` for the edge's road class and no other speed source.
 - INV-12 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph runs twice on the same OSM data and settings, the two `graph.json` files are byte-identical.
@@ -93,7 +93,7 @@ Rules:
   When road-graph writes `graph.json`, no edge has the same `from` and `to`.
 - INV-16 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   If an allowlisted hospital has no OSM `name`, then road-graph exits non-zero with an English error that names its OSM id and writes no `graph.json`.
-- INV-17 [none]
+- INV-17 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   If a road class on a kept edge has no entry in `SPEED_MODEL_KMH`, then road-graph exits non-zero with an English error that names the class and writes no `graph.json`.
 - INV-18 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   If the compact `graph.json` would exceed 3 MB, then road-graph exits non-zero with an English error that states the size and writes no `graph.json`.
@@ -101,9 +101,9 @@ Rules:
   If the hospital allowlist has no ids, then road-graph exits non-zero with an English error saying the allowlist is empty and writes no `graph.json`.
 - INV-20 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When two edges join the same pair of OSM end nodes, road-graph numbers first the one with the smaller OSM way id.
-- INV-21 [none]
+- INV-21 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   If the local OSM extract is missing, then road-graph (without `--download`) exits non-zero with an English error that says how to obtain it (`make osm`) and writes no `graph.json`.
-- INV-22 [none]
+- INV-22 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When the download step finishes, `work/osm/extract_date.txt` holds the UTC download date as `YYYY-MM-DD`.
 
 ## Deferred / Open questions
