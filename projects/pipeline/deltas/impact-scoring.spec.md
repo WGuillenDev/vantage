@@ -69,39 +69,39 @@ Decision notes:
 
 ## Invariants
 
-- INV-01 [none]
+- INV-01 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   When impact-scoring finishes, the `scenarios.json` and `graph.json` it wrote pass `make validate` together with the `change.geojson` they refer to.
-- INV-02 [none]
+- INV-02 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   When impact-scoring writes `baseline`, it lists every community in `graph.json` exactly once, with the nearest-hospital route time or `null` when no route exists.
-- INV-03 [none]
+- INV-03 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   When a candidate is closed, a community is listed as affected exactly when it had a baseline route and is then isolated or has `extra_s > 0`.
-- INV-04 [none]
+- INV-04 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   When impact-scoring writes a candidate, `per_community` lists exactly its affected communities.
-- INV-05 [none]
+- INV-05 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   When a community has no route to any hospital after closing, impact-scoring lists it in `isolated_community_ids` with `time_s`, `extra_s` and `hospital_id` set to `null`.
-- INV-06 [none]
+- INV-06 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   When impact-scoring writes a candidate, `extra_time_s` is the maximum `extra_s` among its affected non-isolated communities, `null` if all affected communities are isolated, and `0` if none is affected.
-- INV-07 [none]
+- INV-07 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   When impact-scoring writes a candidate, `criticality` equals the sum over its affected communities of population times `extra_s`, where isolated communities use the penalty and `null` populations add 0.
-- INV-08 [none]
+- INV-08 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   When impact-scoring computes the penalty, it uses the largest finite `extra_s` across all candidates, or 0 if there is none.
-- INV-09 [none]
+- INV-09 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   When impact-scoring writes a candidate, `population_dependent` is the sum of the known populations of its affected communities, or `null` if none is known.
-- INV-10 [none]
+- INV-10 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   When impact-scoring ranks candidates, it orders them by `criticality` desc, then isolated count desc, then `extra_time_s` desc with `null` last, then smallest edge id, and sets `rank` 1, 2, … in that order.
-- INV-11 [none]
+- INV-11 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   When impact-scoring assigns ids, the candidate with `rank` n gets id `T-` followed by n zero-padded to at least two digits.
-- INV-12 [none]
+- INV-12 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   When impact-scoring writes `graph.json`, every candidate edge carries its final id and every other field equals the input `graph.json`.
-- INV-13 [none]
+- INV-13 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   When impact-scoring writes a candidate, `zone_ids` and `mean_delta_db` equal what P4 gave for it.
-- INV-14 [none]
+- INV-14 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   When two hospitals are reached in the same time, impact-scoring reports the one with the lowest id number.
-- INV-15 [none]
+- INV-15 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   When impact-scoring runs twice on the same inputs, both output files are byte-identical.
-- INV-16 [none]
+- INV-16 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   When impact-scoring writes a candidate, `alternates` is Ruta 126 (light) and Ruta 10 (freight) if any of its edges has `road: "Ruta 32"`, and empty otherwise.
-- INV-17 [none]
+- INV-17 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   If the `contracts.md` §8 cross-reference checks fail on the pair it is about to write, then impact-scoring exits non-zero with an English error naming the failed check and writes neither `graph.json` nor `scenarios.json`.
 
 ## Deferred / Open questions
@@ -114,11 +114,11 @@ Decision notes:
 
 ## Acceptance criteria
 
-- ACC-01 [none]
+- ACC-01 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   Given the contract mock `graph.json` with its four candidates as P4 input, when impact-scoring runs, then the candidate with `edge_ids ["e3"]` gets `rank` 1 and `criticality` 2 622 000 even though the one with `["e2"]` has the larger `extra_time_s` (1200).
-- ACC-02 [none]
+- ACC-02 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   Given the contract mock as input, when impact-scoring runs, then baseline, per-community values, `extra_time_s`, `population_dependent`, `criticality` and `rank` match `projects/contract/examples/scenarios.json` for each candidate matched by `edge_ids` (ids and `alternates` are excluded, since the mock's ids are not in rank order and its `road` values are fake).
-- ACC-03 [none]
+- ACC-03 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   Given a graph where a candidate's closure leaves no community affected, when impact-scoring runs, then that candidate has `extra_time_s` 0, `criticality` 0, `population_dependent` `null` and empty affected and isolated lists.
-- ACC-04 [none]
+- ACC-04 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   Given two candidates with `criticality` 0, one with an isolated community and `extra_time_s` `null` and the other with no isolated community and `extra_time_s` greater than 0, when impact-scoring ranks them, then the one with the isolated community gets the better `rank`.
