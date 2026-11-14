@@ -19,11 +19,11 @@
 | S2 | **FALLA** | 3 pruebas + paso A sintético: sin separar evento de control. Mínimo detectable ≈10×10 px (≈1 ha) a −5 dB. B exploratorio negativo; C (GUNW) sin correr. |
 | S2c | pendiente | SME2: ¿sube la humedad del suelo antes de los cierres? Máx. 40 min, criterios escritos antes. |
 | S3 | PARCIAL | Cierres de 2026 con prensa que cita al MOPT; falta el comunicado primario. |
-| S4 | PARCIAL | El grafo funciona, pero «hospital más cercano» da cero en el 43 % de los tramos. Mediciones contradictorias (ver `STATUS.md`). _Fuente: informe de situación; sin ficha propia._ |
+| S4 | PARCIAL | Red regional conecta; un corte en el parque da +77,6 min San José→Guápiles por alterna. Con «hospital más cercano» el parque afecta a 0 comunidades; recortar al corredor crea aislamientos falsos (ver ficha). |
 | S5 | sin avanzar | IMERG sin probar. _Fuente: informe de situación._ |
 | S6 | PASA | MapLibre carga el mock en dev, build y Pages (https://wguillendev.github.io/vantage/), sin errores de consola. |
 | S7 | PASA | WorldPop CRI 2020 (100 m): 31,5 MB por HTTPS, sin streaming; se recorta con `rasterio`. 946 290 personas en el `bbox` provisional `[-84.20, 9.95, -83.70, 10.30]`. Es una estimación modelada, no un censo. |
-| S8 | PASA en rama | `graph.ts` coincide con el mock; no está en `main`. _Fuente: informe de situación._ |
+| S8 | PASA | `graph.ts` (ya en `main`) coincide con la línea base y con los 4 candidatos del mock, incluido el aislamiento de c4 en T-03. |
 
 ---
 
@@ -82,3 +82,20 @@
 - La Nación (24 ago) cuenta al menos 27 días de cierre en 17 eventos entre el 1 ene y el 23 ago; algunos son preventivos.
 - Descartados por no aparecer en ninguna nota: un cierre del 5 nov, y los de 21 jun, 17 jul y 20 jul.
 - La lista de eventos anterior del proyecto («8–11, 9, 16–17, 20 de julio») queda como no verificada y descartada.
+
+## S4 · Red vial y métrica de impacto
+
+**PARCIAL.** El grafo y la métrica funcionan sobre un área regional; quedan aislamientos dudosos en los bordes. Scripts y comandos en `projects/pipeline/spikes/s4/` (README); las descargas no se commitean.
+
+- **Fuente:** OSM vía Overpass (OSMnx 2.1.1), 14 nov 2026. Clases `motorway`…`unclassified` (+ `_link`), sin `residential`. Áreas: corredor `[-84.10, 9.90, -83.72, 10.25]` y regional `[-84.30, 9.80, -83.40, 10.45]` (con Ruta 126 y Ruta 10). Ruta 32: `ref=32`, 281 vías `trunk`.
+- **Tamaño:** corredor 1 687 nodos, 2 216 aristas, 74 componentes (la mayor, 89,6 % de los nodos); regional 6 124 nodos, 7 068 aristas, 590 componentes (la mayor, 73,4 %). `graph.json` del corredor ~990 KB (~540 KB con geometría simplificada a ~10 m).
+- **Hospitales y comunidades:** `amenity=hospital` 27 (corredor) / 63 (regional), con ruido (clínica dental, banco de sangre, psiquiátrico, privados); comunidades `place=city/town/village/hamlet` 124 / 718. Distancia al nodo más cercano p50 / p90 / máx = 462 / 2 047 / 7 018 m (corredor) y 783 / 2 896 / 10 089 m (regional). Hospital Guápiles = `way/326924912`.
+- **Velocidades del spike:** mediana de `maxspeed` por clase (trunk 60; primary, secondary y tertiary 40; unclassified 30, con solo 20 de 2 319 aristas etiquetadas).
+- **Corte 1, Ruta 32 dentro del parque** (una arista simplificada de 34,5 km): 0 comunidades afectadas en las dos áreas del spike (borde este -83.72 y -83.40). En la red hasta Limón (borde -82.95) la medición para G1 dio 1 comunidad aislada, sin revisar a mano. Hospital Calderón Guardia → Guápiles pasa de 68,8 a 146,4 min en el regional (+77,6 min por alterna) y queda sin camino en el corredor. Las cifras 0 y 1 son de redes distintas, no una contradicción.
+- **Corte 2, Ruta 32 entre Guápiles y Siquirres** (20,3 km): 51 afectadas, 33 con tiempo extra (mediana 21,2 min, máx 72,8) y 18 aisladas. La revisión a mano (`review_isolated.py`) muestra que **ninguna de las 18 es real**: 3 quedan fuera del grafo (a más de 3 km de una vía), 2 dejan de estar aisladas, 6 están ajustadas a un nodo de la propia Ruta 32 cortada, y 7 no tienen ruta dirigida (probable artefacto de `oneway`).
+- **Razonable:** sí la línea base San José→Guápiles (68,8 min) y el desvío (+77,6 min).
+- **Riesgos para P3 y P5:** con «hospital más cercano» un corte en el parque no afecta a nadie (hospitales a ambos lados); recortar al corredor crea aislamientos falsos; ojo con comunidades ajustadas a un nodo de la vía cortada y con tramos de un solo sentido. Specs de las dos tareas: `projects/pipeline/deltas/road-graph.spec.md` y `impact-scoring.spec.md`.
+
+## S8 · `graph.ts`
+
+**PASA** (en `main`). `computeAccess(graph, [])` es idéntico al `baseline` de `scenarios.json`; los 4 candidatos del mock coinciden con su `per_community` (T-01 e2, T-02 e3, T-03 e9, T-04 e4; en T-03, c4 queda aislada); se probó una vía `oneway`. Rendimiento: ~0,03 ms por llamada en el mock (9 nodos); ~230 ms en un grafo sintético de 10 000 nodos y 50 comunidades (una medición con `bun`, no en navegador). Un Dijkstra por comunidad: si el grafo real es grande y el recálculo se nota, pasar a una sola búsqueda desde los hospitales. Falta cruzarlo con el grafo real de S4.

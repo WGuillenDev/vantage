@@ -11,7 +11,7 @@ Todo está **sin commitear** (sin git add, commit, pull ni push). La carpeta de 
 
 ## Pendiente de tu decisión
 
-- **Contradicciones que siguen:** S4 (0 comunidades afectadas en el parque vs 1 aislada) y el plan B de S4 («reducir al corredor» empeora el resultado). Están en `STATUS.md`.
+- **S4:** el merge con `main` aclaró que 0 vs 1 son redes distintas; la aislada hasta Limón sigue sin revisar (E5).
 - **CODEOWNERS:** la protección de `main` exige revisión de un dueño de código; trabajando solo hay que desactivarla o usar bypass. No se tocó.
 - **Frontend sin tocar:** `App.tsx:89` dice «Señal de cambio candidata» y `App.tsx:34` hace `meta.overlays.find(...)` (falla si `overlays` falta). `pyproject.toml:4` aún dice «NISAR change detection».
 - **`rain.start/end`** sigue obligatorio en `meta.json` aunque no haya pasadas.

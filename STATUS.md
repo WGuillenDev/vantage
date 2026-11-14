@@ -22,12 +22,12 @@ Prioridad ahora: la mitad de datos reales (grafo → población → impacto → 
 
 ## Progreso
 
-**13 / 39 tareas · 33 %** `███████░░░░░░░░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman; las `[-]` descartadas no cuentan)_
+**15 / 39 tareas · 38 %** `████████░░░░░░░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman; las `[-]` descartadas no cuentan)_
 
 | Fase | Hechas | % |
 |---|---|---|
 | 1 · Bootstrap | 9 / 9 | 100 % |
-| 2 · Spiking | 4 / 9 | 44 % |
+| 2 · Spiking | 6 / 9 | 67 % |
 | 3 · Building | 0 / 16 | 0 % |
 | 4 · Polish | 0 / 5 | 0 % |
 
@@ -65,11 +65,11 @@ _Actualizá este bloque cada vez que marques una tarea `[x]`._
 | S2 | Detectabilidad | R | [x] | **FALLA** → G1 NO-GO; mínimo detectable ≈1 ha a −5 dB |
 | S2c | SME2: ¿sube antes de los cierres? | R | [ ] | Opcional, máx. 40 min, criterios escritos antes. Si falla, exposición solo con IMERG |
 | S3 | Eventos de validación | R | [~] | PARCIAL: prensa que cita al MOPT; falta comunicado primario |
-| S4 | Red vial y métrica | I | [~] | PARCIAL: el grafo funciona; «hospital más cercano» da cero en el 43 % de los tramos |
+| S4 | Red vial y métrica | I | [x] | PARCIAL: la red regional conecta (+77,6 min por alterna al cortar el parque); con «hospital más cercano» el parque afecta a 0 comunidades; recortar al corredor crea aislamientos falsos (ver `SPIKING.md`) |
 | S5 | IMERG | I | [ ] | Sin avanzar (se absorbe en E1) |
 | S6 | Humo del frontend | W, V | [x] | PASA |
 | S7 | WorldPop | W | [x] | PASA |
-| S8 | `graph.ts` | V | [~] | PASA en rama, no está en `main` |
+| S8 | `graph.ts` | V | [x] | PASA; ya está en `main` |
 
 ## Fase 3 · Building (sáb ~17:00 → dom 14:00)
 
@@ -77,10 +77,10 @@ _Actualizá este bloque cada vez que marques una tarea `[x]`._
 
 | ID | Tarea | Dueño | Estado | Terminada cuando |
 |---|---|---|---|---|
-| P3 | Grafo vial de OSM para el área configurada: tramos, hospitales, comunidades → `graph.json` | I | [ ] | Valida; los ids se cruzan |
+| P3 | Grafo vial de OSM para el área configurada: tramos, hospitales, comunidades → `graph.json` (spec: `projects/pipeline/deltas/road-graph.spec.md`) | I | [ ] | Valida; los ids se cruzan |
 | E4 | Población WorldPop sobre las comunidades (para que la criticidad deje de dar 0) | I | [ ] | `population` poblada donde hay dato |
-| E5 | Decidir la métrica de impacto (hospital de referencia vs. más cercano) y resolver la contradicción de S4 | I | [ ] | Una sola cifra por tramo y la decisión anotada abajo |
-| P5 | Impacto: quitar un tramo a la vez → tiempo extra, población, aisladas, ranking → `scenarios.json` (clave `candidates`, `source: "network_consequence"`) | I | [ ] | Valida; un caso revisado a mano |
+| E5 | Decidir la métrica de impacto (hospital de referencia vs. más cercano; con el más cercano el parque da 0 comunidades afectadas) y revisar a mano la 1 aislada hasta Limón | I | [ ] | Una sola cifra por tramo y la decisión anotada abajo |
+| P5 | Impacto: quitar un tramo a la vez → tiempo extra, población, aisladas, ranking → `scenarios.json` (clave `candidates`, `source: "network_consequence"`; spec: `projects/pipeline/deltas/impact-scoring.spec.md`) | I | [ ] | Valida; un caso revisado a mano; sin aislamientos falsos (comunidades ajustadas a la vía cortada, `oneway`) |
 | E1 | IMERG: `rain.csv` y lluvia acumulada por tramo (`exposure.rain_mm_12d`) | I | [ ] | Valida; las fechas cubren el periodo |
 | E3 | Zona como parámetro (nombre o bbox en config → `meta.area`) | I | [ ] | Cambiar el bbox cambia la salida sin tocar código |
 | P7 | `meta.json` y `make all` de punta a punta | R | [ ] | `make all` regenera todo y `make validate` pasa |
@@ -136,7 +136,7 @@ Cortadas `[-]`: **F2** (mostrar pasadas) y **F9** (alternar antes/después): dep
 
 ### Preguntas abiertas
 
-- **Hospital de referencia vs. más cercano** (E5): ¿qué métrica evita que el 43 % de los tramos quede en cero?
+- **Hospital de referencia vs. más cercano** (E5): ¿qué métrica evita que muchos tramos queden en cero? (el informe de situación midió 43 % de 495 tramos de prueba en la red hasta Limón)
 - **Revisión de código con CODEOWNERS:** `.github/CODEOWNERS` y la protección de `main` exigen revisión de un dueño de código; trabajando solo hay que decidir si se desactiva o se usa bypass. No se tocó.
 - **SME2 en bosque denso:** ¿es fiable? (S2c)
 - **`rain.start/end` sin pasadas:** sigue siendo obligatorio en `meta.json`; ¿qué periodo se usa?
@@ -144,5 +144,4 @@ Cortadas `[-]`: **F2** (mostrar pasadas) y **F9** (alternar antes/después): dep
 
 ### Contradicciones por resolver
 
-- **S4, comunidades aisladas:** una medición da 0 afectadas en el parque (áreas de corredor y regional) y otra 1 aislada en la red hasta Limón.
-- **Plan B de S4 («reducir al corredor»):** el informe de situación dice que empeora el resultado (18 aisladas sospechosas).
+Ninguna abierta. La aparente contradicción de S4 (0 comunidades afectadas en el parque frente a 1 aislada) se explica: son redes distintas (bordes este -83.40 y -82.95); la de Limón sigue sin revisar a mano (E5). El plan B de S4 («reducir al corredor») empeora el resultado: crea aislamientos falsos.
