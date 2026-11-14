@@ -57,13 +57,14 @@ Definitions (all times are integer seconds, because every `time_s` in `graph.jso
 | `criticality` | Σ over affected communities of `population × extra_s`, using the penalty as `extra_s` for isolated ones; `population: null` adds 0. |
 | `population_dependent` | Sum of the known populations of affected communities; `null` only when none of them has a population (including when there are no affected communities). |
 | Ranking | `criticality` desc → isolated count desc → `extra_time_s` desc with `null` last → smallest edge id (by number) in `edge_ids`. `rank` = position, starting at 1. |
-| Final ids | `T-01`, `T-02`, … in rank order (two digits minimum, more if needed). |
+| Final ids | `T-01`, `T-02`, … in rank order (two digits minimum, more if needed). Ids change between runs because the ranking does; they are not quoted in the presentation. |
+| Joint write | `graph.json` and `scenarios.json` are written together, after the `contracts.md` §8 cross-reference checks pass on the pair. |
 | `alternates` | `[{"name": "Ruta 126", "vehicles": "light"}, {"name": "Ruta 10", "vehicles": "freight"}]` when any of the candidate's edges has `road: "Ruta 32"`; otherwise `[]`. |
 | Array order | `baseline` and `per_community` by community id number; `affected_community_ids`, `isolated_community_ids`, `edge_ids`, `zone_ids` by id number; `candidates` by `rank`. |
 
 Decision notes:
 
-- The ranking puts isolated count before `extra_time_s` (Ian, 14 Nov), because losing every path is worse than a longer one. `contracts.md` §6 and the STATUS decision log say the opposite order; see Deferred.
+- The ranking puts isolated count before `extra_time_s` (team decision, 14 Nov), because losing every path is worse than a longer one. Without population every `criticality` is 0, so the tie-break is the whole ranking. `contracts.md` §6 and §11 and the STATUS decision log were updated to match.
 - `extra_time_s = 0` for a candidate with no affected community is a measured result, not an unknown. Spike S4 found such a case (Ruta 32 inside Braulio Carrillo with hospitals on both sides).
 
 ## Invariants
@@ -100,15 +101,16 @@ Decision notes:
   When impact-scoring runs twice on the same inputs, both output files are byte-identical.
 - INV-16 [none]
   When impact-scoring writes a candidate, `alternates` is Ruta 126 (light) and Ruta 10 (freight) if any of its edges has `road: "Ruta 32"`, and empty otherwise.
+- INV-17 [none]
+  If the `contracts.md` §8 cross-reference checks fail on the pair it is about to write, then impact-scoring exits non-zero with an English error naming the failed check and writes neither `graph.json` nor `scenarios.json`.
 
 ## Deferred / Open questions
 
-- **Ranking order vs `contracts.md` §6** (team; doc edited by a person): the doc and the 14 Nov decision log say "`extra_time_s`, then isolated count". This spec follows Ian's choice (isolated first). No schema change, since the UI only reads `rank`, but Ron must agree and the doc must be updated before `/builder`.
 - **Candidate list shape from P4** (Ian, in `candidate-segments`): provisional id format, file or in-memory hand-off.
 - **Population source and method** (Wilberth via S7, then Ian or team): until decided every population is `null`, so `criticality` is 0 everywhere and the ranking runs on isolated count and `extra_time_s`.
 - **Parity with `graph.ts`** (Iván): the browser must use the same route direction (community → hospital), the same tie rule for hospitals and the same "affected" rule. A shared fixture (the contract mock) is the proposed check; agree with Iván.
-- **Metric fit for G1** (team): spike S4 suggests a Ruta 32 cut inside the park may affect nobody under "nearest hospital". This spec does not change the metric; the team decides at G1 whether that is acceptable.
-- **Testing gaps:** INV-01 to INV-16 and ACC-01 to ACC-03 are `none` until `/builder impact-scoring` adds tests.
+- **Metric fit for G1** (team, at G1): the S4 measurement on the real network found 215 of 495 test segments (43 %) affecting nobody and `criticality` 0 everywhere without population. A corridor-connectivity metric may be added after G1 as an additive field with one schema bump (`contracts.md` §10). Until then this spec keeps the current metric.
+- **Testing gaps:** INV-01 to INV-17 and ACC-01 to ACC-04 are `none` until `/builder impact-scoring` adds tests.
 
 ## Acceptance criteria
 
@@ -118,3 +120,5 @@ Decision notes:
   Given the contract mock as input, when impact-scoring runs, then baseline, per-community values, `extra_time_s`, `population_dependent`, `criticality` and `rank` match `projects/contract/examples/scenarios.json` for each candidate matched by `edge_ids` (ids and `alternates` are excluded, since the mock's ids are not in rank order and its `road` values are fake).
 - ACC-03 [none]
   Given a graph where a candidate's closure leaves no community affected, when impact-scoring runs, then that candidate has `extra_time_s` 0, `criticality` 0, `population_dependent` `null` and empty affected and isolated lists.
+- ACC-04 [none]
+  Given two candidates with `criticality` 0, one with an isolated community and `extra_time_s` `null` and the other with no isolated community and `extra_time_s` greater than 0, when impact-scoring ranks them, then the one with the isolated community gets the better `rank`.
