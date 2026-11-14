@@ -4,12 +4,10 @@ import argparse
 import json
 import logging
 import math
-import statistics
 import sys
 import urllib.parse
 import urllib.request
-from collections import defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from itertools import pairwise
 from pathlib import Path
 
@@ -39,8 +37,6 @@ class RoadGraphError(Exception):
 class Settings:
     bbox: tuple[float, float, float, float]  # west, south, east, north
     allowlist: Path
-    min_tagged: int = 20
-    fallback_speeds_kmh: dict[str, float] = field(default_factory=dict)
     max_edge_m: float = 1000
     max_snap_m: float = 3000
 
@@ -48,9 +44,12 @@ class Settings:
 SETTINGS = Settings(
     bbox=(-84.30, 9.80, -82.95, 10.45),
     allowlist=PIPELINE / "settings" / "hospital_allowlist.txt",
-    # shortcut: no fallback speeds until Ian sets them with a cited source; a class under MIN_TAGGED stops the run.
-    fallback_speeds_kmh={},
 )
+
+# Single source for time_s and for meta.json -> speed_model_kmh (P7 imports it).
+# Medians of OSM maxspeed tags measured in spike S4 on the 14 Nov extract.
+# `unclassified` is pending (Ian, with a cited source): until it is set, the real run stops (INV-17).
+SPEED_MODEL_KMH = {"trunk": 60, "primary": 40, "secondary": 40, "tertiary": 40}
 
 
 def round_half_up(x: float) -> int:
@@ -70,13 +69,6 @@ def _road_class(data: dict) -> str:
     return _first(data["highway"]).removesuffix("_link")
 
 
-def _maxspeed(data: dict) -> float | None:
-    try:
-        return float(_first(data.get("maxspeed")))
-    except (TypeError, ValueError):
-        return None
-
-
 def _road_name(data: dict) -> str | None:
     ref = _first(data.get("ref"))
     if ref:
@@ -86,28 +78,10 @@ def _road_name(data: dict) -> str | None:
     return name if isinstance(name, str) and name else None
 
 
-def _speed_table(pieces: list, settings: Settings) -> dict[str, float]:
-    tagged: dict[str, list[float]] = defaultdict(list)
-    classes = set()
-    for _, _, _, data in pieces:
-        cls = _road_class(data)
-        classes.add(cls)
-        speed = _maxspeed(data)
-        if speed is not None:
-            tagged[cls].append(speed)
-    table = {}
-    for cls in sorted(classes):
-        if len(tagged[cls]) >= settings.min_tagged:
-            median = statistics.median(tagged[cls])
-            table[cls] = int(median) if median.is_integer() else median
-        elif cls in settings.fallback_speeds_kmh:
-            table[cls] = settings.fallback_speeds_kmh[cls]
-        else:
-            raise RoadGraphError(
-                f"No speed for road class '{cls}': {len(tagged[cls])} edges tag maxspeed "
-                f"(at least {settings.min_tagged} needed) and no fallback speed is configured"
-            )
-    return table
+def _check_speeds(pieces: list) -> None:
+    for cls in sorted({_road_class(data) for _, _, _, data in pieces}):
+        if cls not in SPEED_MODEL_KMH:
+            raise RoadGraphError(f"No speed for road class '{cls}': add it to SPEED_MODEL_KMH with a cited source")
 
 
 def _metres(a: tuple, b: tuple) -> float:
@@ -188,13 +162,13 @@ def _osm_key(entry: str) -> tuple[int, str]:
     return int(number), kind
 
 
-def build(roads_osm: Path, features_osm: Path, settings: Settings) -> tuple[dict, dict[str, float]]:
+def build(roads_osm: Path, features_osm: Path, settings: Settings) -> dict:
     allowlist = sorted(set(_read_allowlist(settings.allowlist)), key=_osm_key)
     if not allowlist:
         raise RoadGraphError(f"The hospital allowlist is empty: {settings.allowlist}")
     w, s, e, n = settings.bbox
     pieces = _load_network(roads_osm, (w, s, e, n))
-    speeds = _speed_table(pieces, settings)
+    _check_speeds(pieces)
 
     osm_nodes = sorted({end for u, v, _, _ in pieces for end in (u, v)})
     node_ids = {osm: f"n{i}" for i, osm in enumerate(osm_nodes, start=1)}
@@ -209,7 +183,7 @@ def build(roads_osm: Path, features_osm: Path, settings: Settings) -> tuple[dict
     for u, v, _, data in pieces:
         parts, length = _split(data["_coords"], settings.max_edge_m)
         length_m = round_half_up(length)
-        time_s = round_half_up(length_m / (speeds[_road_class(data)] / 3.6))
+        time_s = round_half_up(length_m / (SPEED_MODEL_KMH[_road_class(data)] / 3.6))
         start = node_ids[u]
         for i, part in enumerate(parts):
             if i == len(parts) - 1:
@@ -262,7 +236,7 @@ def build(roads_osm: Path, features_osm: Path, settings: Settings) -> tuple[dict
         communities.append({"id": f"c{len(communities) + 1}", "name": name, "node": node, "population": None})
 
     graph = {"schema_version": "0.1", "nodes": nodes, "edges": edges, "hospitals": hospitals, "communities": communities}
-    return graph, speeds
+    return graph
 
 
 def write_graph(graph: dict, path: Path) -> None:
@@ -307,7 +281,7 @@ def main(argv: list[str] | None = None) -> None:
         roads, features = OSM_DIR / "roads.osm", OSM_DIR / "features.osm"
         if not (roads.is_file() and features.is_file()):
             raise RoadGraphError(f"OSM data not found in {OSM_DIR}; run `road-graph --download` first")
-        graph, speeds = build(roads, features, SETTINGS)
+        graph = build(roads, features, SETTINGS)
         write_graph(graph, OUTPUT / "graph.json")
         # shortcut: speed table hand-off to meta.json (P7) is not agreed with Ron yet; it waits in work/ until then.
         WORK.mkdir(parents=True, exist_ok=True)
