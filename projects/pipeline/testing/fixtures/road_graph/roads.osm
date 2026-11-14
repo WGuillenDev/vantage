@@ -31,7 +31,7 @@
   </way>
   <way id="104">
     <nd ref="6"/><nd ref="7"/>
-    <tag k="highway" v="unclassified"/>
+    <tag k="highway" v="tertiary"/>
   </way>
   <!-- one-way link with neither ref nor name -->
   <way id="105">
