@@ -239,3 +239,20 @@ def test_inv17_failed_cross_check_writes_nothing(tmp_path):
     assert exit_info.value.code not in (0, None) and "z99" in str(exit_info.value.code)
     assert not (tmp_path / "out" / "graph.json").exists()
     assert not (tmp_path / "out" / "scenarios.json").exists()
+
+
+def test_inv18_mismatched_candidate_id_writes_nothing(tmp_path):
+    graph = load(EXAMPLES / "graph.json")
+    graph["edges"][0]["candidate_id"] = "T-01"  # e1 is in no candidate's edge_ids
+    with pytest.raises(SystemExit) as exit_info:
+        score(tmp_path, graph, mock_candidates())
+    assert exit_info.value.code not in (0, None) and "e1" in str(exit_info.value.code)
+    assert not (tmp_path / "out" / "graph.json").exists()
+    assert not (tmp_path / "out" / "scenarios.json").exists()
+
+
+def test_inv19_edges_outside_candidates_are_null(tmp_path):
+    scenarios, graph = run_mock(tmp_path)
+    listed = {e for c in scenarios["candidates"] for e in c["edge_ids"]}
+    outside = [e for e in graph["edges"] if e["id"] not in listed]
+    assert outside and all(e["candidate_id"] is None for e in outside)
