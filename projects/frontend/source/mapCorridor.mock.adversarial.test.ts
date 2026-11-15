@@ -18,6 +18,13 @@ describe.each(['mock-validated', 'mock-unvalidated'])('map-corridor adversarial:
     expect(new Set(drawn.map((feature) => feature.properties.id)).size).toBe(drawn.length)
   })
 
+  test('INV-04 each drawn line keeps the full geometry of its edge, so both carriageways are complete', () => {
+    const ids = new Set(units.map((unit) => unit.id))
+    const expected = graph.edges.filter((edge) => edge.candidate_id !== null && ids.has(edge.candidate_id)).map((edge) => edge.geometry)
+    const drawn = unitFeatures(graph, units).features.flatMap((feature) => feature.geometry.coordinates)
+    expect(drawn.sort()).toEqual(expected.sort())
+  })
+
   test('INV-04 every unit of scenarios.json owns at least one drawn edge', () => {
     const drawn = new Set(unitFeatures(graph, units).features.map((feature) => feature.properties.id))
     for (const unit of units) expect(drawn.has(unit.id)).toBe(true)
