@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.2",
+  "schema_version": "0.3",
   "baseline": [
     {
       "community_id": "c1",
@@ -33,9 +33,7 @@
       "rank": 1,
       "source": "network_consequence",
       "exposure": {
-        "rain_mm_12d": 85.2,
-        "soil_moisture_pctl": 90,
-        "radar_evidence": "not_detectable_at_scale"
+        "rain_mm_12d": 85.2
       },
       "edge_ids": [
         "e3"
@@ -82,16 +80,16 @@
           "vehicles": "freight"
         }
       ],
-      "criticality": 2622000
+      "criticality": 2622000,
+      "length_m": 12400,
+      "suspect_isolated_community_ids": []
     },
     {
       "id": "T-01",
       "rank": 2,
       "source": "network_consequence",
       "exposure": {
-        "rain_mm_12d": 85.2,
-        "soil_moisture_pctl": null,
-        "radar_evidence": "not_detectable_at_scale"
+        "rain_mm_12d": 85.2
       },
       "edge_ids": [
         "e2"
@@ -131,16 +129,16 @@
           "vehicles": "freight"
         }
       ],
-      "criticality": 1800000
+      "criticality": 1800000,
+      "length_m": 8700,
+      "suspect_isolated_community_ids": []
     },
     {
       "id": "T-03",
       "rank": 3,
       "source": "network_consequence",
       "exposure": {
-        "rain_mm_12d": null,
-        "soil_moisture_pctl": null,
-        "radar_evidence": null
+        "rain_mm_12d": null
       },
       "edge_ids": [
         "e9"
@@ -175,7 +173,11 @@
           "vehicles": "freight"
         }
       ],
-      "criticality": 360000
+      "criticality": 360000,
+      "length_m": 5200,
+      "suspect_isolated_community_ids": [
+        "c4"
+      ]
     },
     {
       "id": "T-04",
@@ -213,7 +215,9 @@
           "vehicles": "freight"
         }
       ],
-      "criticality": 0
+      "criticality": 0,
+      "length_m": 3100,
+      "suspect_isolated_community_ids": []
     }
   ]
 }

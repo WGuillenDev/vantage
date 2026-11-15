@@ -5,7 +5,7 @@
   "additionalProperties": false,
   "required": ["schema_version", "generated_at", "files", "area", "rain", "speed_model_kmh", "attributions"],
   "properties": {
-    "schema_version": { "const": "0.2" },
+    "schema_version": { "const": "0.3" },
     "generated_at": { "type": "string", "format": "date-time" },
     "files": {
       "type": "object",

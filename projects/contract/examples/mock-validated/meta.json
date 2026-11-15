@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.2",
+  "schema_version": "0.3",
   "generated_at": "2026-11-14T12:00:00Z",
   "files": {
     "rain_csv_schema": "0.1"
@@ -88,7 +88,10 @@
     "min_delta_db": 5,
     "note": "MOCK: GCOV change at 10 m was not detectable below about 1 ha at -5 dB in synthetic tests."
   },
-  "exposure_sources": ["IMERG Late (NASA GPM)", "NISAR SME2 (optional)"],
+  "exposure_sources": [
+    "IMERG Late (NASA GPM)",
+    "NISAR SME2 (optional)"
+  ],
   "attributions": [
     "Contains modified NISAR GCOV data (NASA/JPL)",
     "IMERG Late (NASA GPM)",

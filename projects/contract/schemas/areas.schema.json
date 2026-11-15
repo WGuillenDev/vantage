@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "areas.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "areas"],
+  "properties": {
+    "schema_version": { "const": "0.3" },
+    "areas": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "bbox", "validated"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+          "name": { "type": "string", "minLength": 1 },
+          "bbox": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "type": "number" } },
+          "validated": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}
