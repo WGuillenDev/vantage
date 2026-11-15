@@ -8,7 +8,7 @@ import pytest
 
 import pipeline.pipeline_run as pipeline_run
 from pipeline.pipeline_run import PipelineRunError, run_zone, write_areas
-from test_pipeline_run import ROOT, make_zone, snapshot, stages, work  # noqa: F401  (work is a fixture)
+from test_pipeline_run import ROOT, graph_stage, make_zone, snapshot, stages, work  # noqa: F401  (work is a fixture)
 
 
 def test_adv_inv_02_failed_swap_restores_the_previous_output(tmp_path: Path, work: Path, monkeypatch: pytest.MonkeyPatch):
@@ -187,3 +187,65 @@ def test_inv_17_unknown_output_folder_is_named_and_areas_is_not_rewritten(tmp_pa
   with pytest.raises(PipelineRunError, match="stray-folder"):
     write_areas(output, configs)
   assert (output / "areas.json").read_text(encoding="utf-8") == "previous"
+
+
+def test_adv3_inv_01_real_road_graph_and_impact_scoring_stages_run_through_the_runner(tmp_path: Path, work: Path):
+  from pipeline import impact_scoring, road_graph
+  from test_road_graph import FIXTURE
+
+  osm = work / "osm"
+  shutil.copy(FIXTURE / "roads.osm", osm / "roads.osm")
+  shutil.copy(FIXTURE / "features.osm", osm / "features.osm")
+  zone = replace(make_zone(tmp_path), bbox=(9.995, -0.005, 10.05, 0.02), referral_hospitals=("way/301", "node/30"),
+                 speed_model_kmh={"trunk": 60.0, "primary": 40.0, "secondary": 40.0, "tertiary": 40.0})
+
+  def closure_units(z, w):
+    graph = json.loads((z.output_dir / "graph.json").read_text(encoding="utf-8"))
+    edge = graph["edges"][0]
+    edge["candidate_id"] = "T-01"
+    (z.output_dir / "graph.json").write_text(json.dumps(graph), encoding="utf-8")
+    (w / "closure_units.json").write_text(json.dumps([{"id": "T-01", "edge_ids": [edge["id"]], "length_m": edge["length_m"]}]), encoding="utf-8")
+
+  chosen = {"road-graph": road_graph.run, "closure-units": closure_units, "impact-scoring": impact_scoring.run}
+  runner = [(name, chosen.get(name, stage)) for name, stage in stages()]
+  run_zone(zone, work, runner)
+  assert sorted(snapshot(zone.output_dir)) == ["graph.json", "meta.json", "rain.csv", "scenarios.json"]
+
+
+def test_adv3_inv_16_a_leftover_old_folder_next_to_a_live_output_is_not_restored(tmp_path: Path, work: Path):
+  zone = make_zone(tmp_path)
+  run_zone(zone, work, stages())
+  old = zone.output_dir.with_name(".zone-a.old")
+  old.mkdir()
+  (old / "stale.json").write_text("{}", encoding="utf-8")
+  broken = stages()
+  broken[0] = ("road-graph", lambda z, w: 1 / 0)
+  before = snapshot(zone.output_dir)
+  with pytest.raises(PipelineRunError):
+    run_zone(zone, work, broken)
+  assert snapshot(zone.output_dir) == before and "stale.json" not in snapshot(zone.output_dir)
+  run_zone(zone, work, stages())
+  assert not old.exists() and sorted(snapshot(zone.output_dir)) == ["graph.json", "meta.json", "rain.csv", "scenarios.json"]
+
+
+def test_adv3_inv_10_worldpop_line_when_only_some_communities_have_population(tmp_path: Path, work: Path):
+  def one_community(zone, work_dir):
+    graph_stage(None)(zone, work_dir)
+    path = zone.output_dir / "graph.json"
+    graph = json.loads(path.read_text(encoding="utf-8"))
+    graph["communities"][0]["population"] = 50
+    path.write_text(json.dumps(graph), encoding="utf-8")
+
+  zone = make_zone(tmp_path)
+  mixed = stages()
+  mixed[0] = ("road-graph", one_community)
+  run_zone(zone, work, mixed)
+  lines = json.loads((zone.output_dir / "meta.json").read_text(encoding="utf-8"))["attributions"]
+  assert any("WorldPop" in line for line in lines)
+
+
+@pytest.mark.parametrize("content", ["{}", "not json"])
+def test_adv3_inv_15_invalid_source_error_names_the_file(tmp_path: Path, work: Path, content: str):
+  (work / "imerg" / "source.json").write_text(content, encoding="utf-8")
+  with pytest.raises(PipelineRunError, match="source.json"):
+    run_zone(make_zone(tmp_path), work, stages())
