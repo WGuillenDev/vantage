@@ -51,7 +51,8 @@ const toHex = (rgb: number[]): string => `#${rgb.map((v) => Math.round(v).toStri
 
 export function colorForCriticality(value: number, range: { min: number; max: number }): string {
   const span = range.max - range.min
-  const t = span > 0 ? Math.min(1, Math.max(0, (value - range.min) / span)) : 0
+  const raw = span > 0 ? Math.min(1, Math.max(0, (value - range.min) / span)) : 0
+  const t = Number.isNaN(raw) ? 0 : raw // a malformed criticality must not stop the map
   const scaled = t * (RAMP.length - 1)
   const index = Math.min(RAMP.length - 2, Math.floor(scaled))
   const from = toRgb(RAMP[index]!)
