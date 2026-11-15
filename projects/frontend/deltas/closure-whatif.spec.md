@@ -48,17 +48,17 @@ Reads `graph.json` and `scenarios.json` (the baseline and the units' `edge_ids` 
   When exactly the edges of one unit are closed, `computeAccess` returns for every community in that unit's `per_community` the same time and hospital as `scenarios.json`.
 - INV-03 [test: bun test --cwd projects/frontend]
   When an edge is `oneway`, `computeAccess` follows it only from its `from` node to its `to` node.
-- INV-04 [none]
+- INV-04 [test: bun test --cwd projects/frontend source/graph.test.ts]
   When two referral hospitals are equally near a community, `computeAccess` reports the one with the lowest hospital number.
-- INV-06 [none]
+- INV-06 [test: bun test --cwd projects/frontend source/closureWhatif.test.ts]
   When a community had a baseline route and has none after closing, the simulation lists it as affected and shows "sin ruta al hospital de referencia" for it, and when a community had no baseline route, the simulation never lists it as affected.
-- INV-08 [none]
+- INV-08 [test: bun test --cwd projects/frontend source/closureWhatif.test.ts]
   When units are closed, the summary shows the largest extra time among affected communities that keep a route, the number of communities without a route, and the sum of the known populations of the affected ones, with "sin dato" if none is known.
-- INV-09 [none]
+- INV-09 [test: bun test --cwd projects/frontend source/closureWhatif.test.ts]
   When a unit is closed, the simulation shows one chip for it, when the chip's remove control is used the unit is open again, and when "Restablecer" is pressed nothing is closed, with the results updating each time.
 - INV-12 [none]
   When the closed set changes, the map draws the closed units in the closed style and highlights the edges whose `road` equals a name in the `alternates` of any closed unit.
-- INV-13 [none]
+- INV-13 [test: bun test --cwd projects/frontend source/closureWhatif.test.ts]
   When the active zone changes, the closed set is emptied.
 - INV-15 [manual]
   When the user changes the closed set on the Ruta 32 real graph, the results update within 300 ms on a mid-range laptop.
