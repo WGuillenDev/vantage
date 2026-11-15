@@ -54,21 +54,21 @@ Definitions:
 
 ## Invariants
 
-- INV-01 [none]
+- INV-01 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_time_crosscheck.py]
   When time-crosscheck builds the sample, it takes up to 20 communities with a baseline route at evenly spaced positions of the list sorted by baseline time and then by id number, and the same inputs always give the same sample.
-- INV-02 [none]
+- INV-02 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_time_crosscheck.py]
   When time-crosscheck queries a pair, it uses the `graph.json` coordinates of the community's node and of the node of its baseline hospital.
-- INV-04 [none]
+- INV-04 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_time_crosscheck.py]
   When time-crosscheck finishes, `median_relative_error` and `median_bias` are the medians, over the pairs that have a router time, of the absolute difference between `model_s` and `router_s` divided by `router_s`, and of the signed difference divided by `router_s`.
-- INV-05 [none]
+- INV-05 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_time_crosscheck.py]
   When time-crosscheck finishes, the verdict is `pass` when at least 15 pairs have a router time and the median relative error is at most 0.25, `fail` when at least 15 do and the median is above it, and `insufficient_pairs` otherwise.
-- INV-06 [none]
+- INV-06 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_time_crosscheck.py]
   If the router finds no route for a pair, then time-crosscheck records `router_s: null`, leaves the pair out of the medians and counts it in `excluded`.
-- INV-07 [none]
+- INV-07 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_time_crosscheck.py]
   If a reference time has no `source` or no `accessed_on`, then time-crosscheck exits non-zero with an English error naming the entry and writes no report.
-- INV-09 [none]
+- INV-09 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_time_crosscheck.py]
   When time-crosscheck sends a request, it identifies itself with a generic client name and no personal data, and waits at least one second between requests.
-- INV-10 [none]
+- INV-10 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_time_crosscheck.py]
   If the router answers with an error status or the network fails, then time-crosscheck exits non-zero with an English error naming the status and writes no report.
 
 ## Deferred / Open questions
