@@ -150,3 +150,25 @@ describe('segment-detail', () => {
     })
   })
 })
+
+describe('suspect isolation mark in the detail card (trust-signals INV-05)', () => {
+  const unit = {
+    ...scenarios.candidates[0]!,
+    affected_community_ids: ['c1', 'c2'],
+    per_community: [
+      { community_id: 'c1', time_s: null, extra_s: null, hospital_id: null },
+      { community_id: 'c2', time_s: null, extra_s: null, hospital_id: null },
+    ],
+    suspect_isolated_community_ids: ['c1'],
+  } as DetailUnit
+  const baseline = [
+    { community_id: 'c1', time_s: 600, hospital_id: 'h1' },
+    { community_id: 'c2', time_s: 600, hospital_id: 'h1' },
+  ]
+
+  test('marks only the suspect isolated community', () => {
+    const view = detailView(unit, graph, baseline)
+    expect(view.communities.find((c) => c.id === 'c1')?.withClosure).toBe('sin ruta al hospital de referencia (posible artefacto del modelo)')
+    expect(view.communities.find((c) => c.id === 'c2')?.withClosure).toBe('sin ruta al hospital de referencia')
+  })
+})
