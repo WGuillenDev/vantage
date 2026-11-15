@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Hand-made fixture for road-graph tests. Synthetic coordinates near lon 10 / lat 0; not real data. -->
+<osm version="0.6" generator="hand-made fixture">
+  <node id="1" lat="0.0000" lon="10.0000"/>
+  <node id="2" lat="0.0000" lon="10.0050"/>
+  <node id="3" lat="0.0000" lon="10.0100"/>
+  <node id="4" lat="0.0000" lon="10.0200"/>
+  <node id="5" lat="0.0050" lon="10.0100"/>
+  <node id="6" lat="0.0100" lon="10.0100"/>
+  <node id="7" lat="0.0100" lon="10.0200"/>
+  <node id="8" lat="0.0000" lon="10.0600"/>
+  <node id="9" lat="0.0000" lon="10.0280"/>
+  <node id="10" lat="0.0120" lon="10.0080"/>
+  <node id="11" lat="0.0120" lon="10.0120"/>
+  <node id="20" lat="0.0150" lon="10.0400"/>
+  <node id="21" lat="0.0150" lon="10.0450"/>
+  <!-- two-way trunk, ~1112 m once node 2 is simplified away: split in two -->
+  <way id="101">
+    <nd ref="1"/><nd ref="2"/><nd ref="3"/>
+    <tag k="highway" v="trunk"/><tag k="ref" v="901"/><tag k="maxspeed" v="60"/>
+  </way>
+  <!-- multi-valued ref and maxspeed: first value wins -->
+  <way id="102">
+    <nd ref="3"/><nd ref="4"/>
+    <tag k="highway" v="trunk"/><tag k="ref" v="901;902"/><tag k="maxspeed" v="80;100"/>
+  </way>
+  <!-- one-way primary with a name and no ref -->
+  <way id="103">
+    <nd ref="3"/><nd ref="5"/><nd ref="6"/>
+    <tag k="highway" v="primary"/><tag k="oneway" v="yes"/><tag k="name" v="Fixture Primary"/><tag k="maxspeed" v="40"/>
+  </way>
+  <way id="104">
+    <nd ref="6"/><nd ref="7"/>
+    <tag k="highway" v="tertiary"/>
+  </way>
+  <!-- one-way link with neither ref nor name -->
+  <way id="105">
+    <nd ref="7"/><nd ref="4"/>
+    <tag k="highway" v="secondary_link"/><tag k="oneway" v="yes"/>
+  </way>
+  <!-- leaves the network area: node 8 is east of it -->
+  <way id="106">
+    <nd ref="4"/><nd ref="9"/><nd ref="8"/>
+    <tag k="highway" v="trunk"/><tag k="ref" v="903"/><tag k="maxspeed" v="90"/>
+  </way>
+  <!-- disconnected fragment -->
+  <way id="107">
+    <nd ref="20"/><nd ref="21"/>
+    <tag k="highway" v="tertiary"/>
+  </way>
+  <!-- closed loop hanging from node 6: becomes a self-loop once simplified -->
+  <way id="108">
+    <nd ref="6"/><nd ref="10"/><nd ref="11"/><nd ref="6"/>
+    <tag k="highway" v="tertiary"/>
+  </way>
+</osm>

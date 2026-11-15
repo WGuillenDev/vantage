@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Hand-made fixture for road-graph tests: a two-way trunk A-B-C and a one-way spur B->E that cannot be left. Synthetic, not real data. -->
+<osm version="0.6" generator="hand-made fixture">
+  <node id="1" lat="0.0000" lon="10.0000"/>
+  <node id="2" lat="0.0000" lon="10.0080"/>
+  <node id="3" lat="0.0000" lon="10.0160"/>
+  <node id="4" lat="0.0060" lon="10.0080"/>
+  <way id="201">
+    <nd ref="1"/><nd ref="2"/><nd ref="3"/>
+    <tag k="highway" v="trunk"/><tag k="ref" v="911"/>
+  </way>
+  <!-- one-way into node 4: a sink, so it is outside the largest strongly connected component -->
+  <way id="202">
+    <nd ref="2"/><nd ref="4"/>
+    <tag k="highway" v="tertiary"/><tag k="oneway" v="yes"/>
+  </way>
+</osm>

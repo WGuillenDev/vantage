@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Hand-made fixture for road-graph tests: a hospital and a village next to the sink of roads_spur.osm. Synthetic, not real data. -->
+<osm version="0.6" generator="hand-made fixture">
+  <node id="50" lat="0.0061" lon="10.0081">
+    <tag k="amenity" v="hospital"/><tag k="name" v="Fixture Spur Hospital"/>
+  </node>
+  <node id="51" lat="0.0059" lon="10.0079">
+    <tag k="place" v="village"/><tag k="name" v="Fixture Spur Village"/>
+  </node>
+</osm>
