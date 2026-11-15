@@ -1,0 +1,193 @@
+{
+  "router": "OSRM public demo, driving profile",
+  "queried_on": "2026-11-15",
+  "limitation": "the router uses OpenStreetMap too, so it checks the calculation, not ground truth",
+  "threshold": {
+    "median_relative_error": 0.25,
+    "min_pairs": 15
+  },
+  "pairs": [
+    {
+      "community_id": "c304",
+      "hospital_id": "h1",
+      "model_s": 32,
+      "router_s": 69.5,
+      "relative_error": 0.539568345323741
+    },
+    {
+      "community_id": "c305",
+      "hospital_id": "h3",
+      "model_s": 551,
+      "router_s": 703,
+      "relative_error": 0.21621621621621623
+    },
+    {
+      "community_id": "c14",
+      "hospital_id": "h2",
+      "model_s": 835,
+      "router_s": 686.9,
+      "relative_error": 0.21560634735769402
+    },
+    {
+      "community_id": "c57",
+      "hospital_id": "h2",
+      "model_s": 1252,
+      "router_s": 1240.9,
+      "relative_error": 0.008945120477073017
+    },
+    {
+      "community_id": "c378",
+      "hospital_id": "h3",
+      "model_s": 1850,
+      "router_s": 2298.2,
+      "relative_error": 0.1950221912801322
+    },
+    {
+      "community_id": "c646",
+      "hospital_id": "h1",
+      "model_s": 2299,
+      "router_s": 2713.9,
+      "relative_error": 0.15287961973543612
+    },
+    {
+      "community_id": "c686",
+      "hospital_id": "h3",
+      "model_s": 3043,
+      "router_s": 3509.1,
+      "relative_error": 0.13282608076144878
+    },
+    {
+      "community_id": "c497",
+      "hospital_id": "h3",
+      "model_s": 3728,
+      "router_s": 10807.4,
+      "relative_error": 0.655051168643707
+    },
+    {
+      "community_id": "c520",
+      "hospital_id": "h3",
+      "model_s": 4411,
+      "router_s": 10905.5,
+      "relative_error": 0.5955251937095961
+    },
+    {
+      "community_id": "c473",
+      "hospital_id": "h3",
+      "model_s": 5012,
+      "router_s": 4970.1,
+      "relative_error": 0.00843041387497226
+    },
+    {
+      "community_id": "c705",
+      "hospital_id": "h3",
+      "model_s": 5440,
+      "router_s": 5351.3,
+      "relative_error": 0.01657541158223232
+    },
+    {
+      "community_id": "c538",
+      "hospital_id": "h3",
+      "model_s": 5843,
+      "router_s": 6896.9,
+      "relative_error": 0.15280778320694802
+    },
+    {
+      "community_id": "c224",
+      "hospital_id": "h3",
+      "model_s": 6259,
+      "router_s": 6240,
+      "relative_error": 0.003044871794871795
+    },
+    {
+      "community_id": "c716",
+      "hospital_id": "h3",
+      "model_s": 6527,
+      "router_s": 6358.8,
+      "relative_error": 0.026451531735547557
+    },
+    {
+      "community_id": "c178",
+      "hospital_id": "h3",
+      "model_s": 6821,
+      "router_s": 6753.1,
+      "relative_error": 0.010054641572018722
+    },
+    {
+      "community_id": "c227",
+      "hospital_id": "h3",
+      "model_s": 7055,
+      "router_s": 7256.1,
+      "relative_error": 0.027714612532903398
+    },
+    {
+      "community_id": "c184",
+      "hospital_id": "h3",
+      "model_s": 7330,
+      "router_s": 8922.5,
+      "relative_error": 0.17848136732978426
+    },
+    {
+      "community_id": "c183",
+      "hospital_id": "h3",
+      "model_s": 7936,
+      "router_s": 9645.4,
+      "relative_error": 0.17722437638667132
+    },
+    {
+      "community_id": "c212",
+      "hospital_id": "h3",
+      "model_s": 8915,
+      "router_s": 10878.2,
+      "relative_error": 0.1804710338107408
+    },
+    {
+      "community_id": "c182",
+      "hospital_id": "h3",
+      "model_s": 11634,
+      "router_s": 13703.5,
+      "relative_error": 0.15101981245667165
+    }
+  ],
+  "excluded": 0,
+  "median_relative_error": 0.15284370147119208,
+  "median_bias": -0.15191379783180983,
+  "references": [
+    {
+      "community_id": "c1",
+      "hospital_id": "h3",
+      "minutes": 180,
+      "source": "Enter Costa Rica, 'drive times', https://www.entercostarica.com/travel-guide/drive-times : San Jose to Limón, 3 hrs (average times, origin within San José not specified)",
+      "accessed_on": "2026-11-15",
+      "model_s": 9538,
+      "relative_error": 0.11685185185185185
+    },
+    {
+      "community_id": "c20",
+      "hospital_id": "h3",
+      "minutes": 150,
+      "source": "Enter Costa Rica, 'drive times', https://www.entercostarica.com/travel-guide/drive-times : San Jose to Siquirres, 2.5 hrs (average times, origin within San José not specified)",
+      "accessed_on": "2026-11-15",
+      "model_s": 6045,
+      "relative_error": 0.3283333333333333
+    },
+    {
+      "community_id": "c18",
+      "hospital_id": "h3",
+      "minutes": 120,
+      "source": "Enter Costa Rica, 'drive times', https://www.entercostarica.com/travel-guide/drive-times : San Jose to Turrialba, 2 hrs (average times, origin within San José not specified)",
+      "accessed_on": "2026-11-15",
+      "model_s": 4778,
+      "relative_error": 0.3363888888888889
+    },
+    {
+      "community_id": "c54",
+      "hospital_id": "h3",
+      "minutes": 60,
+      "source": "Anywhere.com, Guápiles, https://www.anywhere.com/costa-rica/destinations/guapiles : 'Transportation time is about an hour' (from San José, by bus or car, mode not specified)",
+      "accessed_on": "2026-11-15",
+      "model_s": 3975,
+      "relative_error": 0.10416666666666667
+    }
+  ],
+  "verdict": "pass"
+}
