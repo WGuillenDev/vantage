@@ -64,7 +64,7 @@ export function Layout({ header, footer, map, ranking, detail, simulation, why }
   return (
     <div className="flex h-full flex-col overflow-x-hidden">
       {header}
-      <div className="relative flex min-h-0 min-w-0 flex-1 flex-col md:flex-row">
+      <main className="relative flex min-h-0 min-w-0 flex-1 flex-col md:flex-row">
         <div className="relative min-h-0 min-w-0 flex-1 md:order-2">{map}</div>
         <aside className="relative z-10 flex min-w-0 shrink-0 flex-col rounded-t-2xl border-t border-line bg-white shadow-sheet md:order-1 md:w-96 md:rounded-none md:border-r md:border-t-0 md:shadow-none">
           <button
@@ -136,7 +136,7 @@ export function Layout({ header, footer, map, ranking, detail, simulation, why }
             </div>
           </div>
         </aside>
-      </div>
+      </main>
       {footer}
     </div>
   )

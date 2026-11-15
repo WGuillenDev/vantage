@@ -20,7 +20,7 @@ export function SegmentRanking({ state }: { state: ZoneState }) {
   const [filter, setFilter] = useState<RankFilter>('all')
 
   return (
-    <ZoneGate state={state} loading="Cargando tramos…">
+    <ZoneGate state={state}>
       {(data) => {
         const listed = listedUnits(data.units)
         const rows = filterUnits(listed, data.graph.edges, query, filter)
@@ -32,6 +32,7 @@ export function SegmentRanking({ state }: { state: ZoneState }) {
           <section className="text-sm" aria-label="Tramos críticos">
             <div className="sticky top-0 z-10 space-y-2 border-b border-line bg-white p-3">
               <h2 className="font-semibold">Tramos críticos por criticidad</h2>
+              {selected === null && <p className="text-muted">Toca un tramo para ver sus comunidades afectadas y simular su cierre.</p>}
               {noPopulationNote(data.units) && (
                 <p className="text-muted">El orden sale del tiempo extra y de las comunidades aisladas, porque la población es desconocida.</p>
               )}

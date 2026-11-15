@@ -118,8 +118,12 @@ export function MapView({ state }: { state: ZoneState }) {
       })
       setReady(true)
     })
+    // The layers exist only after `load`; an earlier pointer event must not query them.
+    const loaded = () => map.getLayer('units-line') !== undefined
     const unitAt = (point: { x: number; y: number }) =>
-      map.queryRenderedFeatures(
+      !loaded()
+        ? undefined
+        : map.queryRenderedFeatures(
         [
           [point.x - CLICK_TOLERANCE, point.y - CLICK_TOLERANCE],
           [point.x + CLICK_TOLERANCE, point.y + CLICK_TOLERANCE],
@@ -128,16 +132,24 @@ export function MapView({ state }: { state: ZoneState }) {
       )[0]?.properties?.id as string | undefined
     // INV-09: a click on a unit selects it; a click anywhere else clears the selection.
     map.on('click', (event) => useAppStore.getState().selectUnit(unitAt(event.point) ?? null))
-    // The pointer over a unit shows its name and extra time, and highlights it like the list does.
+    // The pointer over a point shows its name; over a unit, its label and extra time, and the unit is highlighted like in the list.
     map.on('mousemove', (event) => {
-      const id = unitAt(event.point)
+      if (!loaded()) return
+      const { x, y } = event.point
+      const point = map.queryRenderedFeatures([[x - 4, y - 4], [x + 4, y + 4]], { layers: ['hospitals', 'communities'] })[0]
+      const id = point ? undefined : unitAt(event.point)
       map.getCanvas().style.cursor = id ? 'pointer' : ''
       const current = dataRef.current
       const unit = id && current ? current.units.find((item) => item.id === id) : undefined
-      if (!unit || !current) return void popup.current?.remove()
-      const row = rowView(unit, current.graph.edges, 0)
+      const text =
+        typeof point?.properties?.name === 'string'
+          ? point.properties.name
+          : unit && current
+            ? `${rowView(unit, current.graph.edges, 0).label} · ${rowView(unit, current.graph.edges, 0).extraTime}`
+            : null
+      if (text === null) return void popup.current?.remove()
       popup.current ??= new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 10 })
-      popup.current.setLngLat(event.lngLat).setText(`${row.label} · ${row.extraTime}`).addTo(map)
+      popup.current.setLngLat(event.lngLat).setText(text).addTo(map)
     })
     map.on('mouseout', () => popup.current?.remove())
     // The canvas is sized before the layout settles; follow the container so the map fills it.

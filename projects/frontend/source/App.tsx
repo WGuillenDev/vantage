@@ -14,7 +14,7 @@ const WhyPanel = lazy(() => import('./WhyPanel.tsx'))
 
 function TopBar({ state }: { state: ZoneState }) {
   return (
-    <header className="flex items-center gap-4 border-b border-line bg-white px-3 py-1.5">
+    <div className="flex items-center gap-4 border-b border-line bg-white px-3 py-1.5">
       <h1 className="flex items-center gap-1.5 text-base font-bold tracking-wide">
         <Route aria-hidden="true" className="h-5 w-5 text-brand" />
         VANTAGE
@@ -22,7 +22,7 @@ function TopBar({ state }: { state: ZoneState }) {
       <ZonePicker />
       {state.status === 'loading' && <p className="text-sm text-muted">Cargando…</p>}
       {state.status === 'error' && <p className="truncate text-sm text-red-800">{state.message}</p>}
-    </header>
+    </div>
   )
 }
 
@@ -32,10 +32,10 @@ function App() {
   return (
     <Layout
       header={
-        <>
+        <header>
           <TopBar state={state} />
           <TrustHeader state={state} />
-        </>
+        </header>
       }
       footer={<TrustFooter state={state} />}
       ranking={<SegmentRanking state={state} />}
