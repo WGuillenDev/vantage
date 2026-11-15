@@ -1,0 +1,30 @@
+[
+  {
+    "community_id": "c1",
+    "hospital_id": "h3",
+    "minutes": 180,
+    "source": "Enter Costa Rica, 'drive times', https://www.entercostarica.com/travel-guide/drive-times : San Jose to Limón, 3 hrs (average times, origin within San José not specified)",
+    "accessed_on": "2026-11-15"
+  },
+  {
+    "community_id": "c20",
+    "hospital_id": "h3",
+    "minutes": 150,
+    "source": "Enter Costa Rica, 'drive times', https://www.entercostarica.com/travel-guide/drive-times : San Jose to Siquirres, 2.5 hrs (average times, origin within San José not specified)",
+    "accessed_on": "2026-11-15"
+  },
+  {
+    "community_id": "c18",
+    "hospital_id": "h3",
+    "minutes": 120,
+    "source": "Enter Costa Rica, 'drive times', https://www.entercostarica.com/travel-guide/drive-times : San Jose to Turrialba, 2 hrs (average times, origin within San José not specified)",
+    "accessed_on": "2026-11-15"
+  },
+  {
+    "community_id": "c54",
+    "hospital_id": "h3",
+    "minutes": 60,
+    "source": "Anywhere.com, Guápiles, https://www.anywhere.com/costa-rica/destinations/guapiles : 'Transportation time is about an hour' (from San José, by bus or car, mode not specified)",
+    "accessed_on": "2026-11-15"
+  }
+]

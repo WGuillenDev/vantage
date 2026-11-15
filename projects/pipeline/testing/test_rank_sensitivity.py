@@ -317,3 +317,11 @@ def test_inv_14_a_scenarios_file_that_is_not_json_is_a_clean_error(tmp_path: Pat
   with pytest.raises(SensitivityError, match="scenarios.json"):
     execute(output, work, reports, Stub({}))
   assert not (reports / "sensitivity.json").exists()
+
+
+def test_inv_01_exposure_added_after_scoring_does_not_break_the_baseline():
+  scenarios = scenarios_of(BASE_ORDER)
+  for unit in scenarios["candidates"]:
+    unit["exposure"] = {"rain_mm_12d": 12.5}
+  report = build_report(make_graph(), UNITS, scenarios, Stub({}))
+  assert report["baseline"]["unit_ids"] == BASE_ORDER

@@ -2,6 +2,7 @@ import type { Area } from './storage.ts'
 
 export const NOTICE = 'Tramos críticos por consecuencia; no son derrumbes confirmados.'
 export const UNVALIDATED_BANNER = 'Zona no validada: sus resultados no se han revisado.'
+export const REFERRAL_NOTE = 'El orden de los tramos depende de qué hospitales cuentan como referencia: con otro conjunto, los tramos críticos cambian.'
 
 export interface TrustMeta {
   speed_model_kmh: Record<string, number>
@@ -22,7 +23,7 @@ export function readingPanel(meta: TrustMeta, graph: { hospitals: { name: string
   }
 }
 
-const NO_ROUTE = 'sin ruta al hospital de referencia'
+export const NO_ROUTE = 'sin ruta al hospital de referencia'
 
 export const suspectLabel = (communityId: string, suspectIds: string[]): string =>
   suspectIds.includes(communityId) ? `${NO_ROUTE} (posible artefacto del modelo)` : NO_ROUTE

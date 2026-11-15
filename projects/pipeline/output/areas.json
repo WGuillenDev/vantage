@@ -1,0 +1,16 @@
+{
+  "schema_version": "0.3",
+  "areas": [
+    {
+      "id": "ruta-32",
+      "name": "Ruta 32 (San José–Limón)",
+      "bbox": [
+        -84.3,
+        9.8,
+        -82.95,
+        10.45
+      ],
+      "validated": false
+    }
+  ]
+}

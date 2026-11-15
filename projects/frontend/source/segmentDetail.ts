@@ -1,7 +1,8 @@
 import { formatDuration, formatPopulation } from './format.ts'
 import { rowView, type RankedUnit } from './ranking.ts'
+import { NO_ROUTE, suspectLabel } from './trustSignals.ts'
 
-export const NO_ROUTE = 'sin ruta al hospital de referencia'
+export { NO_ROUTE }
 export const NO_DATA = 'sin dato'
 export const HYPOTHESIS_LABEL = 'Hipótesis, no causa confirmada'
 export const WHY_TEXT =
@@ -19,6 +20,7 @@ export interface DetailUnit extends RankedUnit {
   per_community?: PerCommunity[]
   alternates?: { name: string; vehicles: 'light' | 'freight' }[]
   exposure?: { rain_mm_12d: number | null } | null
+  suspect_isolated_community_ids?: string[]
 }
 
 export interface BaselineEntry {
@@ -74,7 +76,8 @@ export function detailView(unit: DetailUnit, graph: DetailGraph, baseline: Basel
         id,
         name: names.get(id) ?? id,
         withoutClosure: timeText(before.get(id)),
-        withClosure: timeText(entry === undefined ? undefined : entry.time_s),
+        withClosure:
+          entry?.time_s === null ? suspectLabel(id, unit.suspect_isolated_community_ids ?? []) : timeText(entry === undefined ? undefined : entry.time_s),
         extra: timeText(entry === undefined ? undefined : entry.extra_s),
         hospital,
       },

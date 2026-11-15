@@ -164,7 +164,7 @@ def run(zone: Zone, work_dir: Path) -> Path:
   old_rain = rain_path.read_bytes() if rain_path.is_file() else None
   _write_atomic(rain_path, ("\n".join(lines) + "\n").encode("utf-8"))
   try:
-    _write_atomic(path, (json.dumps(scenarios, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
+    _write_atomic(path, (json.dumps(scenarios, separators=(",", ":"), ensure_ascii=False) + "\n").encode("utf-8"))
   except BaseException:
     # shortcut: if this restore fails too, the two files disagree; fine for a rerunnable offline stage.
     if old_rain is None:

@@ -397,3 +397,20 @@ def test_inv29_unusable_answer_leaves_the_previous_extract_whole(tmp_path, monke
 def test_inv30_same_osm_element_twice_stops_naming_both_ids(tmp_path):
   zone = make_zone(tmp_path, referral_hospitals=("way/301", "way/0301"))
   fails_without_graph(tmp_path, zone, "way/301", "way/0301")
+
+
+def test_first_of_a_merged_tag_does_not_depend_on_list_order():
+  from pipeline.road_graph import _first
+
+  assert _first(["32", "100"]) == _first(["100", "32"]) == "32"
+  assert _first(["b;c", "a"]) == "a"
+
+
+def test_road_class_of_a_merged_way_is_the_highest_one_whatever_the_order():
+  assert road_graph._road_class({"highway": ["tertiary", "trunk_link"]}) == "trunk"
+  assert road_graph._road_class({"highway": ["trunk", "tertiary"]}) == "trunk"
+  assert road_graph._road_class({"highway": "primary_link"}) == "primary"
+
+def test_a_road_without_a_usable_class_is_a_clean_error():
+  with pytest.raises(road_graph.RoadGraphError, match="no usable highway class"):
+    road_graph._road_class({"highway": [None, ""]})

@@ -1,10 +1,14 @@
-import maplibregl from 'maplibre-gl'
+import * as maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
+import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
 import { useEffect, useRef, useState } from 'react'
 import { alternateEdgeIds, alternateFeatures, alternateRoads, closedFeatures } from './closureWhatif.ts'
 import { colorForCriticality, fitBounds, GRAY, legendRange, pointFeatures, rankingUnknown, unitFeatures } from './mapCorridor.ts'
 import { useAppStore } from './store.ts'
 import type { ZoneData } from './zoneData.ts'
+
+// maplibre-gl 6 does not find its worker by itself when Vite bundles the page.
+maplibregl.setWorkerUrl(workerUrl)
 
 const EMPTY = { type: 'FeatureCollection' as const, features: [] }
 const CLICK_TOLERANCE = 6 // px around the pointer, so thin roads are easy to hit

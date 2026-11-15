@@ -1,9 +1,16 @@
+import argparse
 import copy
 import json
 import math
 from fractions import Fraction
 from pathlib import Path
 from typing import Callable
+
+from .area_config import PIPELINE_DIR, ConfigError, load_zone
+from .impact_scoring import score
+
+REPORTS_DIR = PIPELINE_DIR / "reports"
+WORK_DIR = PIPELINE_DIR / "work"
 
 # The scorer is the stage of `impact-scoring`: (graph, units) in, the content of scenarios.json out.
 # It is injected so this module reads only candidates[].id, .rank and .affected_community_ids.
@@ -112,10 +119,15 @@ def _run(kind: str, value: float | str, baseline: dict, scenarios: dict) -> dict
   }
 
 
+def _without_exposure(scenarios: dict) -> dict:
+  # `rain-context` adds `exposure` after scoring; the scorer does not produce it, so it is not part of the baseline check
+  return {**scenarios, "candidates": [{k: v for k, v in unit.items() if k != "exposure"} for unit in scenarios["candidates"]]}
+
+
 def build_report(graph: dict, units: list[dict], scenarios: dict, scorer: Scorer) -> dict:
   _check_graph(graph)
   _check_scenarios(scenarios, "scenarios.json")
-  if _as_json(scorer(graph, units), "scorer output") != _as_json(scenarios, "scenarios.json"):
+  if _as_json(scorer(graph, units), "scorer output") != _without_exposure(_as_json(scenarios, "scenarios.json")):
     raise SensitivityError("the baseline is not reproducible: scoring the unperturbed graph does not give scenarios.json")
   with_impact = len(_impact_ranks(scenarios))
   gradable = with_impact >= MIN_UNITS_WITH_IMPACT
@@ -167,3 +179,16 @@ def execute(output_dir: Path, work_dir: Path, reports_dir: Path, scorer: Scorer)
   path = reports_dir / "sensitivity.json"
   path.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
   return path
+
+
+def main(argv: list[str] | None = None) -> None:
+  parser = argparse.ArgumentParser(prog="rank-sensitivity", description="Measure how much the ranking changes when the model's assumptions change.")
+  parser.add_argument("--area", required=True, help="zone id, the name of a file in configs/ without .toml")
+  args = parser.parse_args(argv)
+  try:
+    zone = load_zone(args.area)
+    alternates = [{"name": name, "vehicles": vehicles} for name, vehicles in zone.closure_alternates]
+    path = execute(zone.output_dir, WORK_DIR / zone.id, REPORTS_DIR / zone.id, lambda graph, units: score(graph, units, alternates))
+  except (ConfigError, SensitivityError) as exc:
+    raise SystemExit(f"rank-sensitivity: {exc}") from None
+  print(f"{zone.id}: report written to {path}")

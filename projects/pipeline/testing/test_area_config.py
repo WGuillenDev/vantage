@@ -213,7 +213,7 @@ def test_inv_02_main_exits_non_zero_on_invalid_config(tmp_path: Path, monkeypatc
 def test_acc_01_ruta_32_zone():
   zone = load_zone("ruta-32", PIPELINE / "configs")
   assert zone.id == "ruta-32"
-  assert zone.validated is True
+  assert zone.validated is False
   assert zone.output_dir == PIPELINE / "output" / "ruta-32"
 
 

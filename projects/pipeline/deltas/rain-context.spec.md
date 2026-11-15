@@ -69,7 +69,7 @@ Rules:
 
 ## Deferred / Open questions
 
-Testing gaps (all claims are tagged `none`; `builder` turns each into `test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_rain_context.py` against a small synthetic cells file; the S5 spike in `projects/pipeline/spikes/s5/measure.py` is the starting point and it reads IMERG without downloading whole files): INV-01 to INV-05, INV-14.
+Testing gaps: none; every invariant has a `test:` tag and the 46 tests of `test_rain_context.py` and `test_rain_context_adversarial.py` pass. ACC-01 was checked on the real run of 15 Nov (317 days from 2026-01-01 to 2026-11-13, no gaps, 115 of 115 units with a non-null `rain_mm_12d`). ACC-02 was checked on 15 Nov: 8 cells of the 2026-11-13 granule, read independently with h5py, equal their rows in `cells.csv` exactly (the float32 as stored).
 
 - **Which cells count for each rule:** S5 used cells whose centre lies strictly inside its bbox and found the boundary ambiguous; the daily mean uses centres inside `bbox` and the per-unit value the cells actually touched. Confirm on the first real run that the edges do not change the result.
 - **Window:** 12 days, from S5's criterion, not tuned; S5 did not test 3 or 7 days (it would have meant picking the one that came out best).
