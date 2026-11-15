@@ -193,7 +193,8 @@ def run(zone: Zone, work_dir: Path) -> Path:
   if errors:
     raise ImpactScoringError("scenarios.json failed its checks, nothing written: " + "; ".join(errors))
   path = zone.output_dir / "scenarios.json"
-  path.write_text(json.dumps(scenarios, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+  # Compact like graph.json: the file is committed, and one line per field made a 110 000 line diff.
+  path.write_text(json.dumps(scenarios, separators=(",", ":"), ensure_ascii=False) + "\n", encoding="utf-8")
   return path
 
 
