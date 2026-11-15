@@ -119,13 +119,13 @@ Rules:
   If a referral hospital lies more than 3000 m from its snapped node, then road-graph exits non-zero with an English error that names the hospital and the distance and writes no `graph.json`.
 - INV-26 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes `graph.json`, it also writes `work/<id>/communities.json` with exactly one entry per community of `graph.json`, holding its id, its OSM id and its original `lon` and `lat`.
-- INV-27 [none]
+- INV-27 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   If `roads.osm` is empty, is not well-formed OSM XML or holds no roads, or `features.osm` is empty or is not well-formed OSM XML, then road-graph exits non-zero with an English error that names the file and writes no `graph.json` and no `communities.json`.
-- INV-28 [none]
+- INV-28 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   If any Overpass request of `--download` fails (network error, timeout or HTTP error status), then road-graph exits non-zero with an English error and leaves the zone's `roads.osm`, `features.osm` and `extract_date.txt` as they were.
-- INV-29 [none]
+- INV-29 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   If an Overpass answer is not well-formed OSM XML, holds no elements or contains a `remark` element, then road-graph with `--download` exits non-zero with an English error and leaves the zone's `roads.osm`, `features.osm` and `extract_date.txt` as they were.
-- INV-30 [none]
+- INV-30 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   If the zone's referral hospital ids include two that name the same OSM element (for example `way/301` and `way/0301`), then road-graph exits non-zero with an English error that names both ids and writes no `graph.json`.
 
 ## Deferred / Open questions
