@@ -3,6 +3,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 from functools import partial
 from pathlib import Path
 
@@ -155,3 +156,25 @@ def test_graph_with_an_edge_to_an_unknown_node_stops_naming_it(tmp_path):
   graph = two_paths()
   graph["edges"][0]["from"] = "n99"
   stops_cleanly(tmp_path, [unit("T-01", "e1")], "graph.json", "n99", graph=graph)
+
+
+# --- performance: rank-sensitivity calls score about six times, so one call must stay cheap on a real-sized graph ---
+
+
+def chain_graph(n_edges: int, n_communities: int) -> dict:
+  """A road of n_edges with the hospital at one end and communities along it: one cut isolates everyone beyond it."""
+  edges = [edge(f"e{i}", f"n{i}", f"n{i + 1}", 10) for i in range(1, n_edges + 1)]
+  step = n_edges // n_communities
+  communities = [(f"c{j}", f"n{1 + j * step}", 10) for j in range(1, n_communities + 1)]
+  return make_graph(edges, [("h1", "n1")], communities)
+
+
+def test_score_stays_fast_when_each_cut_isolates_hundreds_of_communities():
+  graph = chain_graph(8700, 758)  # the size of the Ruta 32 network area
+  units = [unit(f"T-{i:02d}", f"e{500 + i * 1600}") for i in range(5)]
+  started = time.perf_counter()
+  scenarios = score(graph, units)
+  elapsed = time.perf_counter() - started
+  assert sum(len(c["isolated_community_ids"]) for c in scenarios["candidates"]) > 1500  # the cuts really isolate many
+  # Before the fix, marking suspects rebuilt the whole graph per isolated community: 7 s for these five units.
+  assert elapsed < 2.0, f"score took {elapsed:.1f} s"
