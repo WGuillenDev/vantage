@@ -5,6 +5,7 @@ import json
 import logging
 import math
 import os
+from collections import Counter
 from pathlib import Path
 
 from .area_config import ConfigError, Zone, load_zone
@@ -83,6 +84,9 @@ def _pair_edges(corridor: list[dict], groups: _Groups) -> None:
 
 def build_units(graph: dict, roads: tuple[str, ...]) -> list[dict]:
   """The closure units of the edges whose road is in `roads`: id, edge_ids and length_m, in id order."""
+  repeated = next((i for i, n in Counter(e["id"] for e in graph["edges"]).items() if n > 1), None)
+  if repeated:
+    raise ClosureUnitsError(f"graph.json repeats the edge id {repeated}")
   corridor = [e for e in graph["edges"] if e["road"] in roads]
   if not corridor:
     raise ClosureUnitsError(f"No edge of graph.json matches closure.roads {list(roads)}")
@@ -93,10 +97,13 @@ def build_units(graph: dict, roads: tuple[str, ...]) -> list[dict]:
     touching.setdefault(e["to"], []).append(e)
 
   chains = _Groups(in_corridor)  # corridor edges joined at plain nodes: the stretches between two junctions
+  lanes = _Groups(in_corridor)  # corridor edges joined wherever exactly two meet, a ramp or not: one carriageway
   for node, here in touching.items():
     corridor_here = [e["id"] for e in here if e["id"] in in_corridor]
-    if len(corridor_here) == 2 and len(here) == 2:  # not a junction: no other road, not an end
-      chains.union(*corridor_here)
+    if len(corridor_here) == 2:
+      lanes.union(*corridor_here)
+      if len(here) == 2:  # not a junction: no other road, not an end
+        chains.union(*corridor_here)
   units = _Groups(in_corridor)
   units.parent = dict(chains.parent)
   _pair_edges(corridor, units)
@@ -113,10 +120,13 @@ def build_units(graph: dict, roads: tuple[str, ...]) -> list[dict]:
 
   result = []
   for number, edge_ids in enumerate(sorted(members.values(), key=key), start=1):
-    chain_lengths: dict[str, int] = {}
+    lane_lengths: dict[str, int] = {}
     for i in edge_ids:
-      chain_lengths[chains.find(i)] = chain_lengths.get(chains.find(i), 0) + by_edge[i]["length_m"]
-    result.append({"id": f"T-{number:02d}", "edge_ids": sorted(edge_ids, key=_number), "length_m": max(chain_lengths.values())})
+      lane_lengths[lanes.find(i)] = lane_lengths.get(lanes.find(i), 0) + by_edge[i]["length_m"]
+    length_m = max(lane_lengths.values())
+    if length_m == 0:  # scenarios.json needs length_m > 0, so this would fail later in impact-scoring with a message about another file
+      raise ClosureUnitsError(f"The closure unit made of edges {sorted(edge_ids, key=_number)} has a length of 0 m")
+    result.append({"id": f"T-{number:02d}", "edge_ids": sorted(edge_ids, key=_number), "length_m": length_m})
   return result
 
 
