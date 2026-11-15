@@ -165,3 +165,9 @@ def test_acc_04_two_zones_validate(storage: Path):
 def test_oversized_overlay_is_rejected(data: Path):
   (data / "overlay_change.png").write_bytes(b"0" * (2 * 1024 * 1024 + 1))
   assert any("is larger than" in e for e in validate_dir(data))
+
+
+def test_change_geojson_is_optional(data: Path):
+  (data / "change.geojson").unlink()
+  edit(data, "scenarios.json", lambda s: [c.update(zone_ids=[], mean_delta_db=None) for c in s["candidates"]])
+  assert validate_dir(data) == []

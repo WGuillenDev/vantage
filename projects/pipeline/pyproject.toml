@@ -17,6 +17,7 @@ timecheck = "pipeline.time_crosscheck:main"
 manual-review = "pipeline.manual_review:main"
 road-graph = "pipeline.road_graph:main"
 impact-scoring = "pipeline.impact_scoring:main"
+pipeline-run = "pipeline.pipeline_run:main"
 
 [build-system]
 requires = ["uv_build>=0.12.1,<0.13.0"]

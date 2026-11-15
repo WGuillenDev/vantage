@@ -160,11 +160,12 @@ def _check_rain(rows: list[dict], period: dict) -> list[str]:
 
 def validate_dir(folder: Path) -> list[str]:
   errors: list[str] = []
-  data = {name: _load(folder, name, errors) for name in JSON_FILES}
+  # change.geojson is the optional radar layer: a zone without it is valid.
+  data = {name: _load(folder, name, errors) for name in JSON_FILES if name != "change.geojson" or (folder / name).exists()}
   rows = _load_rain(folder, errors)
   ok = {}
   for name, schema_file in JSON_FILES.items():
-    if data[name] is not None:
+    if data.get(name) is not None:
       found = _schema_errors(name, data[name], schema_file)
       errors += found
       if not found:
@@ -175,8 +176,8 @@ def validate_dir(folder: Path) -> list[str]:
       errors += _check_rain(rows, ok["meta.json"]["rain"])
   if "graph.json" in ok:
     errors += _check_graph(ok["graph.json"])
-    if "scenarios.json" in ok and "change.geojson" in ok:
-      zones = {f["properties"]["id"] for f in ok["change.geojson"]["features"]}
+    if "scenarios.json" in ok:
+      zones = {f["properties"]["id"] for f in ok["change.geojson"]["features"]} if "change.geojson" in ok else set()
       errors += _check_scenarios(ok["graph.json"], ok["scenarios.json"], zones)
   return errors
 
