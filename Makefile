@@ -2,7 +2,7 @@ EXAMPLES := projects/contract/examples
 OUTPUT   := projects/pipeline/output
 STORAGE  := projects/frontend/public/storage
 
-.PHONY: mock publish validate all
+.PHONY: mock publish validate all timecheck
 
 mock:
 	rm -rf $(STORAGE)
@@ -19,3 +19,6 @@ validate:
 
 all:
 	@echo "all: not implemented yet"; exit 1
+
+timecheck:
+	uv run --project projects/pipeline timecheck --area $(AREA)
