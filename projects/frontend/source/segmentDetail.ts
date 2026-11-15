@@ -1,8 +1,8 @@
 import { formatDuration, formatPopulation } from './format.ts'
 import { rowView, type RankedUnit } from './ranking.ts'
-import { suspectLabel } from './trustSignals.ts'
+import { NO_ROUTE, suspectLabel } from './trustSignals.ts'
 
-export const NO_ROUTE = 'sin ruta al hospital de referencia'
+export { NO_ROUTE }
 export const NO_DATA = 'sin dato'
 export const HYPOTHESIS_LABEL = 'Hipótesis, no causa confirmada'
 export const WHY_TEXT =

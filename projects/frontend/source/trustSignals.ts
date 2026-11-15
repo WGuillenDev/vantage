@@ -23,7 +23,7 @@ export function readingPanel(meta: TrustMeta, graph: { hospitals: { name: string
   }
 }
 
-const NO_ROUTE = 'sin ruta al hospital de referencia'
+export const NO_ROUTE = 'sin ruta al hospital de referencia'
 
 export const suspectLabel = (communityId: string, suspectIds: string[]): string =>
   suspectIds.includes(communityId) ? `${NO_ROUTE} (posible artefacto del modelo)` : NO_ROUTE
