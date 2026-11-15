@@ -117,6 +117,17 @@ Notas de la revisión de sentido (B3):
 
 Meta: P8 antes del cierre del bloque de datos, no esperar a G2.
 
+**Estado del bloque C (15 nov):**
+
+| # | Estado | Detalle |
+|---|---|---|
+| C1 | Hecho | `projects/pipeline/output/` commiteado (4,7 MB: `areas.json` y `ruta-32/` con grafo, escenarios, lluvia y `meta.json`) |
+| C2 | Hecho | `deploy.yml` corre `make publish` en lugar de `make mock`; se quitó el comentario `shortcut:` |
+| C3 | Parcial | Probado en local con los pasos exactos del workflow (`make publish validate`, `bun install --frozen-lockfile`, `bun run build`) y el build servido en `/vantage/`: sin «MOCK», con aviso, banner de zona no validada y las tres atribuciones; abrir un tramo, el panel «Cómo leer» y la nota de referencia funcionan. **Falta** empujar y fusionar (denegado para Claude) y abrir el sitio publicado en ventana privada |
+| C4 | Sin uso | No hubo que volver al mock |
+
+Hallazgos del bloque C: en la comprobación vi que el detalle del tramo no marcaba los aislamientos sospechosos, aunque el spec de `trust-signals` lo exige (`suspectLabel` existía pero nada lo usaba). Corregido y con prueba; F10 sí queda `[x]` ahora, y en la auditoría anterior lo di por hecho sin comprobar ese cableado.
+
 ### Bloque D — Informes de confiabilidad (después de P8; no bloquean el despliegue)
 
 | # | Paso | Dueño | Terminado cuando |
