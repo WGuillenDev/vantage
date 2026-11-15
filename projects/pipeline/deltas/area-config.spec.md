@@ -79,17 +79,17 @@ Values above only show the shape. Real values are not final (see Deferred).
 
 ## Invariants
 
-- INV-01 [none]
+- INV-01 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_area_config.py]
   When a valid config is loaded, the zone it yields has the file's id (its name without `.toml`) and the same `name`, `validated`, `bbox`, referral hospital ids, speed model, raster path and rain period as the file.
-- INV-02 [none]
+- INV-02 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_area_config.py]
   If a required key is missing or empty, then the loader exits non-zero with an English error naming the file and the key, and writes no output.
-- INV-03 [none]
+- INV-03 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_area_config.py]
   If a config contains a key the format does not define, then the loader exits non-zero with an English error naming the key.
-- INV-04 [none]
+- INV-04 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_area_config.py]
   If a value is invalid (a zone id that is not lowercase words joined by hyphens, a `bbox` that is not four numbers with `w < e`, `s < n`, valid longitudes and latitudes, a date that is not `YYYY-MM-DD` or a `start` after `end`, or a speed not above 0), then the loader exits non-zero with an English error naming the key.
-- INV-07 [none]
+- INV-07 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_area_config.py]
   If `--area` names an id with no file in `configs/`, then the loader exits non-zero with an English error that lists the available ids.
-- INV-10 [none]
+- INV-10 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_area_config.py]
   When a zone is loaded, its output folder is `output/<id>/`.
 
 ## Deferred / Open questions
@@ -106,7 +106,7 @@ Testing gaps (all claims are tagged `none`; `builder` turns each into `test: <co
 
 ## Acceptance criteria
 
-- ACC-01 [none]
+- ACC-01 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_area_config.py]
   Given `configs/ruta-32.toml`, when the loader runs with `--area ruta-32`, then it yields a zone with id `ruta-32`, `validated: true` and its output folder `output/ruta-32/`.
-- ACC-02 [none]
+- ACC-02 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_area_config.py]
   Given a copy of `ruta-32.toml` saved as `other-zone.toml` with a different `name` and `bbox`, when the loader runs with `--area other-zone`, then the zone carries the new values and no source file was changed.
