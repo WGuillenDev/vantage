@@ -85,7 +85,7 @@ Un delta por rebanada, en `projects/<proyecto>/deltas/<delta>.spec.md`. Nombres 
 | 2 | `area-config` | pipeline | S | I | E3 | — | sí | [x] |
 | 3 | `zone-picker` | frontend | S | V | F11 | map-corridor, pipeline-run | no | [x] |
 | 4 | `segment-ranking` | frontend | S | V | F3 | contract-update | sí | [x] |
-| 5 | `trust-signals` | frontend | S | V | F8, F10 | segment-detail | F8 sí; F10 no | [~] |
+| 5 | `trust-signals` | frontend | S | V | F8, F10 | segment-detail | F8 sí; F10 no | [x] |
 | 6 | `time-crosscheck` | pipeline | S | V | P11 | road-graph | no | [~] |
 | 7 | `rank-sensitivity` | pipeline | S | V | P10 | impact-scoring | no | [~] |
 | 8 | `manual-review` | pipeline | S | R | P12 | impact-scoring | no | [~] |

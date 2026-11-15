@@ -1,4 +1,4 @@
-import { formatDuration } from './format.ts'
+import { formatDuration, formatPopulation } from './format.ts'
 
 export interface RankedUnit {
   id: string
@@ -49,15 +49,13 @@ function mainRoad(unit: RankedUnit, edges: { id: string; road?: string | null }[
 const formatLength = (meters: number): string =>
   Math.round(meters) < 1000 ? `${Math.round(meters)} m` : `${(meters / 1000).toFixed(1).replace('.', ',')} km`
 
-const formatCount = (value: number): string => String(value).replace(/\B(?=(\d{3})+$)/g, '\u00a0')
-
 export function rowView(unit: RankedUnit, edges: { id: string; road?: string | null }[], maxCrit: number): RowView {
   return {
     id: unit.id,
     label: `${mainRoad(unit, edges)} · ${unit.id}`,
     length: formatLength(unit.length_m),
     extraTime: unit.extra_time_s === null ? 'sin ruta al hospital de referencia' : formatDuration(unit.extra_time_s),
-    population: unit.population_dependent === null ? 'sin dato' : `${formatCount(unit.population_dependent)} estimada`,
+    population: formatPopulation(unit.population_dependent),
     barFraction: maxCrit > 0 ? unit.criticality / maxCrit : null,
   }
 }

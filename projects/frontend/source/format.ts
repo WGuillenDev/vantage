@@ -7,3 +7,9 @@ export function formatDuration(seconds: number): string {
   const rest = minutes % 60
   return rest === 0 ? `≈ ${hours} h` : `≈ ${hours} h ${rest} min`
 }
+
+// A population is always a modelled estimate; null stays "sin dato", never 0.
+export function formatPopulation(value: number | null): string {
+  if (value === null) return 'sin dato'
+  return `${String(value).replace(/\B(?=(\d{3})+$)/g, '\u00a0')} estimada`
+}

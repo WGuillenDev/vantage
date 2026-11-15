@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { formatDuration } from './format.ts'
+import { formatDuration, formatPopulation } from './format.ts'
 
 // Rule owned by `trust-signals` (INV-07, INV-08); first used by `segment-ranking`.
 describe('formatDuration', () => {
@@ -20,5 +20,14 @@ describe('formatDuration', () => {
     expect(formatDuration(60 * 60)).toBe('≈ 1 h')
     expect(formatDuration(75 * 60)).toBe('≈ 1 h 15 min')
     expect(formatDuration(125 * 60)).toBe('≈ 2 h 5 min')
+  })
+})
+
+describe('formatPopulation', () => {
+  test('INV-09 a population figure is labeled "estimada" and null reads "sin dato"', () => {
+    expect(formatPopulation(2300)).toBe('2\u00a0300 estimada')
+    expect(formatPopulation(999)).toBe('999 estimada')
+    expect(formatPopulation(0)).toBe('0 estimada')
+    expect(formatPopulation(null)).toBe('sin dato')
   })
 })
