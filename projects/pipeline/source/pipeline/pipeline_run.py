@@ -37,7 +37,7 @@ def default_stages() -> list[Stage]:
 
 
 def _write_json(path: Path, data: object) -> None:
-  path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+  path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
 
 
 def _read(path: Path, hint: str) -> str:
@@ -101,15 +101,17 @@ def run_zone(zone: Zone, work_dir: Path, stages: list[Stage] | None = None) -> P
     shutil.rmtree(staging, ignore_errors=True)
     raise
   shutil.rmtree(old, ignore_errors=True)
-  if final.exists():
-    final.rename(old)
   try:
+    if final.exists():
+      final.rename(old)
     staging.rename(final)
-  except OSError as exc:
-    if old.exists():
+  except BaseException as exc:
+    if old.exists() and not final.exists():
       old.rename(final)
     shutil.rmtree(staging, ignore_errors=True)
-    raise PipelineRunError(f"cannot publish {final}, the previous output was kept: {exc}") from None
+    if isinstance(exc, OSError):
+      raise PipelineRunError(f"cannot publish {final}, the previous output was kept: {exc}") from None
+    raise
   shutil.rmtree(old, ignore_errors=True)
   return final
 

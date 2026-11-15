@@ -1,11 +1,13 @@
+import json
 import shutil
 import subprocess
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
 import pipeline.pipeline_run as pipeline_run
-from pipeline.pipeline_run import PipelineRunError, run_zone
+from pipeline.pipeline_run import PipelineRunError, run_zone, write_areas
 from test_pipeline_run import ROOT, make_zone, snapshot, stages, work  # noqa: F401  (work is a fixture)
 
 
@@ -77,3 +79,71 @@ def test_adv_inv_14_publish_from_a_missing_source_keeps_the_old_storage(tmp_path
   )
   assert done.returncode != 0
   assert (storage / "areas.json").exists()
+
+
+def test_adv2_inv_02_failed_move_of_the_old_output_is_a_pipeline_error(tmp_path: Path, work: Path, monkeypatch: pytest.MonkeyPatch):
+  zone = make_zone(tmp_path)
+  run_zone(zone, work, stages())
+  before = snapshot(zone.output_dir)
+  real_rename = Path.rename
+
+  def locked(self: Path, target):
+    if self == zone.output_dir:
+      raise PermissionError("folder is in use")
+    return real_rename(self, target)
+
+  monkeypatch.setattr(Path, "rename", locked)
+  with pytest.raises(PipelineRunError):
+    run_zone(zone, work, stages())
+  monkeypatch.undo()
+  assert snapshot(zone.output_dir) == before
+  assert sorted(p.name for p in zone.output_dir.parent.iterdir()) == ["zone-a"]
+
+
+def test_adv2_inv_02_interrupt_during_the_swap_keeps_the_previous_output(tmp_path: Path, work: Path, monkeypatch: pytest.MonkeyPatch):
+  zone = make_zone(tmp_path)
+  run_zone(zone, work, stages())
+  before = snapshot(zone.output_dir)
+  real_rename = Path.rename
+
+  def interrupted(self: Path, target):
+    if self.name.endswith(".new"):
+      raise KeyboardInterrupt
+    return real_rename(self, target)
+
+  monkeypatch.setattr(Path, "rename", interrupted)
+  with pytest.raises(KeyboardInterrupt):
+    run_zone(zone, work, stages())
+  monkeypatch.undo()
+  assert zone.output_dir.is_dir() and snapshot(zone.output_dir) == before
+
+
+def test_adv2_inv_06_non_ascii_zone_name_survives_meta_and_areas(tmp_path: Path, work: Path):
+  zone = replace(make_zone(tmp_path), name="Ruta 32 (San José–Limón)")
+  run_zone(zone, work, stages())
+  meta = json.loads((zone.output_dir / "meta.json").read_text(encoding="utf-8"))
+  assert meta["area"]["name"] == "Ruta 32 (San José–Limón)"
+
+
+def test_adv2_inv_13_areas_json_is_byte_identical_between_runs(tmp_path: Path, work: Path):
+  configs, output = tmp_path / "configs", tmp_path / "output"
+  configs.mkdir()
+  for zone_id in ("zone-b", "zone-a"):
+    (output / zone_id).mkdir(parents=True)
+    (configs / f"{zone_id}.toml").write_text(
+      'name = "Zona José"\nvalidated = true\nbbox = [-84.2, 9.95, -83.7, 10.3]\n'
+      '[hospitals]\nreferral = ["way/1"]\n[speed_model_kmh]\nprimary = 60\n[closure]\nroads = ["R"]\nalternates = []\n'
+      '[population]\nraster = "r.tif"\nurl = "u"\n[rain]\nstart = "2026-06-29"\nend = "2026-07-01"\n',
+      encoding="utf-8",
+    )
+  write_areas(output, configs)
+  first = (output / "areas.json").read_bytes()
+  write_areas(output, configs)
+  assert (output / "areas.json").read_bytes() == first
+  assert "Zona José".encode("utf-8") in first
+
+
+def test_adv2_inv_13_written_json_uses_unix_line_endings(tmp_path: Path, work: Path):
+  zone = make_zone(tmp_path)
+  run_zone(zone, work, stages())
+  assert b"\r" not in (zone.output_dir / "meta.json").read_bytes()
