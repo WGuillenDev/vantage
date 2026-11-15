@@ -66,55 +66,55 @@ Rules:
 
 ## Invariants
 
-- INV-01 [none]
+- INV-01 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph finishes, the `graph.json` it wrote passes `make validate`'s graph schema and node-reference checks.
-- INV-02 [none]
+- INV-02 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes an edge, the first and last points of its `geometry` equal the `lon`/`lat` of its `from` and `to` nodes.
-- INV-03 [none]
+- INV-03 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes an edge, its `length_m` and `time_s` are integers and `time_s` equals `length_m / (speed_kmh / 3.6)` rounded half up, with the speed of the edge's road class in the zone's `speed_model_kmh`.
-- INV-04 [none]
+- INV-04 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes `graph.json`, no edge has `length_m` greater than 1000.
-- INV-05 [none]
+- INV-05 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes `graph.json`, every edge has `candidate_id: null`.
-- INV-06 [none]
+- INV-06 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes `graph.json`, its hospitals are exactly the zone's referral hospital ids, one per id.
-- INV-07 [none]
+- INV-07 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   If a referral hospital id is not found in the OSM extract, then road-graph exits non-zero with an English error that names that id and writes no `graph.json`.
-- INV-08 [none]
+- INV-08 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes `graph.json`, every community comes from a named OSM `place` node of type `city`, `town`, `village` or `hamlet` and lies at most 3000 m from its snapped node.
-- INV-09 [none]
+- INV-09 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   If a community's nearest node of the largest strongly connected component is farther than 3000 m, then road-graph leaves it out of `graph.json` and logs its name and distance in English.
-- INV-10 [none]
+- INV-10 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes `graph.json`, every community has `population: null`.
-- INV-11 [none]
+- INV-11 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph computes `time_s`, it uses the speed of the zone's `speed_model_kmh` for the edge's road class and no other speed source.
-- INV-12 [none]
+- INV-12 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph runs twice on the same OSM data and zone, the two `graph.json` files are byte-identical.
-- INV-13 [none]
+- INV-13 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes `graph.json`, the file is at most 3 MB.
-- INV-14 [none]
+- INV-14 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes `graph.json`, every node is reachable from every other node when edge direction is ignored.
-- INV-15 [none]
+- INV-15 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes `graph.json`, no edge has the same `from` and `to`.
-- INV-16 [none]
+- INV-16 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   If a referral hospital has no OSM `name`, then road-graph exits non-zero with an English error that names its OSM id and writes no `graph.json`.
-- INV-17 [none]
+- INV-17 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   If a road class on a kept edge has no entry in the zone's `speed_model_kmh`, then road-graph exits non-zero with an English error that names the class and writes no `graph.json`.
-- INV-18 [none]
+- INV-18 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   If the compact `graph.json` would exceed 3 MB, then road-graph exits non-zero with an English error that states the size and writes no `graph.json`.
-- INV-19 [none]
+- INV-19 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When two edges join the same pair of OSM end nodes, road-graph numbers first the one with the smaller OSM way id.
-- INV-20 [none]
+- INV-20 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   If the local OSM extract of the zone is missing, then road-graph (without `--download`) exits non-zero with an English error that says how to obtain it (`make osm`) and writes no `graph.json`.
-- INV-21 [none]
+- INV-21 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When the download step finishes, `work/<id>/osm/extract_date.txt` holds the UTC download date as `YYYY-MM-DD`.
-- INV-22 [none]
+- INV-22 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph runs with `--download`, it only downloads the extract and records its date, and writes no `graph.json`.
-- INV-23 [none]
+- INV-23 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes `graph.json`, every hospital node and every community node belongs to the largest strongly connected component of the directed graph.
-- INV-24 [none]
+- INV-24 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   If a referral hospital lies more than 3000 m from its snapped node, then road-graph exits non-zero with an English error that names the hospital and the distance and writes no `graph.json`.
-- INV-26 [none]
+- INV-26 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes `graph.json`, it also writes `work/<id>/communities.json` with exactly one entry per community of `graph.json`, holding its id, its OSM id and its original `lon` and `lat`.
 
 ## Deferred / Open questions
