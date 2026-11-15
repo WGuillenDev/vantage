@@ -54,17 +54,17 @@ Rules:
 
 ## Invariants
 
-- INV-01 [none]
+- INV-01 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_rain_context.py]
   When rain-context finishes, the `rain.csv` and `scenarios.json` it wrote pass `make validate`, and `scenarios.json` differs from its input only in `exposure`.
-- INV-02 [none]
+- INV-02 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_rain_context.py]
   When rain-context writes `rain.csv`, it has one row per day from `rain.start` to `rain.end`, in ascending order, with no gaps.
-- INV-03 [none]
+- INV-03 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_rain_context.py]
   When rain-context writes a day's `precip_mm`, it equals the mean of that day's values over the cells whose centre lies inside `bbox`, rounded half up to 3 decimals.
-- INV-04 [none]
+- INV-04 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_rain_context.py]
   If a day between `rain.start` and `rain.end` is missing for any cell, or the 12 days ending at `rain.end` are not all inside the period, then rain-context exits non-zero with an English error naming the date or the period and writes no output.
-- INV-05 [none]
+- INV-05 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_rain_context.py]
   When rain-context writes a unit's `rain_mm_12d`, it equals the mean, over the distinct cells touched by the unit's edge geometries, of each cell's rain over the 12 days ending at `rain.end`, rounded half up to 1 decimal.
-- INV-14 [none]
+- INV-14 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_rain_context.py]
   If Earthdata credentials are missing or the GES DISC application is not authorized, then `make imerg` exits non-zero with an English error that says how to authorize it and writes no file.
 
 ## Deferred / Open questions
