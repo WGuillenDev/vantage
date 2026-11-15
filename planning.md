@@ -162,13 +162,28 @@ Decisión (R, 15 nov): **se mantienen los tres hospitales de San José**, porque
 | D1 | Hecho | Faltaba el punto de entrada: se añadió `rank-sensitivity` y `make sensitivity`. La corrida real falló al principio porque la comprobación de la línea base comparaba `exposure` (que añade `rain-context` después del scoring); se corrigió con prueba. Veredicto `pass`: top 5 = 5 y top 10 = 10 en ×0,8, ×1,2 y al quitar cada hospital (correlación 1,0). Reportes en `reports/ruta-32/sensitivity.json` |
 | D2 | Hecho | `time_crosscheck.json`: 20 pares contra OSRM, error relativo mediano 15,3 % (umbral 25 %), sesgo −15,2 %, veredicto `pass`. `reference_times.json`: 4 referencias citadas (Enter Costa Rica y Anywhere.com, consultadas el 2026-11-15) con errores de 12 % (Limón), 33 % (Siquirres), 34 % (Turrialba) y 10 % (Guápiles); no se califican |
 | D3 | Esperando a una persona | Hoja `reports/ruta-32/manual_review.json` preparada, sin commitear mientras esté vacía. 3 unidades (T-20, T-56, T-24) y solo 4 comunidades aisladas que clasificar (Germania, Altos de Germania, Trinidad, Las Minas). La herramienta sugiere `snapping_artifact` en las cuatro |
-| D4 | Depende de D3 | `validated` sigue en `false` |
+| D4 | Medido, no se aplica | Ver «Efecto de corregir los aislamientos sospechosos»; `validated` sigue en `false` hasta D3 |
 | D5 | Hecho | Ver «Resultado de D5» |
 
 Lectura honesta de D1 y D2:
 - **El `pass` de velocidad es casi automático.** Los dos factores escalan todas las velocidades por igual, así que el orden no puede cambiar salvo por el redondeo. Pesa más la prueba de quitar hospitales, y esa solo habla de los tres de San José, que están a pocos kilómetros entre sí (ver D5).
 - **El router comparte datos con el modelo** (OSM): comprueba la cuenta, no la realidad. Las referencias son tiempos de San José a cada ciudad de portales de viaje, no al hospital, y la de Turrialba no pasa por la Ruta 32.
 - **Dos pares quedan lejos del router:** c497 y c520 (62 y 74 min frente a unos 180). No se investigaron.
+
+**Efecto de corregir los aislamientos sospechosos (D4, medición del 15 nov).** Script y salida en `projects/pipeline/spikes/suspect_effect/` (`measure.py`, `result.txt`); no se cambió el pipeline. De 965 pares comunidad-unidad aislados, 208 (21,6 %) están marcados como sospechosos. Se midieron dos correcciones sobre las 115 unidades:
+
+| Variante | Unidades con impacto | Top 5 / 10 / 20 en común | Spearman | Unidades que bajan ≥ 10 puestos |
+|---|---|---|---|---|
+| Base | 100 | | | |
+| A: excluir los 208 aislamientos sospechosos | 92 | 4 / 10 / 19 | 0,999 | 8 |
+| B: reenganchar al nodo abierto más cercano | 100 | 5 / 10 / 20 | 1,000 | 0 |
+
+- **La cima casi no depende de los artefactos.** Con A solo cambia T-24 (34,5 km), que cae del puesto 2 al 6 porque su única comunidad aislada, Las Minas, es sospechosa; el top 10 sigue siendo el mismo. La criticidad de las primeras unidades la dan unas 311 comunidades con tiempo extra finito, no los aislamientos.
+- **Lo que sí cambia es la cola:** 8 unidades (puestos 19 a 77 en la base) solo tenían impacto por una comunidad sospechosa; sin ella pasan a los puestos 93 a 112 con impacto 0, y las comunidades «sin ruta» que se muestran bajan de 965 a 757.
+- **B se aplica a pocas:** solo 39 de las 208 sospechosas tienen el nodo en un extremo del tramo cerrado (las otras 169 se marcan por ser alcanzables ignorando el sentido, es decir, por vías de un solo sentido). De esas 39, 20 llegan a un hospital tras reengancharse y 19 siguen sin ruta.
+- Aproximaciones de la medición: B reengancha por distancia en línea recta, y el tiempo extra se mide contra la base del nodo original.
+
+Conclusión: **no hace falta tocar el modelo para el ranking**. D4 no se aplica; las marcas de sospechoso que ya muestra la interfaz bastan, y la hoja de D3 decide si `validated` pasa a `true` (lo más probable es que no). Hay que decir en la presentación que el top 10 resiste la exclusión de los aislamientos sospechosos (10 de 10), y que el 21,6 % de aislamientos sospechosos es una limitación conocida.
 
 ### Bloque E — Cierre
 
