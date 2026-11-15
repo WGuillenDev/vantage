@@ -2,7 +2,7 @@ EXAMPLES := projects/contract/examples
 OUTPUT   := projects/pipeline/output
 STORAGE  := projects/frontend/public/storage
 
-.PHONY: mock publish validate all timecheck
+.PHONY: mock publish validate all timecheck review-prepare review-summary
 
 mock:
 	rm -rf $(STORAGE)
@@ -22,3 +22,9 @@ all:
 
 timecheck:
 	uv run --project projects/pipeline timecheck --area $(AREA)
+
+review-prepare:
+	uv run --project projects/pipeline manual-review prepare --area $(AREA)
+
+review-summary:
+	uv run --project projects/pipeline manual-review summarize --area $(AREA)
