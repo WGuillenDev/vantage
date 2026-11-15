@@ -49,7 +49,7 @@ Public function (decided 15 Nov, for `rank-sensitivity`): besides the file, the 
 | Part | Contract |
 |---|---|
 | `graph` | The content of `graph.json`, already loaded. Hospitals (`graph["hospitals"]`) and every `time_s` are read from it, never from the zone config or a module value. |
-| `units` | A list of `{id, edge_ids, length_m}`, already loaded. |
+| `units` | A list of `{id, edge_ids, length_m}`, already loaded. Each `id` appears once: a repeated id is an error, not two units (decided 15 Nov, found by `breaker`). |
 | `alternates` | A list of `{name, vehicles}`, copied to every unit; empty by default, so the function does not depend on the zone config. |
 | Returns | The content of `scenarios.json`: a dict with `schema_version`, `baseline` and `candidates`. Not a tuple, and it never rewrites the graph. |
 
@@ -124,17 +124,22 @@ Decision notes:
   When `score` runs, it derives its result only from its arguments: it reads no file, zone config or module-level value, and it leaves its arguments unmodified.
 - INV-24 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   When `score` is called twice with equal arguments, the two results serialize to identical JSON.
+- INV-25 [none]
+  If two units passed to `score` have the same `id`, then `score` raises an English error that names the id.
+- INV-26 [none]
+  If `closure_units.json` lists two units with the same `id`, then impact-scoring exits non-zero with an English error that names the id and writes no `scenarios.json`.
 
 ## Deferred / Open questions
 
-Testing gaps (all claims are tagged `none`; the old spec on `origin/feat/impact-scoring` had 19 tests and `impact_scoring.py`, and `builder` ports them to zones and units and turns each tag into `test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py`): INV-01 to INV-13, INV-15, INV-18, INV-19, INV-20, ACC-01 to ACC-04. INV-21 to INV-24 (the public function, added 15 Nov) are `none` too; their tests are plain unit tests on `score`, including one that passes a graph with scaled `time_s` and one hospital less and checks the result follows it.
+Testing gaps: INV-25 and INV-26 are `none` until `builder` runs. Their tests already exist as `test_run_stops_when_two_units_have_the_same_id` and `test_score_rejects_two_units_with_the_same_id` in the uncommitted, red `projects/pipeline/testing/test_impact_scoring_findings.py`; `builder` moves them to `test_impact_scoring.py` and turns each tag into `test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py`. Every other claim has a passing test, and ACC-05 is `manual` (the real Ruta 32 run).
 
 - **Parity with `graph.ts`:** the browser must use the same route direction (community → hospital), the same tie rule and the same "affected" rule. It does not compute suspect marks. The contract mock is the proposed shared fixture (agree with Iván).
 - **Suspect rule limits:** it only knows the two causes found in S4′ (snapped to the closed unit, isolated by `oneway`). Other artifacts, such as a community adjusted to a wrong road, are not detected; the manual review (P12) looks for them.
 - **Suspect counted in the ranking:** decided to keep them in, flagged for the UI. Reopen if the manual review shows they dominate the top of the list.
 - **`closure.alternates` source:** the zone config must cite where the alternates come from; for Ruta 32 the old spec named Ruta 126 (light) and Ruta 10 (freight) from "project knowledge", without a source. Pending (Ian).
 - **Referral set meaning:** an isolated community may have a nearer regional hospital; the UI wording "sin ruta al hospital de referencia" carries that (D8). The referral hospital list is still pending (Ian).
-- **Performance:** one search per unit over a graph of about 8 700 edges is cheap, but the number of units is open (`closure-units`).
+- **Performance (measured by `breaker`, 15 Nov):** the search itself is cheap, but marking suspect isolations rebuilds the neighbour lists of the whole graph once per isolated community, about 3 ms each. On a synthetic graph of 8 700 edges and 758 communities, 1 unit takes 1.0 s, 5 units 7.1 s and 20 units 23.8 s (7 353 isolated pairs). `rank-sensitivity` calls `score` about six times, so the number of units from `closure-units` decides whether this is acceptable; it is a `builder` improvement, not a claim.
+- **Duplicate candidate ids in the contract validator:** the contract validator does not reject two candidates with the same `id`, so only this slice stops them (INV-25, INV-26). Whether `validate` should also check it belongs to `contract-update`.
 - **Mock fixture:** ACC-01 to ACC-04 use the contract mock; `contract-update` rewrites it for 0.3, and these criteria must be checked against that mock, not the 0.1 one.
 - **Old `score`:** the function of `origin/feat/impact-scoring` returned a tuple `(scenarios, graph)`, renumbered the ids by rank and took the alternates from a module constant tied to "Ruta 32". None of that survives: the contract above returns only the scenarios and takes the alternates as an argument.
 - **Binding the alternates (`pipeline-run`):** `rank-sensitivity` raises "the baseline is not reproducible" when `scorer(graph, units)` differs from the whole `scenarios.json`. The wiring that builds the scorer must therefore bind the zone's alternates; `pipeline-run` owns that wiring, and an unbound scorer would fail the check on every run.
