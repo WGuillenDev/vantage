@@ -49,4 +49,7 @@ def test_inv_03_unknown_key_in_detection_limits_is_named(tmp_path: Path):
 
 
 def test_inv_02_crlf_line_endings_load(tmp_path: Path):
-  assert load_zone("test-zone", make(tmp_path, VALID.replace("\n", "\r\n"))).name == "Test Zone"
+  configs = make(tmp_path)
+  # write_bytes: write_text would turn \n into \r\n again on Windows and double the \r.
+  (configs / "test-zone.toml").write_bytes(VALID.replace("\n", "\r\n").encode("utf-8"))
+  assert load_zone("test-zone", configs).name == "Test Zone"

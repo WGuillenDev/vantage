@@ -1,4 +1,5 @@
 import argparse
+import math
 import re
 import tomllib
 from dataclasses import dataclass
@@ -67,7 +68,14 @@ def _string(value: object, path: str, file: str) -> str:
 def _string_list(value: object, path: str, file: str) -> tuple[str, ...]:
   if not isinstance(value, list) or not value:
     raise _fail(file, path, "must be a non-empty list")
-  return tuple(_string(v, path, file) for v in value)
+  items = tuple(_string(v, path, file) for v in value)
+  _no_repeats(items, path, file)
+  return items
+
+
+def _no_repeats(items: tuple[str, ...], path: str, file: str) -> None:
+  if len(set(items)) != len(items):
+    raise _fail(file, path, "has a repeated value")
 
 
 def _number(value: object, path: str, file: str) -> float:
@@ -77,8 +85,8 @@ def _number(value: object, path: str, file: str) -> float:
 
 
 def _positive(value: object, path: str, file: str) -> float:
-  if not _number(value, path, file) > 0:
-    raise _fail(file, path, "must be greater than 0")
+  if not (math.isfinite(_number(value, path, file)) and value > 0):
+    raise _fail(file, path, "must be a finite number greater than 0")
   return value
 
 
@@ -116,6 +124,7 @@ def _alternates(value: object, file: str) -> tuple[tuple[str, str], ...]:
     if vehicles not in ("light", "freight"):
       raise _fail(file, "closure.alternates.vehicles", "must be 'light' or 'freight'")
     out.append((name, vehicles))
+  _no_repeats(tuple(name for name, _ in out), "closure.alternates", file)
   return tuple(out)
 
 
@@ -130,7 +139,7 @@ def _detection_limits(table: dict, file: str) -> dict | None:
 
 
 def available_ids(configs_dir: Path) -> list[str]:
-  return sorted(p.stem for p in configs_dir.glob("*.toml"))
+  return sorted(p.stem for p in configs_dir.glob("*.toml") if p.is_file() and ZONE_ID.fullmatch(p.stem))
 
 
 def load_zone(zone_id: str, configs_dir: Path = CONFIGS_DIR) -> Zone:
@@ -138,10 +147,15 @@ def load_zone(zone_id: str, configs_dir: Path = CONFIGS_DIR) -> Zone:
     raise ConfigError(f"zone id {zone_id!r}: must be lowercase letters and digits joined by single hyphens")
   path = configs_dir / f"{zone_id}.toml"
   file = path.name
-  if not path.is_file():
-    raise ConfigError(f"{file}: no such config; available zones: {', '.join(available_ids(configs_dir)) or 'none'}")
+  # Matching against the listing, not is_file(), so a file spelled RUTA-32.toml is not found on a case-insensitive disk.
+  ids = available_ids(configs_dir)
+  if zone_id not in ids:
+    raise ConfigError(f"{file}: no such config; available zones: {', '.join(ids) or 'none'}")
   try:
-    data = tomllib.loads(path.read_text(encoding="utf-8"))
+    # utf-8-sig drops the byte-order mark that some Windows editors add.
+    data = tomllib.loads(path.read_bytes().decode("utf-8-sig"))
+  except OSError as exc:
+    raise ConfigError(f"{file}: cannot be read ({exc.strerror or exc})") from None
   except (tomllib.TOMLDecodeError, UnicodeDecodeError) as exc:
     raise ConfigError(f"{file}: invalid TOML ({exc})") from None
   _check_keys(
@@ -155,6 +169,8 @@ def load_zone(zone_id: str, configs_dir: Path = CONFIGS_DIR) -> Zone:
     raise _fail(file, "validated", "must be true or false")
   hospitals = _table(data, "hospitals", {"referral"}, file)
   speeds = _table(data, "speed_model_kmh", None, file)
+  if "" in speeds:
+    raise _fail(file, "speed_model_kmh", "road class name must not be empty")
   if not speeds:
     raise _fail(file, "speed_model_kmh", "needs at least one road class")
   closure = _table(data, "closure", {"roads", "alternates"}, file)

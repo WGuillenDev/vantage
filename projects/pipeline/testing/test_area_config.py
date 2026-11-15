@@ -234,3 +234,84 @@ def test_acc_02_another_zone_carries_its_own_values(tmp_path: Path):
   assert (zone.id, zone.name, zone.bbox) == ("other-zone", "Other", (-80.0, 8.0, -79.0, 9.0))
   assert source.read_bytes() == before
   shutil.rmtree(configs)
+
+
+@pytest.mark.parametrize("speed", ["inf", "-inf", "nan"])
+def test_inv_04_speed_must_be_finite(tmp_path: Path, speed: str):
+  with pytest.raises(ConfigError, match="speed_model_kmh.trunk"):
+    load_zone("test-zone", make(tmp_path, VALID.replace("trunk = 60", f"trunk = {speed}")))
+
+
+def test_inv_04_road_class_name_must_not_be_empty(tmp_path: Path):
+  with pytest.raises(ConfigError, match="speed_model_kmh"):
+    load_zone("test-zone", make(tmp_path, VALID.replace("trunk = 60", '"" = 60')))
+
+
+def test_inv_04_detection_limits_must_be_finite(tmp_path: Path):
+  block = "\n[detection_limits]\nmin_detectable_area_ha = inf\nmin_delta_db = 5\nnote = 'x'\n"
+  with pytest.raises(ConfigError, match="detection_limits.min_detectable_area_ha"):
+    load_zone("test-zone", make(tmp_path, VALID + block))
+
+
+def test_inv_07_only_loadable_ids_are_listed(tmp_path: Path):
+  configs = make(tmp_path)
+  for bad in ("Bad_Name", "worse name", "-x"):
+    make(tmp_path, VALID, bad)
+  (configs / "dir-zone.toml").mkdir()
+  with pytest.raises(ConfigError) as err:
+    load_zone("missing", configs)
+  assert str(err.value).endswith("available zones: test-zone")
+
+
+def test_inv_07_a_file_that_differs_only_by_case_does_not_match(tmp_path: Path):
+  configs = make(tmp_path, VALID, "RUTA-32")
+  with pytest.raises(ConfigError, match="available zones: none"):
+    load_zone("ruta-32", configs)
+
+
+def test_inv_07_a_folder_named_like_a_config_does_not_match(tmp_path: Path):
+  configs = make(tmp_path)
+  (configs / "dir-zone.toml").mkdir()
+  with pytest.raises(ConfigError, match="dir-zone.toml"):
+    load_zone("dir-zone", configs)
+
+
+@pytest.mark.parametrize(
+  ("old", "new", "key"),
+  [
+    ('["way/1"]', '["way/1", "way/1"]', "hospitals.referral"),
+    ('["Ruta X"]', '["Ruta X", "Ruta X"]', "closure.roads"),
+    ('  { name = "Ruta Y", vehicles = "light" },\n', '  { name = "Ruta Y", vehicles = "light" },\n  { name = "Ruta Y", vehicles = "freight" },\n', "closure.alternates"),
+  ],
+)
+def test_inv_11_repeated_values_are_rejected(tmp_path: Path, old: str, new: str, key: str):
+  assert old in VALID
+  with pytest.raises(ConfigError) as err:
+    load_zone("test-zone", make(tmp_path, VALID.replace(old, new)))
+  assert key in str(err.value) and "test-zone.toml" in str(err.value)
+
+
+def test_inv_12_byte_order_mark_and_crlf_are_accepted(tmp_path: Path):
+  configs = tmp_path / "configs"
+  configs.mkdir()
+  (configs / "test-zone.toml").write_bytes(b"\xef\xbb\xbf" + VALID.replace("\n", "\r\n").encode("utf-8"))
+  assert load_zone("test-zone", configs).name == "Test Zone"
+
+
+def test_inv_13_invalid_utf8_names_the_file(tmp_path: Path):
+  configs = tmp_path / "configs"
+  configs.mkdir()
+  (configs / "test-zone.toml").write_bytes(b'name = "\xff\xfe"\n')
+  with pytest.raises(ConfigError, match="test-zone.toml"):
+    load_zone("test-zone", configs)
+
+
+def test_inv_13_unreadable_file_names_the_file(tmp_path: Path, monkeypatch):
+  configs = make(tmp_path)
+
+  def deny(self, *args, **kwargs):
+    raise PermissionError("denied")
+
+  monkeypatch.setattr(Path, "read_bytes", deny)
+  with pytest.raises(ConfigError, match="test-zone.toml"):
+    load_zone("test-zone", configs)
