@@ -110,7 +110,7 @@ Testing gaps: none. All claims run `projects/pipeline/testing/test_area_config.p
 - **Population raster delivery (decided in `population-data`):** `population.raster` is the local path and `population.url` is where `make worldpop` fetches it from (S7: a 31.5 MB HTTPS file). The raster is never committed.
 - **Second zone:** which zone, if any, joins Ruta 32 is not chosen, and its hospitals, speeds and raster are not prepared. A zone with `validated: false` is allowed by this contract; the label it gets in the UI is `zone-picker`.
 - **Referral criterion outside Costa Rica:** the idea of a "referral hospital" may not carry over to another country; not tested (`approach.md`).
-- **`validated` for Ruta 32:** ACC-01 sets `validated: true`, but no result has been checked by hand yet. Revisit before the real run so the label does not overclaim.
+- **`validated` for Ruta 32:** Ruta 32 is `validated: false` (15 Nov) because no result has been checked by hand yet; it becomes `true` only when `manual-review` passes.
 - **Rain end date:** `ruta-32.toml` pins `rain.end` for reproducibility, so it must be advanced by hand before a new run; a "latest available" option is not specified.
 - **Docs out of sync:** `context/structure.md` §4 shows an `[area]` table with `bbox` and `referral_hospitals`; this spec's flat layout supersedes it. A person updates the doc.
 - **Road class names:** the loader only requires a non-empty name; it does not check the name is an OSM `highway` class. A typo surfaces in `road-graph`, which uses the speeds.
@@ -118,6 +118,6 @@ Testing gaps: none. All claims run `projects/pipeline/testing/test_area_config.p
 ## Acceptance criteria
 
 - ACC-01 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_area_config.py]
-  Given `configs/ruta-32.toml`, when the loader runs with `--area ruta-32`, then it yields a zone with id `ruta-32`, `validated: true` and its output folder `output/ruta-32/`.
+  Given `configs/ruta-32.toml`, when the loader runs with `--area ruta-32`, then it yields a zone with id `ruta-32`, `validated: false` (until the manual review passes) and its output folder `output/ruta-32/`.
 - ACC-02 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_area_config.py]
   Given a copy of `ruta-32.toml` saved as `other-zone.toml` with a different `name` and `bbox`, when the loader runs with `--area other-zone`, then the zone carries the new values and no source file was changed.

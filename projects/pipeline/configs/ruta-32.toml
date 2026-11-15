@@ -1,7 +1,7 @@
 # Ruta 32 (San José–Limón): the demonstration zone. Values marked PENDING are not final.
 name = "Ruta 32 (San José–Limón)"
-# ACC-01 requires true. Nobody has checked the results by hand yet: revisit before the real run.
-validated = true
+# Nobody has checked the results by hand yet (manual-review, P12): stays false until that review passes.
+validated = false
 bbox = [-84.30, 9.80, -82.95, 10.45]  # [w, s, e, n]
 
 [hospitals]
@@ -11,8 +11,16 @@ bbox = [-84.30, 9.80, -82.95, 10.45]  # [w, s, e, n]
 referral = ["way/1168011056", "way/25400008", "way/24857117"]
 
 [speed_model_kmh]
-# PENDING: no cited source yet, and `unclassified` has no value (Ian). 60 is the example value of the spec.
+# Source: median of the OSM `maxspeed` tag per road class in the extract of 2026-11-15 (Overpass, bbox above),
+# ways with a plain km/h value. It is the posted limit, not the travel speed, so times are optimistic:
+# `make timecheck` measures that gap. Tagged ways per class: trunk 901, primary 273, secondary 1449, tertiary 512.
+# `unclassified` has only 22 tagged ways (8 at 40): weakest value, PENDING team confirmation (Ian).
+# No motorway exists in the extract, so none is listed.
 trunk = 60
+primary = 40
+secondary = 40
+tertiary = 40
+unclassified = 40
 
 [closure]
 roads = ["Ruta 32"]
