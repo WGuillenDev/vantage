@@ -43,27 +43,27 @@ Reads, from `${BASE_URL}storage/`: `areas.json`, then `<id>/meta.json`, `<id>/gr
 
 ## Invariants
 
-- INV-01 [none]
+- INV-01 [test: bun test --cwd projects/frontend source/mapCorridor.test.ts]
   When the page opens with `?area=<id>` and `areas.json` lists that id, the map loads that zone.
-- INV-02 [none]
+- INV-02 [test: bun test --cwd projects/frontend source/mapCorridor.test.ts]
   When the page opens without a valid `area`, the map loads the first zone with `validated: true`, or the first zone if none is validated.
-- INV-04 [none]
+- INV-04 [test: bun test --cwd projects/frontend source/mapCorridor.test.ts]
   When a zone is drawn, every edge whose `candidate_id` is a unit of `scenarios.json` is drawn in that unit's style, so both carriageways of a unit are shown.
-- INV-06 [none]
+- INV-06 [test: bun test --cwd projects/frontend source/mapCorridor.test.ts]
   When a unit has no affected community, the map draws it gray, and otherwise draws it with a color that is monotone in its `criticality`.
-- INV-07 [none]
+- INV-07 [test: bun test --cwd projects/frontend source/mapCorridor.test.ts]
   When the map is drawn, the legend shows the lowest and highest `criticality` of the zone and the gray "sin impacto" entry.
-- INV-08 [none]
+- INV-08 [test: bun test --cwd projects/frontend source/mapCorridor.test.ts]
   When a zone is drawn, the hospitals and communities shown are exactly those of `graph.json`, at their nodes' coordinates.
 - INV-09 [none]
   When the user clicks a unit, the store's selected unit becomes that unit and it is highlighted, and when the user clicks the map elsewhere, the selection is cleared.
 - INV-11 [none]
   When the active zone changes in the store, the map removes the previous zone's layers, clears the selected unit and loads the new zone's files.
-- INV-12 [none]
+- INV-12 [test: bun test --cwd projects/frontend source/mapCorridor.test.ts]
   If a data file cannot be loaded or its `schema_version` is not `"0.3"`, then the map shows a Spanish message that names the file and does not render a blank map.
 - INV-14 [none]
   When a zone is loaded, the map fits the zone's `bbox`.
-- INV-15 [none]
+- INV-15 [test: bun test --cwd projects/frontend source/mapCorridor.test.ts]
   When the app renders any text, it contains none of the words "candidato", "causado por" or "funciona en cualquier lugar", and "confirmado" appears only in the phrase "no son derrumbes confirmados" or "no es un derrumbe confirmado".
 
 ## Deferred / Open questions
