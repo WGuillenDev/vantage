@@ -47,21 +47,21 @@ Reads `meta.json` and `areas.json` of the active zone, and `scenarios.json` for 
 
 - INV-01 [none]
   When the app is visible, the notice "Tramos críticos por consecuencia; no son derrumbes confirmados." is visible.
-- INV-02 [none]
+- INV-02 [test: bun test --cwd projects/frontend source/trustSignals.test.ts]
   When the footer renders, it shows every string of `meta.attributions` of the active zone.
-- INV-03 [none]
+- INV-03 [test: bun test --cwd projects/frontend source/trustSignals.test.ts]
   While the active zone has `validated: false`, the banner "Zona no validada: sus resultados no se han revisado." is visible, and while it has `validated: true`, the banner is not shown.
-- INV-04 [none]
+- INV-04 [test: bun test --cwd projects/frontend source/trustSignals.test.ts]
   When the "Cómo leer estos números" panel opens, it shows the speed per road class from `meta.speed_model_kmh` and the referral hospital names from `graph.json`, and the radar note only when `meta.detection_limits` exists.
-- INV-05 [none]
+- INV-05 [test: bun test --cwd projects/frontend source/trustSignals.test.ts]
   When the detail card lists an isolated community that is in `suspect_isolated_community_ids`, it adds "posible artefacto del modelo" to it, and it adds nothing to an isolated community that is not.
-- INV-06 [none]
+- INV-06 [test: bun test --cwd projects/frontend source/trustSignals.test.ts]
   While the simulation shows at least one community without a route, it shows the note that such communities may include model artifacts.
-- INV-07 [none]
+- INV-07 [test: bun test --cwd projects/frontend source/format.test.ts]
   When a duration under 300 seconds is shown, it reads "< 5 min".
-- INV-08 [none]
+- INV-08 [test: bun test --cwd projects/frontend source/format.test.ts]
   When a duration of 300 seconds or more is shown, it is rounded half up to a multiple of 5 minutes and prefixed with "≈", as "≈ N min" under 60 minutes and "≈ H h" or "≈ H h M min" from 60.
-- INV-09 [none]
+- INV-09 [test: bun test --cwd projects/frontend source/format.test.ts]
   When a population figure is shown, it is labeled "estimada", and a `null` population is shown as "sin dato".
 - INV-10 [manual]
   When text is shown on the map panels, its contrast against its background is at least 4.5:1.
