@@ -17,3 +17,9 @@ export function chooseZone(
   useAppStore.getState().setActiveZone(id)
   history.replaceState(null, '', url)
 }
+
+// Same rule as `map-corridor` (Active zone): the store's zone, then ?area, then the first validated, then the first.
+export function resolveActiveZone(areas: Area[], storeId: string | null, urlId: string | null): Area | undefined {
+  const listed = (id: string | null) => areas.find((area) => area.id === id)
+  return listed(storeId) ?? listed(urlId) ?? areas.find((area) => area.validated) ?? areas[0]
+}

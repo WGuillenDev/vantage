@@ -1,13 +1,7 @@
 import { useEffect, useState } from 'react'
 import { loadAreas, type Area } from './storage.ts'
 import { useAppStore } from './store.ts'
-import { chooseZone, showsZoneControl, zoneOptions } from './zones.ts'
-
-// Display-only fallback; `map-corridor` owns the real active-zone rule (URL, then first validated, then first).
-function initialZoneId(areas: Area[]): string | undefined {
-  const fromUrl = new URLSearchParams(window.location.search).get('area')
-  return (areas.find((area) => area.id === fromUrl) ?? areas.find((area) => area.validated) ?? areas[0])?.id
-}
+import { chooseZone, resolveActiveZone, showsZoneControl, zoneOptions } from './zones.ts'
 
 export function ZonePicker() {
   const [areas, setAreas] = useState<Area[]>([])
@@ -20,7 +14,7 @@ export function ZonePicker() {
   }, [])
 
   if (areas.length === 0) return null
-  const current = activeId ?? initialZoneId(areas)
+  const current = resolveActiveZone(areas, activeId, new URLSearchParams(window.location.search).get('area'))?.id
   if (!showsZoneControl(areas)) return <span>{areas[0]?.name}</span>
 
   return (

@@ -1,6 +1,7 @@
 import maplibregl from 'maplibre-gl'
 import { useEffect, useRef, useState } from 'react'
 import { loadDefaultZone } from './storage.ts'
+import { SegmentRanking } from './SegmentRanking.tsx'
 import { ZonePicker } from './ZonePicker.tsx'
 
 type Bounds = [number, number, number, number] // west, south, east, north
@@ -84,9 +85,12 @@ function App() {
   }, [])
 
   return (
-    <div className="relative h-full">
-      <div ref={container} className="h-full" />
-      <div className="absolute left-2 top-2 flex items-center gap-3 rounded bg-white/90 px-2 py-1 text-sm">
+    <div className="relative flex h-full">
+      <aside className="w-80 shrink-0 overflow-hidden border-r bg-white">
+        <SegmentRanking />
+      </aside>
+      <div ref={container} className="h-full flex-1" />
+      <div className="absolute left-[21rem] top-2 flex items-center gap-3 rounded bg-white/90 px-2 py-1 text-sm">
         <ZonePicker />
         <p>{error ?? `Señal de cambio candidata · ${areaName ?? 'cargando…'}`}</p>
       </div>

@@ -21,3 +21,9 @@ export async function loadDefaultZone(): Promise<{ area: Area; base: string }> {
   if (!area) throw new Error('areas.json lists no zones')
   return { area, base: `${STORAGE}${area.id}/` }
 }
+
+export async function loadZoneFile<T>(zoneId: string, file: string): Promise<T> {
+  const response = await fetch(`${STORAGE}${zoneId}/${file}`)
+  if (!response.ok) throw new Error(`Could not load ${file} (${response.status}); run "make mock"`)
+  return (await response.json()) as T
+}
