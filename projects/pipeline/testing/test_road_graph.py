@@ -2,6 +2,7 @@ import io
 import json
 import math
 import shutil
+import urllib.error
 from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
@@ -281,3 +282,118 @@ def test_inv26_communities_json_has_one_entry_per_community(tmp_path):
     lat, lon = PLACES[by_name[e["id"]]]
     assert e["osm_id"].startswith("node/")
     assert (e["lat"], e["lon"]) == (lat, lon)
+
+
+EMPTY_OSM = '<?xml version="1.0" encoding="UTF-8"?><osm version="0.6"/>'
+# A timed-out query still returns the elements it found, so the remark is the only sign of the failure.
+REMARK = '<osm version="0.6"><node id="1" lat="0" lon="10"/><remark>runtime error: Query timed out</remark></osm>'
+
+
+def extract_with(tmp_path: Path, roads: str | None = None, features: str | None = None) -> Path:
+  """The fixture extract with one of its two files replaced by the given text."""
+  work = extract(tmp_path)
+  if roads is not None:
+    (work / "osm" / "roads.osm").write_text(roads, encoding="utf-8")
+  if features is not None:
+    (work / "osm" / "features.osm").write_text(features, encoding="utf-8")
+  return work
+
+
+def half(name: str) -> str:
+  text = (FIXTURE / name).read_text(encoding="utf-8")
+  return text[: len(text) // 2]
+
+
+UNREADABLE = [
+  pytest.param("roads.osm", "", id="roads-zero-bytes"),
+  pytest.param("roads.osm", EMPTY_OSM, id="roads-without-ways"),
+  pytest.param("roads.osm", half("roads.osm"), id="roads-truncated"),
+  pytest.param("features.osm", "", id="features-zero-bytes"),
+  pytest.param("features.osm", half("features.osm"), id="features-truncated"),
+]
+
+
+@pytest.mark.parametrize(("name", "content"), UNREADABLE)
+def test_inv27_unusable_extract_file_stops_naming_it(tmp_path, name, content):
+  zone = make_zone(tmp_path)
+  work = extract_with(tmp_path, **{name.removesuffix(".osm"): content})
+  with pytest.raises(road_graph.RoadGraphError) as error:
+    road_graph.run(zone, work)
+  assert name in str(error.value)
+  assert not (zone.output_dir / "graph.json").exists()
+  assert not (work / "communities.json").exists()
+
+
+def previous_extract(tmp_path: Path) -> Path:
+  osm = tmp_path / "work" / "fixture" / "osm"
+  osm.mkdir(parents=True)
+  (osm / "roads.osm").write_text("OLD ROADS", encoding="utf-8")
+  (osm / "features.osm").write_text("OLD FEATURES", encoding="utf-8")
+  (osm / "extract_date.txt").write_text("2026-01-01\n", encoding="utf-8")
+  return osm
+
+
+def failed_download(monkeypatch, tmp_path: Path, answer) -> str:
+  """Runs `--download` with Overpass answering through `answer(name)` and returns the exit message."""
+  def fake_urlopen(request, **_):
+    return answer("features.osm" if b"amenity" in request.data else "roads.osm")
+
+  monkeypatch.setattr(road_graph.urllib.request, "urlopen", fake_urlopen)
+  monkeypatch.setattr(road_graph, "WORK_DIR", tmp_path / "work")
+  monkeypatch.setattr(road_graph, "load_zone", lambda _id: make_zone(tmp_path))
+  with pytest.raises(SystemExit) as exit_info:
+    road_graph.main(["--area", "fixture", "--download"])
+  return str(exit_info.value.code)
+
+
+def assert_previous_extract_intact(osm: Path) -> None:
+  assert (osm / "roads.osm").read_text(encoding="utf-8") == "OLD ROADS"
+  assert (osm / "features.osm").read_text(encoding="utf-8") == "OLD FEATURES"
+  assert (osm / "extract_date.txt").read_text(encoding="utf-8") == "2026-01-01\n"
+
+
+FAILURES = [
+  pytest.param(lambda: urllib.error.URLError("no route to host"), id="network"),
+  pytest.param(lambda: TimeoutError("timed out"), id="timeout"),
+  pytest.param(lambda: urllib.error.HTTPError("https://example.invalid", 504, "Gateway Timeout", {}, None), id="http-status"),
+]
+
+
+@pytest.mark.parametrize("failure", FAILURES)
+@pytest.mark.parametrize("failing", ["roads.osm", "features.osm"])
+def test_inv28_failed_request_leaves_the_previous_extract_whole(tmp_path, monkeypatch, failure, failing):
+  osm = previous_extract(tmp_path)
+
+  def answer(name):
+    if name == failing:
+      raise failure()
+    return FakeResponse((FIXTURE / name).read_bytes())
+
+  message = failed_download(monkeypatch, tmp_path, answer)
+  assert message.startswith("road-graph:") and failing in message
+  assert_previous_extract_intact(osm)
+
+
+UNUSABLE_ANSWERS = [
+  pytest.param(b"<osm version=", id="not-xml"),
+  pytest.param(EMPTY_OSM.encode(), id="no-elements"),
+  pytest.param(REMARK.encode(), id="remark"),
+]
+
+
+@pytest.mark.parametrize("body", UNUSABLE_ANSWERS)
+@pytest.mark.parametrize("bad", ["roads.osm", "features.osm"])
+def test_inv29_unusable_answer_leaves_the_previous_extract_whole(tmp_path, monkeypatch, body, bad):
+  osm = previous_extract(tmp_path)
+
+  def answer(name):
+    return FakeResponse(body if name == bad else (FIXTURE / name).read_bytes())
+
+  message = failed_download(monkeypatch, tmp_path, answer)
+  assert message.startswith("road-graph:") and bad in message
+  assert_previous_extract_intact(osm)
+
+
+def test_inv30_same_osm_element_twice_stops_naming_both_ids(tmp_path):
+  zone = make_zone(tmp_path, referral_hospitals=("way/301", "way/0301"))
+  fails_without_graph(tmp_path, zone, "way/301", "way/0301")
