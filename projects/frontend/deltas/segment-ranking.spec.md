@@ -41,15 +41,15 @@ Reads `scenarios.json` and `graph.json` of the active zone, and the store of `ma
 
 ## Invariants
 
-- INV-01 [none]
+- INV-01 [test: bun test --cwd projects/frontend source/ranking.test.ts]
   When the list renders, it shows exactly the units with at least one affected community, in ascending `rank`, or a Spanish message saying so when there are none.
-- INV-02 [none]
+- INV-02 [test: bun test --cwd projects/frontend source/ranking.test.ts]
   When the list renders, the counter shows the number of units with no affected community.
-- INV-03 [none]
+- INV-03 [test: bun test --cwd projects/frontend source/ranking.test.ts]
   When a unit's `extra_time_s` is `null`, its row shows "sin ruta al hospital de referencia" and not a time, and when its `population_dependent` is `null`, it shows "sin dato" and never 0.
-- INV-05 [none]
+- INV-05 [test: bun test --cwd projects/frontend source/ranking.test.ts]
   When the zone's highest `criticality` is 0, the list shows no criticality bars and a note that the order comes from extra time and isolated communities because population is unknown.
-- INV-07 [none]
+- INV-07 [test: bun test --cwd projects/frontend source/ranking.test.ts]
   When a row is activated by click or by Enter, the store's selected unit becomes that unit and the row is highlighted.
 - INV-08 [none]
   When the selected unit changes from the map, the list highlights its row and scrolls it into view.
