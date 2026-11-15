@@ -40,6 +40,12 @@ function elementProblem(file: string, data: Json): string | null {
     (edge) =>
       !isObject(edge) ||
       !isText(edge.id) ||
+      // closure-whatif routes on these: a missing time would become NaN without a message.
+      !isText(edge.from) ||
+      !isText(edge.to) ||
+      typeof edge.time_s !== 'number' ||
+      !(Number.isFinite(edge.time_s) && edge.time_s >= 0) ||
+      !(edge.oneway === undefined || typeof edge.oneway === 'boolean') ||
       !(edge.candidate_id === null || isText(edge.candidate_id)) ||
       (edge.candidate_id !== null && !(Array.isArray(edge.geometry) && edge.geometry.length >= 2 && edge.geometry.every(isPosition))),
   )
@@ -51,6 +57,10 @@ function elementProblem(file: string, data: Json): string | null {
         return `el elemento ${index + 1} de "${list}" está mal formado`
       }
       if (!nodes.has(item.node)) return `"${list}" usa el nodo "${item.node}", que no está en "nodes"`
+      const { population } = item
+      if (list === 'communities' && !(population === undefined || population === null || (Number.isInteger(population) && (population as number) >= 0))) {
+        return `la comunidad ${index + 1} de "communities" tiene una población no válida`
+      }
     }
   }
   return null
