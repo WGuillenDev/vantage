@@ -40,6 +40,8 @@ Reads, from `${BASE_URL}storage/`: `areas.json`, then `<id>/meta.json`, `<id>/gr
 | Color | Units with at least one affected community are colored by `criticality` on a sequential scale with a legend; units without one are gray. The scale runs from the lowest to the highest `criticality` among the units that have an affected community. |
 | Hospitals, communities | Points at the coordinates of their nodes in `graph.json`. |
 | Selection | A click on a unit selects it in the store and highlights it; a click elsewhere clears it. |
+| Hover and focus | The pointer over a unit shows its label and extra time in a tooltip and highlights it; the same highlight follows a hovered list row. Selecting a unit that is out of view moves the map to it. |
+| Base map | The OpenStreetMap raster is desaturated so the criticality colors stand out; the legend collapses to a button and starts collapsed on narrow screens. |
 | Copy | All user-facing text in Spanish: "tramo crítico", never "candidato" or "causado por", and "confirmado" only in "no son derrumbes confirmados". |
 
 ## Invariants
