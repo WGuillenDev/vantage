@@ -22,13 +22,13 @@ Prioridad ahora: la mitad de datos reales (grafo con las dos calzadas y hospital
 
 ## Progreso
 
-**19 / 46 tareas · 41 %** `████████░░░░░░░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman; las `[-]` descartadas no cuentan)_
+**20 / 46 tareas · 43 %** `█████████░░░░░░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman; las `[-]` descartadas no cuentan)_
 
 | Fase | Hechas | % |
 |---|---|---|
 | 1 · Bootstrap | 9 / 9 | 100 % |
 | 2 · Spiking | 9 / 9 | 100 % |
-| 3 · Building | 1 / 23 | 4 % |
+| 3 · Building | 2 / 23 | 9 % |
 | 4 · Polish | 0 / 5 | 0 % |
 
 _Actualizá este bloque cada vez que marques una tarea `[x]`._
@@ -81,7 +81,7 @@ Un delta por rebanada, en `projects/<proyecto>/deltas/<delta>.spec.md`. Nombres 
 
 | # | Delta | Proyecto | Esfuerzo | Dueño | Cubre | Depende de | Crítico | Spec |
 |---|---|---|---|---|---|---|---|---|
-| 1 | `contract-update` | contract | S | R | C1 | — | sí | [~] |
+| 1 | `contract-update` | contract | S | R | C1 | — | sí | [x] |
 | 2 | `area-config` | pipeline | S | I | E3 | — | sí | [~] |
 | 3 | `zone-picker` | frontend | S | V | F11 | map-corridor, pipeline-run | no | [~] |
 | 4 | `segment-ranking` | frontend | S | V | F3 | contract-update | sí | [~] |
@@ -155,7 +155,7 @@ Descartadas `[-]`: **P1** (obtener pasadas GCOV) y **P2** (detección de cambio 
 
 | ID | Tarea | Dueño | Estado | Terminada cuando |
 |---|---|---|---|---|
-| C1 | Decidir y aplicar la actualización del contrato (¿0.3?): unidad fina, marcas de sospechoso, `meta.area` | R | [ ] | Esquemas y mocks validan; `make validate` pasa; decisión anotada |
+| C1 | Decidir y aplicar la actualización del contrato (¿0.3?): unidad fina, marcas de sospechoso, `meta.area` | R | [x] | Esquemas y mocks validan; `make validate` pasa; decisión anotada. Hecho en 0.3 (`context/contracts.md` §14): `areas.json` y carpeta por zona, `length_m`, `suspect_isolated_community_ids`, sin `soil_moisture_pctl` ni `radar_evidence`; 43 tests del validador pasan |
 
 Cortadas `[-]`: **F2** (mostrar pasadas) y **F9** (alternar antes/después): dependen de una capa de radar que no tenemos.
 
@@ -191,6 +191,7 @@ Cortadas `[-]`: **F2** (mostrar pasadas) y **F9** (alternar antes/después): dep
 | 14 nov | **D7.** S2c = FALLA: la humedad SME2 no sube antes de los cierres (1 de 4). Exposición = solo IMERG; F4 sin humedad. SME2 no se descarta como dato, solo como señal previa | Resultado negativo con número (`SPIKING.md` S2c) |
 | 14 nov | **D8.** Redirección tras los spikes (S2, S2c, S4′, S5). (a) El producto es la **consecuencia (criticidad)**: qué tramos de un corredor vial (demostrado en la Ruta 32), si se cortan, dejan a comunidades sin ruta a un hospital de referencia, con tiempo extra y población. «Riesgo = consecuencia × exposición» deja de usarse porque la exposición no está validada. (b) **Métrica R2:** hospital de referencia más cercano, con el conjunto de referencia como **parámetro de la zona** (en la Ruta 32: Calderón Guardia, México y San Juan de Dios); «aislada» pasa a significar «sin ruta al hospital de referencia» y la interfaz lo dice así. (c) **Un cierre incluye ambas calzadas** de Ruta 32. (d) Comunidades y hospitales se ajustan a la mayor componente fuertemente conexa. (e) **Exposición = lluvia IMERG como contexto**, «hipótesis»; sin SME2 y sin radar como señal. (f) Los tres negativos (S2, S2c, S5) se presentan como hallazgos con su número. (g) **El método es para cualquier corredor con red vial en OSM; la Ruta 32 es el caso de demostración y el único probado.** Son parámetros de la zona, no código: el bbox, los hospitales de referencia, la velocidad por clase de vía (hoy medianas de OSM de Costa Rica) y el ráster de población (WorldPop CRI 2020 es un archivo por país). Nunca se afirma «funciona en cualquier lugar». | R2 fue la única métrica que pasó los criterios de S4′ (12,7 % de aislamientos sospechosos frente a 54,3 % de N y R), con límites: cierres de hasta 61 km, hospitales provisionales, sin población, sin revisión manual. Las tres señales fallaron con criterios escritos antes (`SPIKING.md`). Cambia semántica, no el esquema 0.2 |
 | 14 nov (cierre del día 1) | **Fase 3 repartida entre los cuatro** (ver «Carga por persona»): R queda con 3 deltas más README y entrega; Ian empieza por el pipeline. Specs de los 18 deltas redactados en la rama `docs/delta-specs` y purgados de redundancias (se quitaron `granularity`, `meta.area.referral_hospitals`, `exposure.radar_evidence`, la capa de radar del mapa y las perturbaciones de ajuste de la sensibilidad) | Un delta por rebanada, de lo más fácil a lo más difícil |
+| 14 nov | **C1.** El contrato pasa a 0.3: `storage/areas.json` + `storage/<id>/` por zona; `candidates[].length_m` y `suspect_isolated_community_ids` requeridos; `exposure` solo con `rain_mm_12d`; ids únicos en las listas de comunidades; el validador valida cada zona y reporta archivos no UTF-8 como error. Sin decidir: motivo de la sospecha, carpetas sin listar en `storage/`, coherencia del bbox de `areas.json` con `meta.area` | Los deltas de pipeline y frontend construyen contra esta forma. El frontend aún lee `storage/` en plano: `map-corridor` y `zone-picker` lo migran; `graph.test.ts` falla hasta entonces |
 | 14 nov | Modo solo (hasta el cierre del día 1): sin turnos ni relevos; F2 y F9 cortadas; contrato 0.2 adoptado en el árbol (sin la regla de revisión de ambos lados) | Menos coordinación, más velocidad |
 
 ### Preguntas abiertas
