@@ -1,4 +1,5 @@
 import csv
+import io
 import json
 import sys
 from datetime import date, timedelta
@@ -35,6 +36,9 @@ def _load(folder: Path, name: str, errors: list[str]) -> object | None:
     except json.JSONDecodeError as exc:
         errors.append(f"{name}: invalid JSON ({exc})")
         return None
+    except UnicodeDecodeError as exc:
+        errors.append(f"{name}: not valid UTF-8 ({exc})")
+        return None
 
 
 def _load_rain(folder: Path, errors: list[str]) -> list[dict] | None:
@@ -42,19 +46,23 @@ def _load_rain(folder: Path, errors: list[str]) -> list[dict] | None:
     if not path.is_file():
         errors.append("rain.csv: file is missing")
         return None
-    with path.open(encoding="utf-8", newline="") as fh:
-        reader = csv.DictReader(fh)
-        if reader.fieldnames != ["date", "precip_mm"]:
-            errors.append(f"rain.csv: header must be 'date,precip_mm', got {reader.fieldnames}")
-            return None
-        rows = []
-        for n, row in enumerate(reader, start=2):
-            try:
-                row["precip_mm"] = float(row["precip_mm"])
-            except (TypeError, ValueError):
-                errors.append(f"rain.csv: line {n}: precip_mm is not a number")
-                continue
-            rows.append(row)
+    try:
+        text = path.read_text(encoding="utf-8")
+    except UnicodeDecodeError as exc:
+        errors.append(f"rain.csv: not valid UTF-8 ({exc})")
+        return None
+    reader = csv.DictReader(io.StringIO(text, newline=""))
+    if reader.fieldnames != ["date", "precip_mm"]:
+        errors.append(f"rain.csv: header must be 'date,precip_mm', got {reader.fieldnames}")
+        return None
+    rows = []
+    for n, row in enumerate(reader, start=2):
+        try:
+            row["precip_mm"] = float(row["precip_mm"])
+        except (TypeError, ValueError):
+            errors.append(f"rain.csv: line {n}: precip_mm is not a number")
+            continue
+        rows.append(row)
     return rows
 
 

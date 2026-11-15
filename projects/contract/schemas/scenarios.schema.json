@@ -47,9 +47,9 @@
           "criticality": { "type": "number", "minimum": 0 },
           "extra_time_s": { "type": ["number", "null"], "minimum": 0 },
           "population_dependent": { "type": ["integer", "null"], "minimum": 0 },
-          "affected_community_ids": { "type": "array", "items": { "$ref": "#/$defs/communityId" } },
-          "isolated_community_ids": { "type": "array", "items": { "$ref": "#/$defs/communityId" } },
-          "suspect_isolated_community_ids": { "type": "array", "items": { "$ref": "#/$defs/communityId" } },
+          "affected_community_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/communityId" } },
+          "isolated_community_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/communityId" } },
+          "suspect_isolated_community_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/communityId" } },
           "per_community": {
             "type": "array",
             "items": {

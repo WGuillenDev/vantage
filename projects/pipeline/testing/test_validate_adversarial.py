@@ -52,3 +52,29 @@ def test_adversarial_missing_storage_folder_exits_non_zero(tmp_path: Path, monke
     with pytest.raises(SystemExit) as exc:
         main()
     assert exc.value.code not in (0, None)
+
+
+@pytest.mark.parametrize("name", ["graph.json", "scenarios.json", "meta.json"])
+def test_adversarial_non_utf8_zone_file_is_an_error_not_a_crash(storage: Path, name: str):
+    (storage / "mock-validated" / name).write_bytes(b"\xff\xfe\x00")
+    assert any(name in e for e in validate_dir(storage / "mock-validated"))
+
+
+def test_adversarial_non_utf8_areas_is_an_error_not_a_crash(storage: Path):
+    (storage / "areas.json").write_bytes(b"\xff\xfe\x00bad")
+    assert validate_storage(storage)
+
+
+def test_adversarial_non_utf8_rain_is_an_error_not_a_crash(storage: Path):
+    (storage / "mock-validated" / "rain.csv").write_bytes(b"date,precip_mm\n\xff\xfe,1\n")
+    assert any("rain.csv" in e for e in validate_dir(storage / "mock-validated"))
+
+
+@pytest.mark.parametrize("field", ["isolated_community_ids", "suspect_isolated_community_ids"])
+def test_adversarial_duplicate_community_ids_are_rejected(storage: Path, field: str):
+    def dup(s):
+        c = s["candidates"][2]
+        c[field] = c[field] + c[field]
+
+    edit(storage / "mock-validated", "scenarios.json", dup)
+    assert any("scenarios.json" in e and field in e for e in validate_dir(storage / "mock-validated"))
