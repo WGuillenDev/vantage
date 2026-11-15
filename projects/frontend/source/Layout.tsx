@@ -38,6 +38,7 @@ export function Layout({ header, footer, map, overlay, ranking }: {
   const selected = useAppStore((state) => state.selectedUnitId)
   const [tab, setTab] = useState<TabId>('tramos')
   const [expanded, setExpanded] = useState(false)
+  const [whyOpen, setWhyOpen] = useState(false)
 
   // INV-05: selecting a unit expands the sheet (it only matters on narrow screens).
   const [seen, setSeen] = useState(selected)
@@ -59,6 +60,24 @@ export function Layout({ header, footer, map, overlay, ranking }: {
         <div className="relative min-h-0 min-w-0 flex-1 md:order-2">
           {map}
           {overlay}
+          {wide && (
+            <div className="absolute right-2 top-2 flex w-72 flex-col items-end gap-1">
+              <button
+                type="button"
+                aria-expanded={whyOpen}
+                aria-controls="why-card"
+                onClick={() => setWhyOpen((value) => !value)}
+                className="rounded bg-white/90 px-3 py-1 text-sm shadow"
+              >
+                ¿Por qué?
+              </button>
+              {whyOpen && (
+                <section id="why-card" aria-label="¿Por qué?" className="w-full rounded bg-white shadow">
+                  <Placeholder>Explicación «¿Por qué?»: pendiente.</Placeholder>
+                </section>
+              )}
+            </div>
+          )}
         </div>
         <aside className="flex min-w-0 shrink-0 flex-col border-t bg-white md:order-1 md:w-80 md:border-r md:border-t-0">
           <button
