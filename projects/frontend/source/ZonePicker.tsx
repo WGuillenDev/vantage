@@ -20,7 +20,7 @@ export function ZonePicker() {
   return (
     <label className="flex items-center gap-1 text-sm">
       Zona
-      <select value={current} onChange={(event) => chooseZone(event.target.value)}>
+      <select className="max-md:min-h-11" value={current} onChange={(event) => chooseZone(event.target.value)}>
         {zoneOptions(areas).map((option) => (
           <option key={option.id} value={option.id}>
             {option.label}

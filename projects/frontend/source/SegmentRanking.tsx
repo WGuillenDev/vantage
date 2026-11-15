@@ -40,7 +40,7 @@ export function SegmentRanking({ data }: { data: ZoneData | string | null }) {
                   type="button"
                   aria-pressed={isSelected}
                   onClick={() => selectUnit(unit.id)}
-                  className={`block w-full px-2 py-1 text-left ${isSelected ? 'bg-amber-100' : 'hover:bg-gray-100'}`}
+                  className={`block w-full px-2 py-1 text-left max-md:min-h-11 ${isSelected ? 'bg-amber-100' : 'hover:bg-gray-100'}`}
                 >
                   <span className="font-medium">{row.label}</span> · {row.length}
                   <br />

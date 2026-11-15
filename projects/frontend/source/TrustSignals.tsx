@@ -21,7 +21,7 @@ export function TrustFooter({ data }: { data: ZoneData | string | null }) {
   return (
     <footer className="border-t bg-white px-3 py-1 text-xs text-gray-700">
       <details>
-        <summary className="cursor-pointer">Cómo leer estos números</summary>
+        <summary className="flex cursor-pointer items-center max-md:min-h-11">Cómo leer estos números</summary>
         <ul className="list-disc pl-5">
           <li>
             Los tiempos usan una velocidad constante por clase de vía:{' '}
