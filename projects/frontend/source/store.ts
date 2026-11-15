@@ -7,6 +7,9 @@ interface AppState {
   setActiveZone: (id: string) => void
   selectedUnitId: string | null
   selectUnit: (id: string | null) => void
+  // Minimal closed set so `segment-detail` can add to it; `closure-whatif` owns the simulation.
+  closedUnitIds: string[]
+  closeUnit: (id: string) => void
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -14,4 +17,6 @@ export const useAppStore = create<AppState>((set) => ({
   setActiveZone: (id) => set({ activeZoneId: id, selectedUnitId: null }),
   selectedUnitId: null,
   selectUnit: (id) => set({ selectedUnitId: id }),
+  closedUnitIds: [],
+  closeUnit: (id) => set((state) => (state.closedUnitIds.includes(id) ? state : { closedUnitIds: [...state.closedUnitIds, id] })),
 }))

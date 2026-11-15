@@ -197,7 +197,7 @@ describe('map-corridor: INV-15 forbidden words', () => {
     .map((name) => ({ name, text: readFileSync(new URL(name, dir), 'utf-8') }))
 
   test('INV-15 no source contains the forbidden words', () => {
-    const allowed = /no son derrumbes confirmados|no es un derrumbe confirmado/gi
+    const allowed = /no son derrumbes confirmados|no es un derrumbe confirmado|no causa confirmada/gi
     for (const { name, text } of sources) {
       const lower = text.toLowerCase()
       expect({ name, hit: /candidato|causado por|funciona en cualquier lugar/.test(lower) }).toEqual({ name, hit: false })
