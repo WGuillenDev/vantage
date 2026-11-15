@@ -123,6 +123,11 @@ def test_inv07_unknown_referral_id_stops_the_run(tmp_path):
   fails_without_graph(tmp_path, zone, "way/999")
 
 
+def test_inv07_extract_with_no_features_stops_with_the_hospital_id(tmp_path):
+  zone = make_zone(tmp_path, referral_hospitals=("way/301",))
+  fails_without_graph(tmp_path, zone, "way/301", features="features_empty.osm")
+
+
 def test_inv08_communities_are_named_places_near_their_node(tmp_path):
   graph = run(tmp_path)
   nodes = {n["id"]: n for n in graph["nodes"]}
