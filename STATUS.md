@@ -3,7 +3,7 @@
 > Tablero vivo. Corto y verdadero: actualizalo cuando una tarea cambie de estado.
 > Contexto: `context/approach.md` (porqué y método), `structure.md`, `functions.md`, `contracts.md`. Resultados de spikes: `SPIKING.md`.
 > Horas de Costa Rica (UTC−6). Ventana: **sáb 14 nov 09:00 → dom 15 nov 23:59** (hora de cierre por confirmar).
-> **Modo solo (R) desde el sáb 14 nov por la tarde:** hoy todo lo hace R, por prioridad y sin relevos. La columna «Dueño» guarda el reparto original para cuando vuelva el equipo (R Ron · I Ian · W Wilberth · V Iván).
+> **Equipo completo desde el cierre del día 1 (sáb 14 nov):** R hizo las fases 1 y 2 solo; la fase 3 se reparte entre R Ron · I Ian · W Wilberth · V Iván (columna «Dueño»). **Ian empieza por el pipeline** (ver «Quién empieza por dónde»).
 
 Leyenda: `[ ]` pendiente · `[~]` en curso · `[x]` hecha · `[-]` descartada (con motivo).
 
@@ -18,17 +18,17 @@ Leyenda: `[ ]` pendiente · `[~]` en curso · `[x]` hecha · `[-]` descartada (c
 
 **G1 decidida (sáb 14 nov ~16:35): NO-GO** para detectar derrumbes con GCOV de NISAR (mínimo detectable ≈10×10 px ≈ 1 ha a −5 dB; detalle en `SPIKING.md` S2 y `context/approach.md` §5). Tras los demás spikes (S2c, S4′, S5; ver `SPIKING.md`) ninguna señal de exposición anticipó los cierres, y el producto se redefine en la **D8**: es la **consecuencia (criticidad)** de cada tramo de la Ruta 32, con la lluvia IMERG como contexto etiquetado «hipótesis». «Riesgo = consecuencia × exposición» (D2) ya no se usa. La capa de radar es opcional y puede ir vacía.
 
-Prioridad ahora: la mitad de datos reales (grafo con las dos calzadas y hospitales de referencia → población → impacto → lluvia como contexto) y la UI sobre ellos. P3 y P5 ya existen en ramas remotas: integrarlos, no rehacerlos.
+Prioridad ahora: la mitad de datos reales (grafo con las dos calzadas y hospitales de referencia → población → impacto → lluvia como contexto) y la UI sobre ellos. P3 y P5 ya existen en ramas remotas de Ian: él los porta a los specs de esta rama, no los rehace.
 
 ## Progreso
 
-**18 / 39 tareas · 46 %** `█████████░░░░░░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman; las `[-]` descartadas no cuentan)_
+**19 / 46 tareas · 41 %** `████████░░░░░░░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman; las `[-]` descartadas no cuentan)_
 
 | Fase | Hechas | % |
 |---|---|---|
 | 1 · Bootstrap | 9 / 9 | 100 % |
-| 2 · Spiking | 8 / 9 | 89 % |
-| 3 · Building | 1 / 16 | 6 % |
+| 2 · Spiking | 9 / 9 | 100 % |
+| 3 · Building | 1 / 23 | 4 % |
 | 4 · Polish | 0 / 5 | 0 % |
 
 _Actualizá este bloque cada vez que marques una tarea `[x]`._
@@ -64,7 +64,7 @@ _Actualizá este bloque cada vez que marques una tarea `[x]`._
 | S1 | Cobertura de NISAR | R | [x] | PASA con reservas: 069 D 1→13 jul; GCOV desde el 19 jun |
 | S2 | Detectabilidad | R | [x] | **FALLA** → G1 NO-GO; mínimo detectable ≈1 ha a −5 dB |
 | S2c | SME2: ¿sube antes de los cierres? | R | [x] | **FALLA**: 1 de 4 eventos sobre p75 (hacían falta 3); exposición solo con IMERG (D7). SME2 sí existe y cubre la ruta (S1′ PASA) |
-| S3 | Eventos de validación | R | [~] | PARCIAL: prensa que cita al MOPT; sin comunicado primario en `mopt.go.cr` ni `conavi.go.cr`. Se corrigió la lista: el 17 jul sí hubo cierre; se añadieron el 8 oct y el 2.º episodio de feb |
+| S3 | Eventos de validación | R | [x] | Cerrado con veredicto PARCIAL: prensa que cita al MOPT; sin comunicado primario en `mopt.go.cr` ni `conavi.go.cr`. Se corrigió la lista: el 17 jul sí hubo cierre; se añadieron el 8 oct y el 2.º episodio de feb |
 | S4 | Red vial y métrica | R | [x] | PARCIAL: la red regional conecta (+77,6 min por alterna al cortar el parque); con «hospital más cercano» el parque afecta a 0 comunidades; recortar al corredor crea aislamientos falsos (ver `SPIKING.md`). **S4′ (red real, 191 tramos):** con una calzada por cierre todo falla; con las dos calzadas (19 cierres) pasa solo «hospital de referencia» (R2); ver `SPIKING.md` |
 | S5 | IMERG | R | [x] | Lectura PASA (317 días); señal FALLA: 3 de 8 cierres sobre p75 de lluvia de 12 días (hacían falta 6), todos de ago–oct. La lluvia va como contexto, «hipótesis» (ver `SPIKING.md` S5) |
 | S6 | Humo del frontend | W, V | [x] | PASA |
@@ -73,19 +73,67 @@ _Actualizá este bloque cada vez que marques una tarea `[x]`._
 
 ## Fase 3 · Building (sáb ~17:00 → dom 14:00)
 
+### Deltas (specs)
+
+Un delta por rebanada, en `projects/<proyecto>/deltas/<delta>.spec.md`. Nombres de dos palabras y 10–16 caracteres, en inglés (regla de ramas). Estado del spec: `[ ]` sin redactar · `[~]` redactado, en revisión · `[x]` aprobado (el visto bueno es llamar a `/builder`). Crítico = entra en el camino mínimo de entrega; el resto se corta en G2 si falta tiempo.
+
+**Orden = de más fácil a más difícil de implementar** (esfuerzo: S pocas horas · M media jornada · L el más riesgoso). Cada delta se construye contra fixtures y el mock, así que el orden de facilidad se puede seguir; las dependencias solo mandan para la corrida real de punta a punta.
+
+| # | Delta | Proyecto | Esfuerzo | Dueño | Cubre | Depende de | Crítico | Spec |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `contract-update` | contract | S | R | C1 | — | sí | [~] |
+| 2 | `area-config` | pipeline | S | I | E3 | — | sí | [~] |
+| 3 | `zone-picker` | frontend | S | V | F11 | map-corridor, pipeline-run | no | [~] |
+| 4 | `segment-ranking` | frontend | S | V | F3 | contract-update | sí | [~] |
+| 5 | `trust-signals` | frontend | S | V | F8, F10 | segment-detail | F8 sí; F10 no | [~] |
+| 6 | `time-crosscheck` | pipeline | S | V | P11 | road-graph | no | [~] |
+| 7 | `rank-sensitivity` | pipeline | S | V | P10 | impact-scoring | no | [~] |
+| 8 | `manual-review` | pipeline | S | R | P12 | impact-scoring | no | [~] |
+| 9 | `mobile-layout` | frontend | M | W | F7 | map-corridor | no | [~] |
+| 10 | `map-corridor` | frontend | M | W | F1 | contract-update | sí | [~] |
+| 11 | `segment-detail` | frontend | M | W | F4, F6 | contract-update | sí | [~] |
+| 12 | `closure-whatif` | frontend | M | V | F5 | segment-ranking | sí | [~] |
+| 13 | `road-graph` | pipeline | M | I | P3 | area-config | sí | [~] |
+| 14 | `impact-scoring` | pipeline | M | I | P5, E5 | closure-units, population-data | sí | [~] |
+| 15 | `pipeline-run` | pipeline | M | R | P7, P8 | todos los del pipeline | sí | [~] |
+| 16 | `population-data` | pipeline | M | W | E4 | road-graph | sí | [~] |
+| 17 | `rain-context` | pipeline | M | I | E1 | area-config | no | [~] |
+| 18 | `closure-units` | pipeline | L | I | P9 | road-graph | sí | [~] |
+
+`graph.ts` (S8) ya pasa y no tiene delta propio; si hace falta cruzarlo con el grafo real, entra en `closure-whatif`.
+
+**Carga por persona** (reparto de la fase 3; se rebalancea si alguien se atrasa):
+
+| Quién | Deltas | Total |
+|---|---|---|
+| **I Ian** (pipeline) | `area-config` S · `road-graph` M · `closure-units` L · `impact-scoring` M · `rain-context` M | 5 |
+| **W Wilberth** (mapa y población) | `map-corridor` M · `segment-detail` M · `mobile-layout` M · `population-data` M (hizo S7) | 4 |
+| **V Iván** (lista, simulación y confianza) | `segment-ranking` S · `trust-signals` S · `zone-picker` S · `closure-whatif` M (hizo `graph.ts`) · `time-crosscheck` S · `rank-sensitivity` S | 6 |
+| **R Ron** (pocas, tras haber hecho fases 1 y 2) | `contract-update` S · `pipeline-run` M (con el primer despliegue, P8) · `manual-review` S; además README y entrega (X3, X5) | 3 |
+
+**Quién empieza por dónde**
+
+1. **Ian:** `area-config` (no depende de nada) → `road-graph` (ya existe en `origin/feat/road-graph`; se porta a zonas) → `closure-units` (el más riesgoso: empezar temprano) → `impact-scoring` (ídem, en `origin/feat/impact-scoring`) → `rain-context`.
+2. **R:** `contract-update` primero, porque los mocks y el validador por zona desbloquean a Wilberth y Iván; luego `pipeline-run` cuando haya etapas.
+3. **Wilberth e Iván:** `map-corridor` y `segment-ranking` contra el mock 0.3 en cuanto `contract-update` lo tenga; hasta entonces, trabajar con el mock actual.
+
 ### Pipeline
 
 | ID | Tarea | Dueño | Estado | Terminada cuando |
 |---|---|---|---|---|
 | P3 | Grafo vial de OSM para el área configurada: tramos, hospitales, comunidades → `graph.json` (spec: `projects/pipeline/deltas/road-graph.spec.md`) | I | [ ] | Valida; los ids se cruzan. Existe en `origin/feat/road-graph`; falta que ajuste comunidades y hospitales a la mayor componente fuertemente conexa y que la lista de hospitales sea el conjunto de referencia de la zona, como parámetro (D8) |
-| E4 | Población WorldPop sobre las comunidades (para que la criticidad deje de dar 0) | I | [ ] | `population` poblada donde hay dato |
-| E5 | Decidir la métrica de impacto (hospital de referencia vs. más cercano; con el más cercano el parque da 0 comunidades afectadas) y revisar a mano la 1 aislada hasta Limón | I | [ ] | Una sola cifra por tramo y la decisión anotada abajo — **recomendación S4′: R2, con límites; decisión pendiente**. Métrica decidida en D8; queda la revisión manual de un caso y la lista de hospitales con Ian |
+| E4 | Población WorldPop sobre las comunidades (para que la criticidad deje de dar 0) | W | [ ] | `population` poblada donde hay dato |
+| E5 | Decidir la métrica de impacto (hospital de referencia vs. más cercano; con el más cercano el parque da 0 comunidades afectadas) y revisar a mano la 1 aislada hasta Limón | R | [ ] | Una sola cifra por tramo y la decisión anotada abajo — **recomendación S4′: R2, con límites; decisión pendiente**. Métrica decidida en D8; queda la revisión manual de un caso y la lista de hospitales con Ian |
 | P5 | Impacto: quitar un tramo a la vez → tiempo extra, población, aisladas, ranking → `scenarios.json` (clave `candidates`, `source: "network_consequence"`; spec: `projects/pipeline/deltas/impact-scoring.spec.md`) | I | [ ] | Valida; un caso revisado a mano; sin aislamientos falsos (comunidades ajustadas a la vía cortada, `oneway`). Existe en `origin/feat/impact-scoring`; falta que cierre **ambas calzadas** por tramo y que use el hospital de referencia (D8). Unidad de cierre más fina que 33–61 km: pendiente |
 | E1 | IMERG: `rain.csv` y lluvia acumulada por tramo (`exposure.rain_mm_12d`) | I | [ ] | Valida; las fechas cubren el periodo. Lectura ya probada en S5; no afirmar relación con los cierres |
 | E3 | Zona como parámetro (nombre o bbox en config → `meta.area`) | I | [ ] | Cambiar el bbox cambia la salida sin tocar código |
 | P7 | `meta.json` y `make all` de punta a punta | R | [ ] | `make all` regenera todo y `make validate` pasa |
 | P8 | **Primer despliegue con datos reales** | R, W | [ ] | El sitio publicado muestra datos reales (meta: sáb 21:00) |
 | E2 | S2c (SME2), solo si sobra tiempo | R | [x] | FALLA (ver S2c); sin humedad en la exposición |
+| P9 | Unidad de cierre fina: ambas calzadas, cortada en cada unión del grafo, más de 19 cierres (`RELIABILITY.md` paso 5; el tope de ~5 km se descartó, ver spec) | I | [ ] | Spec `closure-units` aprobado; unidades por uniones, no por cadenado |
+| P10 | Sensibilidad: velocidad ×0,8/×1,2 y quitar cada hospital de referencia (paso 1; el ajuste a la red no se varía, ver spec) | V | [ ] | Top 5 comparte ≥ 4 tramos en las dos de velocidad; quitar hospital se reporta, no se juzga |
+| P11 | Contraste de tiempos con fuente externa (paso 3) | V | [ ] | 15–20 pares y 3–5 referencias citadas; mediana del error relativo ≤ 25 % |
+| P12 | Revisión manual de 3 cierres: mayor criticidad, mediano y el más largo (paso 2) | R | [ ] | ≥ 80 % de las aisladas reales; artefactos corregidos y vuelto a medir |
 
 Descartadas `[-]`: **P1** (obtener pasadas GCOV) y **P2** (detección de cambio como generador de candidatos): la detección no genera tramos (G1). **P4** (tramos candidatos por zona de cambio) se fundió en P5: los tramos salen de la red.
 
@@ -93,13 +141,21 @@ Descartadas `[-]`: **P1** (obtener pasadas GCOV) y **P2** (detección de cambio 
 
 | ID | Tarea | Dueño | Estado | Terminada cuando |
 |---|---|---|---|---|
-| F1 | Mapa con tramos críticos, hospitales y comunidades; capa de cambio solo si existe | W | [ ] | Se dibuja desde el contrato, con o sin capa de cambio |
+| F1 | Mapa con tramos críticos, hospitales y comunidades (sin capa de radar: nada la produce) | W | [ ] | Se dibuja desde el contrato |
 | F3 | Lista de tramos críticos por criticidad; solo impacto > 0 y contador «N tramos sin impacto» | V | [ ] | Coincide con el `rank` |
-| F4 | Detalle del tramo: tiempo extra, población, comunidades, alternas, bloque «Exposición» (lluvia como contexto, «evidencia de radar: no detectable a esta escala»; sin humedad) | V | [ ] | Todos los campos manejan `null` |
+| F4 | Detalle del tramo: tiempo extra, población, comunidades, alternas, bloque «Exposición» (solo lluvia como contexto; sin humedad ni radar por tramo) | W | [ ] | Todos los campos manejan `null` |
 | F5 | Simulación de cierre (varios tramos, chips, restablecer, «sin ruta al hospital de referencia» solo si no hay camino) | V | [ ] | Recálculo instantáneo en el navegador |
 | F6 | Panel «¿Por qué?»: exposición con gráfico IMERG, siempre como hipótesis | W | [ ] | La etiqueta siempre visible |
 | F7 | Responsivo (panel lateral en escritorio; hoja inferior en móvil) | W | [ ] | Usable en celular |
 | F8 | Atribuciones y aviso «tramos críticos por consecuencia; no son derrumbes confirmados» | V | [ ] | Se muestran NASA/JPL, IMERG y OSM |
+| F11 | Selector de zona: carga `areas.json` y los archivos de `storage/<id>/`; las zonas con `validated: false` salen etiquetadas «no validada» | V | [ ] | Cambiar de zona recentra el mapa; solo la Ruta 32 es obligatoria |
+| F10 | Marcas de confianza: aislamientos sospechosos señalados, tiempo como orden de magnitud o rango (`RELIABILITY.md` paso 6) | V | [ ] | «Aislada» se dice «sin ruta al hospital de referencia» |
+
+### Contrato
+
+| ID | Tarea | Dueño | Estado | Terminada cuando |
+|---|---|---|---|---|
+| C1 | Decidir y aplicar la actualización del contrato (¿0.3?): unidad fina, marcas de sospechoso, `meta.area` | R | [ ] | Esquemas y mocks validan; `make validate` pasa; decisión anotada |
 
 Cortadas `[-]`: **F2** (mostrar pasadas) y **F9** (alternar antes/después): dependen de una capa de radar que no tenemos.
 
@@ -134,7 +190,8 @@ Cortadas `[-]`: **F2** (mostrar pasadas) y **F9** (alternar antes/después): dep
 | 14 nov ~16:35 | **D6.** Texto al usuario: «tramo crítico». `candidates` sigue como clave de archivo. Nunca «confirmado» ni «causado por» | No romper el esquema |
 | 14 nov | **D7.** S2c = FALLA: la humedad SME2 no sube antes de los cierres (1 de 4). Exposición = solo IMERG; F4 sin humedad. SME2 no se descarta como dato, solo como señal previa | Resultado negativo con número (`SPIKING.md` S2c) |
 | 14 nov | **D8.** Redirección tras los spikes (S2, S2c, S4′, S5). (a) El producto es la **consecuencia (criticidad)**: qué tramos de un corredor vial (demostrado en la Ruta 32), si se cortan, dejan a comunidades sin ruta a un hospital de referencia, con tiempo extra y población. «Riesgo = consecuencia × exposición» deja de usarse porque la exposición no está validada. (b) **Métrica R2:** hospital de referencia más cercano, con el conjunto de referencia como **parámetro de la zona** (en la Ruta 32: Calderón Guardia, México y San Juan de Dios); «aislada» pasa a significar «sin ruta al hospital de referencia» y la interfaz lo dice así. (c) **Un cierre incluye ambas calzadas** de Ruta 32. (d) Comunidades y hospitales se ajustan a la mayor componente fuertemente conexa. (e) **Exposición = lluvia IMERG como contexto**, «hipótesis»; sin SME2 y sin radar como señal. (f) Los tres negativos (S2, S2c, S5) se presentan como hallazgos con su número. (g) **El método es para cualquier corredor con red vial en OSM; la Ruta 32 es el caso de demostración y el único probado.** Son parámetros de la zona, no código: el bbox, los hospitales de referencia, la velocidad por clase de vía (hoy medianas de OSM de Costa Rica) y el ráster de población (WorldPop CRI 2020 es un archivo por país). Nunca se afirma «funciona en cualquier lugar». | R2 fue la única métrica que pasó los criterios de S4′ (12,7 % de aislamientos sospechosos frente a 54,3 % de N y R), con límites: cierres de hasta 61 km, hospitales provisionales, sin población, sin revisión manual. Las tres señales fallaron con criterios escritos antes (`SPIKING.md`). Cambia semántica, no el esquema 0.2 |
-| 14 nov | Modo solo: sin turnos ni relevos; F2 y F9 cortadas; contrato 0.2 adoptado en el árbol (sin la regla de revisión de ambos lados) | Menos coordinación, más velocidad |
+| 14 nov (cierre del día 1) | **Fase 3 repartida entre los cuatro** (ver «Carga por persona»): R queda con 3 deltas más README y entrega; Ian empieza por el pipeline. Specs de los 18 deltas redactados en la rama `docs/delta-specs` y purgados de redundancias (se quitaron `granularity`, `meta.area.referral_hospitals`, `exposure.radar_evidence`, la capa de radar del mapa y las perturbaciones de ajuste de la sensibilidad) | Un delta por rebanada, de lo más fácil a lo más difícil |
+| 14 nov | Modo solo (hasta el cierre del día 1): sin turnos ni relevos; F2 y F9 cortadas; contrato 0.2 adoptado en el árbol (sin la regla de revisión de ambos lados) | Menos coordinación, más velocidad |
 
 ### Preguntas abiertas
 
