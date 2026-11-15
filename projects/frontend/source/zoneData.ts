@@ -14,11 +14,17 @@ export interface ZoneData {
   baseline: BaselineEntry[]
 }
 
+export type ZoneState = { status: 'loading' } | { status: 'error'; message: string } | { status: 'ready'; data: ZoneData }
+
+export const readyData = (state: ZoneState): ZoneData | null => (state.status === 'ready' ? state.data : null)
+
+const LOADING: ZoneState = { status: 'loading' }
+
 // Loads the active zone's files (map-corridor): the store's zone, then ?area, then the first validated.
-// Returns null while loading and the error message if a file fails.
-export function useZoneData(): ZoneData | string | null {
+// Reports loading while the files arrive and the error message if a file fails.
+export function useZoneData(): ZoneState {
   const activeId = useAppStore((state) => state.activeZoneId)
-  const [loaded, setLoaded] = useState<{ key: string | null; value: ZoneData | string } | null>(null)
+  const [loaded, setLoaded] = useState<{ key: string | null; value: ZoneState } | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -31,10 +37,10 @@ export function useZoneData(): ZoneData | string | null {
           loadZoneFile<ZoneData['graph']>(zone.id, 'graph.json'),
           loadZoneFile<{ candidates: DetailUnit[]; baseline: BaselineEntry[] }>(zone.id, 'scenarios.json'),
         ])
-        if (!cancelled) setLoaded({ key: activeId, value: { zone, meta, graph, units: scenarios.candidates, baseline: scenarios.baseline ?? [] } })
+        if (!cancelled) setLoaded({ key: activeId, value: { status: 'ready', data: { zone, meta, graph, units: scenarios.candidates, baseline: scenarios.baseline ?? [] } } })
       })
       .catch((reason: unknown) => {
-        if (!cancelled) setLoaded({ key: activeId, value: reason instanceof Error ? reason.message : String(reason) })
+        if (!cancelled) setLoaded({ key: activeId, value: { status: 'error', message: reason instanceof Error ? reason.message : String(reason) } })
       })
     return () => {
       cancelled = true
@@ -42,5 +48,5 @@ export function useZoneData(): ZoneData | string | null {
   }, [activeId])
 
   // A result of another zone is not shown while the new one loads (INV-11).
-  return loaded !== null && loaded.key === activeId ? loaded.value : null
+  return loaded !== null && loaded.key === activeId ? loaded.value : LOADING
 }

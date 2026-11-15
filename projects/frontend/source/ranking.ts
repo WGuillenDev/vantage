@@ -59,3 +59,22 @@ export function rowView(unit: RankedUnit, edges: { id: string; road?: string | n
     barFraction: maxCrit > 0 ? unit.criticality / maxCrit : null,
   }
 }
+
+export type RankFilter = 'all' | 'no-route' | 'suspect'
+
+const plain = (text: string): string => text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
+
+// The list the person narrows down: by text over the row label, and by a kind of unit.
+export function filterUnits<T extends RankedUnit & { suspect_isolated_community_ids?: string[] }>(
+  units: T[],
+  edges: { id: string; road?: string | null }[],
+  query: string,
+  filter: RankFilter,
+): T[] {
+  const needle = plain(query.trim())
+  return units.filter((unit) => {
+    if (filter === 'no-route' && unit.extra_time_s !== null) return false
+    if (filter === 'suspect' && (unit.suspect_isolated_community_ids ?? []).length === 0) return false
+    return needle === '' || plain(rowView(unit, edges, 0).label).includes(needle)
+  })
+}

@@ -2,73 +2,51 @@ import * as maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
 import { useEffect, useRef, useState } from 'react'
+import { ALTERNATE_COLOR, CLOSED_COLOR, COMMUNITY_COLOR, HOSPITAL_COLOR, SELECTED_COLOR } from './colors.ts'
 import { alternateEdgeIds, alternateFeatures, alternateRoads, closedFeatures } from './closureWhatif.ts'
-import { colorForCriticality, fitBounds, GRAY, legendRange, pointFeatures, rankingUnknown, unitFeatures } from './mapCorridor.ts'
+import { fitBounds, pointFeatures, unitFeatures } from './mapCorridor.ts'
+import { MapLegend } from './MapLegend.tsx'
+import { rowView } from './ranking.ts'
 import { useAppStore } from './store.ts'
-import type { ZoneData } from './zoneData.ts'
+import { readyData, type ZoneData, type ZoneState } from './zoneData.ts'
 
 // maplibre-gl 6 does not find its worker by itself when Vite bundles the page.
 maplibregl.setWorkerUrl(workerUrl)
 
 const EMPTY = { type: 'FeatureCollection' as const, features: [] }
 const CLICK_TOLERANCE = 6 // px around the pointer, so thin roads are easy to hit
+const NONE = ['==', ['get', 'id'], ''] as maplibregl.FilterSpecification
 
 const SOURCES = ['units', 'hospitals', 'communities', 'closed', 'alternates']
-const CLOSED_COLOR = '#b91c1c'
-const ALTERNATE_COLOR = '#0284c7'
 
-function Legend({ data, hasClosed }: { data: ZoneData; hasClosed: boolean }) {
-  const { min, max } = legendRange(data.units)
-  const format = new Intl.NumberFormat('es').format
-  const range = { min, max }
-  const gradient = [0, 0.25, 0.5, 0.75, 1]
-    .map((t) => colorForCriticality(min + (max - min) * t, range))
-    .join(', ')
-  return (
-    <div className="absolute bottom-2 left-2 rounded bg-white/90 px-2 py-1 text-xs shadow" aria-label="Leyenda de criticidad">
-      <p className="font-semibold">Criticidad del tramo</p>
-      <div className="mt-1 h-2 w-40 rounded" style={{ background: `linear-gradient(to right, ${gradient})` }} />
-      <p className="flex w-40 justify-between">
-        <span>{format(min)}</span>
-        <span>{format(max)}</span>
-      </p>
-      {rankingUnknown(data.units) && (
-        <p className="mt-1 w-40">El color no ordena los tramos: se desconoce la población.</p>
-      )}
-      <p className="mt-1 flex items-center gap-1">
-        <span aria-hidden="true" className="inline-block h-1 w-4 rounded" style={{ background: GRAY }} />
-        sin impacto
-      </p>
-      {hasClosed && (
-        <>
-          <p className="mt-1 flex items-center gap-1">
-            <span aria-hidden="true" className="inline-block w-4 border-t-4 border-dashed" style={{ borderColor: CLOSED_COLOR }} />
-            tramo cerrado
-          </p>
-          <p className="flex items-center gap-1">
-            <span aria-hidden="true" className="inline-block w-4 border-t-4 border-dashed" style={{ borderColor: ALTERNATE_COLOR }} />
-            rutas alternas
-          </p>
-        </>
-      )}
-      <p className="mt-1 flex items-center gap-1">
-        <span aria-hidden="true" className="inline-block h-2.5 w-2.5 rounded-full border border-white bg-red-600" />
-        hospital de referencia
-      </p>
-      <p className="flex items-center gap-1">
-        <span aria-hidden="true" className="inline-block h-2.5 w-2.5 rounded-full border border-white bg-blue-600" />
-        comunidad
-      </p>
-    </div>
-  )
+const setSource = (map: maplibregl.Map, id: string, collection: unknown) =>
+  (map.getSource(id) as maplibregl.GeoJSONSource).setData(collection as typeof EMPTY)
+
+const idFilter = (id: string | null) => (id === null ? NONE : (['==', ['get', 'id'], id] as maplibregl.FilterSpecification))
+
+type Position = [number, number]
+
+function unitBounds(collection: ReturnType<typeof unitFeatures>, id: string): maplibregl.LngLatBounds | null {
+  const feature = collection.features.find((item) => item.properties.id === id)
+  if (!feature) return null
+  const bounds = new maplibregl.LngLatBounds()
+  for (const line of feature.geometry.coordinates as Position[][]) for (const point of line) bounds.extend(point)
+  return bounds
 }
 
-export function MapView({ data }: { data: ZoneData | string | null }) {
+export function MapView({ state }: { state: ZoneState }) {
+  const data = readyData(state)
   const container = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
+  const dataRef = useRef<ZoneData | null>(null)
+  const popup = useRef<maplibregl.Popup | null>(null)
   const [ready, setReady] = useState(false)
-  const selected = useAppStore((state) => state.selectedUnitId)
-  const closed = useAppStore((state) => state.closedUnitIds)
+  const selected = useAppStore((s) => s.selectedUnitId)
+  const hovered = useAppStore((s) => s.hoveredUnitId)
+  const closed = useAppStore((s) => s.closedUnitIds)
+  useEffect(() => {
+    dataRef.current = data
+  }, [data])
 
   useEffect(() => {
     const element = container.current
@@ -88,10 +66,12 @@ export function MapView({ data }: { data: ZoneData | string | null }) {
             attribution: '© colaboradores de OpenStreetMap',
           },
         },
-        layers: [{ id: 'osm', type: 'raster', source: 'osm' }],
+        // Muted base map so the criticality colors carry the eye.
+        layers: [{ id: 'osm', type: 'raster', source: 'osm', paint: { 'raster-saturation': -0.75, 'raster-contrast': -0.1, 'raster-brightness-min': 0.08 } }],
       },
     })
     mapRef.current = map
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right')
     map.on('load', () => {
       for (const id of SOURCES) map.addSource(id, { type: 'geojson', data: EMPTY })
       // closure-whatif: the alternate roads sit under the units, the closed units on top of them.
@@ -102,13 +82,20 @@ export function MapView({ data }: { data: ZoneData | string | null }) {
         paint: { 'line-color': ALTERNATE_COLOR, 'line-width': 5, 'line-dasharray': [2, 1.5] },
       })
       map.addLayer({ id: 'units-casing', type: 'line', source: 'units', paint: { 'line-color': '#ffffff', 'line-width': 7 } })
+      map.addLayer({
+        id: 'units-hover',
+        type: 'line',
+        source: 'units',
+        filter: NONE,
+        paint: { 'line-color': SELECTED_COLOR, 'line-width': 8, 'line-opacity': 0.45 },
+      })
       map.addLayer({ id: 'units-line', type: 'line', source: 'units', paint: { 'line-color': ['get', 'color'], 'line-width': 4 } })
       map.addLayer({
         id: 'units-selected',
         type: 'line',
         source: 'units',
-        filter: ['==', ['get', 'id'], ''],
-        paint: { 'line-color': '#f59e0b', 'line-width': 9, 'line-opacity': 0.9 },
+        filter: NONE,
+        paint: { 'line-color': SELECTED_COLOR, 'line-width': 9, 'line-opacity': 0.9 },
       })
       map.moveLayer('units-line')
       map.addLayer({
@@ -121,36 +108,45 @@ export function MapView({ data }: { data: ZoneData | string | null }) {
         id: 'communities',
         type: 'circle',
         source: 'communities',
-        paint: { 'circle-radius': 5, 'circle-color': '#2563eb', 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 1.5 },
+        paint: { 'circle-radius': 5, 'circle-color': COMMUNITY_COLOR, 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 1.5 },
       })
       map.addLayer({
         id: 'hospitals',
         type: 'circle',
         source: 'hospitals',
-        paint: { 'circle-radius': 7, 'circle-color': '#dc2626', 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 2 },
+        paint: { 'circle-radius': 7, 'circle-color': HOSPITAL_COLOR, 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 2 },
       })
       setReady(true)
     })
-    // INV-09: a click on a unit selects it; a click anywhere else clears the selection.
-    map.on('click', (event) => {
-      const { x, y } = event.point
-      const hit = map.queryRenderedFeatures(
+    const unitAt = (point: { x: number; y: number }) =>
+      map.queryRenderedFeatures(
         [
-          [x - CLICK_TOLERANCE, y - CLICK_TOLERANCE],
-          [x + CLICK_TOLERANCE, y + CLICK_TOLERANCE],
+          [point.x - CLICK_TOLERANCE, point.y - CLICK_TOLERANCE],
+          [point.x + CLICK_TOLERANCE, point.y + CLICK_TOLERANCE],
         ],
         { layers: ['units-line'] },
-      )[0]
-      const id = hit?.properties?.id
-      useAppStore.getState().selectUnit(typeof id === 'string' ? id : null)
+      )[0]?.properties?.id as string | undefined
+    // INV-09: a click on a unit selects it; a click anywhere else clears the selection.
+    map.on('click', (event) => useAppStore.getState().selectUnit(unitAt(event.point) ?? null))
+    // The pointer over a unit shows its name and extra time, and highlights it like the list does.
+    map.on('mousemove', (event) => {
+      const id = unitAt(event.point)
+      map.getCanvas().style.cursor = id ? 'pointer' : ''
+      const current = dataRef.current
+      const unit = id && current ? current.units.find((item) => item.id === id) : undefined
+      if (!unit || !current) return void popup.current?.remove()
+      const row = rowView(unit, current.graph.edges, 0)
+      popup.current ??= new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 10 })
+      popup.current.setLngLat(event.lngLat).setText(`${row.label} · ${row.extraTime}`).addTo(map)
     })
-    map.on('mousemove', 'units-line', () => (map.getCanvas().style.cursor = 'pointer'))
-    map.on('mouseleave', 'units-line', () => (map.getCanvas().style.cursor = ''))
+    map.on('mouseout', () => popup.current?.remove())
     // The canvas is sized before the layout settles; follow the container so the map fills it.
     const observer = new ResizeObserver(() => map.resize())
     observer.observe(element)
     return () => {
       observer.disconnect()
+      popup.current?.remove()
+      popup.current = null
       setReady(false)
       mapRef.current = null
       map.remove()
@@ -161,42 +157,53 @@ export function MapView({ data }: { data: ZoneData | string | null }) {
   useEffect(() => {
     const map = mapRef.current
     if (!map || !ready) return
-    const set = (id: string, collection: typeof EMPTY) => (map.getSource(id) as maplibregl.GeoJSONSource).setData(collection)
-    if (typeof data !== 'object' || data === null) {
-      for (const id of SOURCES) set(id, EMPTY)
+    if (data === null) {
+      for (const id of SOURCES) setSource(map, id, EMPTY)
       return
     }
     const points = pointFeatures(data.graph)
-    set('units', unitFeatures(data.graph, data.units) as unknown as typeof EMPTY)
-    set('hospitals', points.hospitals as unknown as typeof EMPTY)
-    set('communities', points.communities as unknown as typeof EMPTY)
+    setSource(map, 'units', unitFeatures(data.graph, data.units))
+    setSource(map, 'hospitals', points.hospitals)
+    setSource(map, 'communities', points.communities)
     map.fitBounds(fitBounds(data.zone.bbox), { padding: 24, animate: false })
   }, [data, ready])
 
+  // The selected unit is outlined, and the map flies to it when it is not already in view.
   useEffect(() => {
     const map = mapRef.current
-    if (map && ready) map.setFilter('units-selected', ['==', ['get', 'id'], selected ?? ''])
-  }, [selected, ready])
+    if (!map || !ready) return
+    map.setFilter('units-selected', idFilter(selected))
+    if (selected === null || data === null) return
+    const bounds = unitBounds(unitFeatures(data.graph, data.units), selected)
+    const view = map.getBounds()
+    if (bounds && !(view.contains(bounds.getSouthWest()) && view.contains(bounds.getNorthEast()))) {
+      map.fitBounds(bounds, { padding: 80, maxZoom: 13, duration: 600 })
+    }
+  }, [selected, data, ready])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (map && ready) map.setFilter('units-hover', idFilter(hovered))
+  }, [hovered, ready])
 
   // INV-12: the closed units and the roads named like their alternates follow the closed set.
   useEffect(() => {
     const map = mapRef.current
     if (!map || !ready) return
-    const set = (id: string, collection: typeof EMPTY) => (map.getSource(id) as maplibregl.GeoJSONSource).setData(collection)
-    if (typeof data !== 'object' || data === null) {
-      set('closed', EMPTY)
-      set('alternates', EMPTY)
+    if (data === null) {
+      setSource(map, 'closed', EMPTY)
+      setSource(map, 'alternates', EMPTY)
       return
     }
     const names = alternateRoads(data.units, closed)
-    set('closed', closedFeatures(data.graph, data.units, closed) as unknown as typeof EMPTY)
-    set('alternates', alternateFeatures(data.graph.edges, alternateEdgeIds(data.graph.edges, names)) as unknown as typeof EMPTY)
+    setSource(map, 'closed', closedFeatures(data.graph, data.units, closed))
+    setSource(map, 'alternates', alternateFeatures(data.graph.edges, alternateEdgeIds(data.graph.edges, names)))
   }, [data, closed, ready])
 
   return (
     <div className="absolute inset-0">
       <div ref={container} className="h-full w-full" />
-      {typeof data === 'object' && data !== null && <Legend data={data} hasClosed={closed.length > 0} />}
+      {data !== null && <MapLegend data={data} hasClosed={closed.length > 0} />}
     </div>
   )
 }

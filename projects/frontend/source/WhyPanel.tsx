@@ -1,55 +1,77 @@
 import { useEffect, useState } from 'react'
 import { HYPOTHESIS_LABEL, WHY_TEXT, highlightedDays, loadRain, type RainDay } from './segmentDetail.ts'
 import { rainUrl } from './storage.ts'
-import type { ZoneData } from './zoneData.ts'
+import { Badge, Message } from './ui.tsx'
+import type { ZoneState } from './zoneData.ts'
 
 const W = 300
 const H = 100
+const HIGHLIGHT = '#d97706'
+const BASE = '#94a3b8'
 
 function RainChart({ days }: { days: ReturnType<typeof highlightedDays> }) {
   const max = Math.max(1, ...days.map((d) => d.mm))
   const step = W / days.length
+  const first = days[0]?.date
+  const last = days[days.length - 1]?.date
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Lluvia diaria del periodo, con los últimos 12 días resaltados" className="w-full">
-      {days.map((d, i) => {
-        const h = (d.mm / max) * (H - 4)
-        return (
-          <rect key={d.date} x={i * step} y={H - h} width={Math.max(1, step - 1)} height={h} fill={d.highlighted ? '#d97706' : '#9ca3af'}>
-            <title>{`${d.date}: ${d.mm} mm`}</title>
-          </rect>
-        )
-      })}
-    </svg>
+    <figure className="space-y-1">
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Lluvia diaria del periodo, con los últimos 12 días resaltados" className="w-full rounded-lg bg-slate-50">
+        {days.map((d, i) => {
+          const h = (d.mm / max) * (H - 4)
+          return (
+            <rect key={d.date} x={i * step} y={H - h} width={Math.max(1, step - 1)} height={h} fill={d.highlighted ? HIGHLIGHT : BASE}>
+              <title>{`${d.date}: ${d.mm} mm`}</title>
+            </rect>
+          )
+        })}
+      </svg>
+      <figcaption className="flex justify-between text-xs text-muted tabular-nums">
+        <span>{first}</span>
+        <span>máx. {Math.round(max)} mm/día</span>
+        <span>{last}</span>
+      </figcaption>
+      <p className="flex items-center gap-3 text-xs text-muted">
+        <span className="flex items-center gap-1">
+          <span aria-hidden="true" className="h-2 w-3 rounded-sm" style={{ background: HIGHLIGHT }} />
+          últimos 12 días
+        </span>
+        <span className="flex items-center gap-1">
+          <span aria-hidden="true" className="h-2 w-3 rounded-sm" style={{ background: BASE }} />
+          resto del periodo
+        </span>
+      </p>
+    </figure>
   )
 }
 
-export function WhyPanel({ data }: { data: ZoneData | string | null }) {
-  const zoneId = typeof data === 'object' && data !== null ? data.zone.id : null
-  const end = typeof data === 'object' && data !== null ? data.meta.rain?.end : undefined
-  const [state, setState] = useState<{ zoneId: string; rows: RainDay[] | string } | null>(null)
+export default function WhyPanel({ state }: { state: ZoneState }) {
+  const zoneId = state.status === 'ready' ? state.data.zone.id : null
+  const end = state.status === 'ready' ? state.data.meta.rain?.end : undefined
+  const [loaded, setLoaded] = useState<{ zoneId: string; rows: RainDay[] | string } | null>(null)
 
   useEffect(() => {
     if (zoneId === null) return
     let cancelled = false
     loadRain(rainUrl(zoneId))
-      .then((rows) => !cancelled && setState({ zoneId, rows }))
-      .catch((reason: unknown) => !cancelled && setState({ zoneId, rows: reason instanceof Error ? reason.message : String(reason) }))
+      .then((rows) => !cancelled && setLoaded({ zoneId, rows }))
+      .catch((reason: unknown) => !cancelled && setLoaded({ zoneId, rows: reason instanceof Error ? reason.message : String(reason) }))
     return () => {
       cancelled = true
     }
   }, [zoneId])
 
-  const current = state !== null && state.zoneId === zoneId ? state.rows : null
+  const current = loaded !== null && loaded.zoneId === zoneId ? loaded.rows : null
   return (
-    <div className="p-2 text-sm">
-      <p className="font-medium">{HYPOTHESIS_LABEL}</p>
+    <div className="space-y-3 p-3 text-sm">
+      <Badge tone="warning">{HYPOTHESIS_LABEL}</Badge>
       <p>{WHY_TEXT}</p>
       {current === null ? (
-        <p>Cargando lluvia…</p>
+        <p className="text-muted">Cargando lluvia…</p>
       ) : typeof current === 'string' ? (
-        <p role="alert">{current}</p>
+        <Message alert>{current}</Message>
       ) : end === undefined ? (
-        <p role="alert">No se pudo cargar meta.json: falta el fin del periodo de lluvia.</p>
+        <Message alert>No se pudo cargar meta.json: falta el fin del periodo de lluvia.</Message>
       ) : (
         <RainChart days={highlightedDays(current, end)} />
       )}

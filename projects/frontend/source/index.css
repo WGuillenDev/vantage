@@ -59,3 +59,15 @@ body {
   font-size: 0.75rem;
   box-shadow: var(--shadow-card);
 }
+
+/* Keep the attribution on one line; the 44 px touch button must not repeat its icon (mobile-layout INV-06). */
+.maplibregl-ctrl-attrib.maplibregl-compact {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.maplibregl-ctrl-attrib-button {
+  background-repeat: no-repeat;
+  background-position: center;
+}
