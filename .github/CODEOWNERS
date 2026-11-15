@@ -1,3 +1,5 @@
 # Contract changes need one backend and one frontend review.
 # Pair with "Require review from Code Owners" in the branch protection of main.
-/projects/contract/ @ronz204 @WGuillenDev
+# The last matching pattern wins, so each rule lists every owner for its path.
+*                    @ian0905423
+/projects/contract/  @ronz204 @WGuillenDev @ian0905423
