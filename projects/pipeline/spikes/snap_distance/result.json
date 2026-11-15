@@ -1,0 +1,57 @@
+{
+  "zone": "ruta-32",
+  "threshold": {
+    "top5_min_overlap": 4
+  },
+  "runs": [
+    {
+      "max_snap_m": 3000,
+      "communities": 758,
+      "communities_with_population": 758,
+      "units": 115,
+      "units_with_impact": 100,
+      "isolated_pairs": 965,
+      "suspect_pairs": 208,
+      "same_unit_ids_as_real": true,
+      "top5_overlap": 5,
+      "top10_overlap": 10,
+      "top20_overlap": 20,
+      "rank_correlation": 1.0,
+      "compared_units": 100,
+      "scenarios_equal_to_real_output": true
+    },
+    {
+      "max_snap_m": 1500,
+      "communities": 643,
+      "communities_with_population": 643,
+      "units": 115,
+      "units_with_impact": 100,
+      "isolated_pairs": 682,
+      "suspect_pairs": 140,
+      "same_unit_ids_as_real": true,
+      "top5_overlap": 5,
+      "top10_overlap": 10,
+      "top20_overlap": 20,
+      "rank_correlation": 0.999,
+      "compared_units": 100,
+      "scenarios_equal_to_real_output": false
+    },
+    {
+      "max_snap_m": 5000,
+      "communities": 799,
+      "communities_with_population": 799,
+      "units": 115,
+      "units_with_impact": 100,
+      "isolated_pairs": 1162,
+      "suspect_pairs": 254,
+      "same_unit_ids_as_real": true,
+      "top5_overlap": 5,
+      "top10_overlap": 10,
+      "top20_overlap": 20,
+      "rank_correlation": 1.0,
+      "compared_units": 100,
+      "scenarios_equal_to_real_output": false
+    }
+  ],
+  "verdict": "pass"
+}
