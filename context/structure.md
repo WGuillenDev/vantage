@@ -6,7 +6,7 @@
 
 ```mermaid
 flowchart TD
-    src["<b>External sources</b><br/>OSM roads · WorldPop · IMERG rain · NISAR SME2 (optional) · NISAR GCOV (optional, experimental)"]
+    src["<b>External sources</b><br/>OSM roads · WorldPop · IMERG rain (context) · NISAR GCOV (optional, experimental)"]
     pipe["<b>pipeline/</b><br/>Python, offline"]
     out["<b>pipeline/output/</b><br/>committed, light artifacts"]
     data["<b>frontend/public/storage/</b><br/>meta.json<br/>graph.json<br/>scenarios.json<br/>rain.csv<br/>change.geojson + PNGs (optional, may be empty)"]
@@ -86,13 +86,14 @@ Runs offline and is deterministic. Managed with **uv**.
 [area]
 name = "Ruta 32 corridor"        # shown in the UI and meta.json
 bbox = [-84.20, 9.95, -83.70, 10.30]   # [w, s, e, n], placeholder values
+referral_hospitals = []                # OSM ids (way/…); for Ruta 32: Calderón Guardia, México, San Juan de Dios (ids pending, Ian)
 ```
 
 | Stage | Input | Output |
 |---|---|---|
 | Road graph | OSM for the configured area | Segment network, hospitals and communities → `graph.json` |
-| Impact (consequence) | Graph + population | Remove one segment at a time and recompute shortest paths to the nearest (or reference) hospital → extra time, dependent population, isolated communities, criticality ranking → `scenarios.json` |
-| Exposure layer | IMERG Late daily; NISAR SME2 if test S2c passes | `rain.csv`, and per-segment `exposure` in `scenarios.json` (`rain_mm_12d`, `soil_moisture_pctl`, `radar_evidence`) |
+| Impact (consequence) | Graph + population | Remove one segment at a time (both carriageways) and recompute shortest paths to the nearest referral hospital → extra time, dependent population, isolated communities, criticality ranking → `scenarios.json` |
+| Exposure layer | IMERG Late daily | `rain.csv`, and per-segment `exposure` in `scenarios.json` (`rain_mm_12d`; `soil_moisture_pctl` stays `null`; `radar_evidence`) |
 | Change detection (optional, experimental) | Two GCOV passes | ΔdB change polygons + overlay PNG. At landslide scale the test was negative (`approach.md` §5), so this stage may produce an empty layer. Not a generator of critical segments |
 | Export | All of the above | Files in `pipeline/output/`, then `make publish` and `make validate` |
 
@@ -102,7 +103,8 @@ bbox = [-84.20, 9.95, -83.70, 10.30]   # [w, s, e, n], placeholder values
 - IMERG Late (`GPM_3IMERGDL` V07): 0.1°, latency of at least 14 h.
 - For the optional radar stages: same **track, direction and CRID** for both passes, never mix provisional `P05023` and validated `P05036`; pixel is 10 or 20 m; respect the data gap **Jul 27 – Aug 10** and the 12-day repeat; stream and clip, never whole scenes.
 - OSM data requires ODbL attribution; carry it into `meta.json` and the UI footer.
-- Generalization: designed for corridors with an OSM road network, not tested outside Ruta 32. Known limits: OSM quality, hospital registration, SME2 in dense forest.
+- Closures remove **both carriageways** of Ruta 32 (87 % of its OSM edges are one-way pairs), and communities and hospitals snap to the largest strongly connected component of the directed graph (D8). Neither is in the P3 and P5 specs yet.
+- Generalization: designed for corridors with an OSM road network, not tested outside Ruta 32. Known limits: OSM quality, hospital registration, the choice of referral hospitals for each area.
 
 ## 5. Frontend (static SPA)
 
@@ -111,7 +113,7 @@ Stack: **Bun**, **strict TypeScript**, **React + Vite**, **MapLibre GL JS**, **Z
 - No server, no accounts. Contract files are fetched from `import.meta.env.BASE_URL`.
 - **Map:** corridor, critical segments, hospitals, communities; the change layer (opacity control) only when it exists.
 - **State (Zustand):** selected segment, set of closed segments, and layer mode, opacity and selected passes when a change layer exists.
-- **`graph.ts`:** loads `graph.json`, runs the shortest path to the nearest hospital and recomputes when segments are closed. Runs fully in the browser.
+- **`graph.ts`:** loads `graph.json`, runs the shortest path to the nearest hospital in `graph.json` (the referral hospitals, D8) and recomputes when segments are closed. Runs fully in the browser.
 - **Charts (Recharts):** daily rainfall from `rain.csv` for the "Why?" (exposure) panel.
 - Never hardcode numbers that come from the pipeline; read them from `scenarios.json` and `meta.json`.
 
