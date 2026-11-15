@@ -13,7 +13,7 @@ const STORAGE = `${import.meta.env.BASE_URL}storage/`
 const REQUIRED_LISTS: Record<string, string[]> = {
   'areas.json': ['areas'],
   'graph.json': ['nodes', 'edges', 'hospitals', 'communities'],
-  'scenarios.json': ['candidates'],
+  'scenarios.json': ['baseline', 'candidates'],
 }
 
 type Json = Record<string, unknown>
@@ -25,13 +25,25 @@ const isPosition = (value: unknown): boolean =>
 // Returns what is wrong with the first malformed element of a required list, or null (INV-17, INV-18).
 function elementProblem(file: string, data: Json): string | null {
   if (file === 'scenarios.json') {
+    // closure-whatif compares every closure with `baseline`, so a wrong entry would give a wrong answer without a message.
+    const badEntry = (data.baseline as unknown[]).findIndex(
+      (entry) =>
+        !isObject(entry) ||
+        !isText(entry.community_id) ||
+        !(entry.time_s === null || (typeof entry.time_s === 'number' && Number.isFinite(entry.time_s) && entry.time_s >= 0)) ||
+        !(entry.hospital_id === null || isText(entry.hospital_id)),
+    )
+    if (badEntry >= 0) return `la entrada ${badEntry + 1} de "baseline" está mal formada`
     const bad = (data.candidates as unknown[]).findIndex(
       (unit) =>
         !isObject(unit) ||
         !isText(unit.id) ||
         typeof unit.criticality !== 'number' ||
         !Number.isFinite(unit.criticality) ||
-        !Array.isArray(unit.affected_community_ids),
+        !Array.isArray(unit.affected_community_ids) ||
+        // Without edge_ids a closed unit would silently change nothing; alternates is read as a list.
+        !Array.isArray(unit.edge_ids) ||
+        !(unit.alternates === undefined || Array.isArray(unit.alternates)),
     )
     return bad >= 0 ? `el tramo ${bad + 1} de "candidates" está mal formado` : null
   }
@@ -58,7 +70,7 @@ function elementProblem(file: string, data: Json): string | null {
       }
       if (!nodes.has(item.node)) return `"${list}" usa el nodo "${item.node}", que no está en "nodes"`
       const { population } = item
-      if (list === 'communities' && !(population === undefined || population === null || (Number.isInteger(population) && (population as number) >= 0))) {
+      if (list === 'communities' && !(population === undefined || population === null || (Number.isInteger(population) && (population as number) >= 1))) {
         return `la comunidad ${index + 1} de "communities" tiene una población no válida`
       }
     }

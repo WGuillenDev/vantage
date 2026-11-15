@@ -42,7 +42,7 @@ describe('map-corridor adversarial: INV-12 trust boundary', () => {
   })
 
   test('INV-12 complete files still load', async () => {
-    respondJson({ schema_version: '0.3', candidates: [] })
+    respondJson({ schema_version: '0.3', baseline: [], candidates: [] })
     await expect(loadZoneFile('z', 'scenarios.json')).resolves.toBeTruthy()
     respondJson({ schema_version: '0.3', nodes: [], edges: [], hospitals: [], communities: [] })
     await expect(loadZoneFile('z', 'graph.json')).resolves.toBeTruthy()
