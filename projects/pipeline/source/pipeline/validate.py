@@ -118,6 +118,9 @@ def _check_scenarios(graph: dict, scenarios: dict, zone_ids: set[str]) -> list[s
                 errors.append(f"{where}: unknown community {cid}")
         if not set(c["isolated_community_ids"]) <= set(c["affected_community_ids"]):
             errors.append(f"{where}/isolated_community_ids: must be a subset of affected_community_ids")
+        for cid in c["suspect_isolated_community_ids"]:
+            if cid not in c["isolated_community_ids"]:
+                errors.append(f"{where}/suspect_isolated_community_ids: {cid} is not in isolated_community_ids")
         for p in c["per_community"]:
             errors += _refs(f"{where}/per_community", p["community_id"], p["hospital_id"], communities, hospitals)
             isolated = p["community_id"] in c["isolated_community_ids"]
@@ -183,11 +186,33 @@ def _rows_ok(rows: list[dict]) -> bool:
     return True
 
 
+def validate_storage(root: Path) -> list[str]:
+    errors: list[str] = []
+    areas = _load(root, "areas.json", errors)
+    if areas is None:
+        return errors
+    found = _schema_errors("areas.json", areas, "areas.schema.json")
+    if found:
+        return errors + found
+    seen: set[str] = set()
+    for area in areas["areas"]:
+        zone_id = area["id"]
+        if zone_id in seen:
+            errors.append(f"areas.json: areas/{zone_id}/id: listed twice")
+            continue
+        seen.add(zone_id)
+        if not (root / zone_id).is_dir():
+            errors.append(f"areas.json: areas/{zone_id}: folder {zone_id}/ does not exist")
+            continue
+        errors += [f"{zone_id}/{line}" for line in validate_dir(root / zone_id)]
+    return errors
+
+
 def main() -> None:
     if len(sys.argv) != 2:
-        sys.exit("usage: validate <data-folder>")
+        sys.exit("usage: validate <storage-folder>")
     folder = Path(sys.argv[1])
-    errors = validate_dir(folder)
+    errors = validate_storage(folder)
     for line in errors:
         print(line, file=sys.stderr)
     if errors:
