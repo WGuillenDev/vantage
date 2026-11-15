@@ -15,11 +15,12 @@ export interface CorridorGraph {
     to: string
     time_s: number
     road?: string | null
+    oneway?: boolean
     candidate_id: string | null
     geometry: Position[]
   }[]
   hospitals: { id: string; name: string; node: string }[]
-  communities: { id: string; name: string; node: string }[]
+  communities: { id: string; name: string; node: string; population?: number | null }[]
 }
 
 interface Feature<G, P> {

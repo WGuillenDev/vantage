@@ -19,13 +19,13 @@ const graph = (over: Record<string, unknown> = {}) => ({
   communities: [{ id: 'c1', name: 'Comunidad', node: 'a' }],
   ...over,
 })
-const unit = { id: 'T-01', criticality: 1, affected_community_ids: [] }
+const unit = { id: 'T-01', criticality: 1, affected_community_ids: [], edge_ids: ['e1'] }
 
 describe('map-corridor INV-17: malformed elements inside the required lists', () => {
   test('INV-17 a well-formed graph.json and scenarios.json load', async () => {
     respondJson(graph({ edges: [edge, { ...edge, id: 'e2', candidate_id: null, geometry: undefined }] }))
     await expect(loadZoneFile('z', 'graph.json')).resolves.toBeDefined()
-    respondJson({ schema_version: '0.3', candidates: [unit] })
+    respondJson({ schema_version: '0.3', baseline: [], candidates: [unit] })
     await expect(loadZoneFile('z', 'scenarios.json')).resolves.toBeDefined()
   })
 

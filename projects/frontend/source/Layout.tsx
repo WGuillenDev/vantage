@@ -22,18 +22,14 @@ function useIsWide(): boolean {
   )
 }
 
-// Placeholders stand in for panels owned by other slices (closure-whatif).
-function Placeholder({ children }: { children: ReactNode }) {
-  return <p className="p-3 text-sm text-gray-600">{children}</p>
-}
-
-export function Layout({ header, footer, map, overlay, ranking, detail, why }: {
+export function Layout({ header, footer, map, overlay, ranking, detail, simulation, why }: {
   header: ReactNode
   footer: ReactNode
   map: ReactNode
   overlay: ReactNode
   ranking: ReactNode
   detail: (onWhy?: () => void) => ReactNode
+  simulation: ReactNode
   why: ReactNode
 }) {
   const wide = useIsWide()
@@ -131,7 +127,7 @@ export function Layout({ header, footer, map, overlay, ranking, detail, why }: {
                 <div className="min-h-0 flex-1">{ranking}</div>
               </>
             )}
-            {activeTab === 'simulacion' && <Placeholder>Simulación de cierre: pendiente.</Placeholder>}
+            {activeTab === 'simulacion' && simulation}
             {activeTab === 'porque' && why}
           </div>
         </aside>
