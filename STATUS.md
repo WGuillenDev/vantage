@@ -90,8 +90,8 @@ Un delta por rebanada, en `projects/<proyecto>/deltas/<delta>.spec.md`. Nombres 
 | 7 | `rank-sensitivity` | pipeline | S | V | P10 | impact-scoring | no | [x] |
 | 8 | `manual-review` | pipeline | S | R | P12 | impact-scoring | no | [x] |
 | 9 | `mobile-layout` | frontend | M | W | F7 | map-corridor | no | [x] |
-| 10 | `map-corridor` | frontend | M | W | F1 | contract-update | sí | [~] |
-| 11 | `segment-detail` | frontend | M | W | F4, F6 | contract-update | sí | [~] |
+| 10 | `map-corridor` | frontend | M | W | F1 | contract-update | sí | [x] |
+| 11 | `segment-detail` | frontend | M | W | F4, F6 | contract-update | sí | [x] |
 | 12 | `closure-whatif` | frontend | M | V | F5 | segment-ranking | sí | [~] |
 | 13 | `road-graph` | pipeline | M | I | P3 | area-config | sí | [~] |
 | 14 | `impact-scoring` | pipeline | M | I | P5, E5 | closure-units, population-data | sí | [~] |
