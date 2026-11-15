@@ -19,6 +19,7 @@ Owns:
 - Per-unit aggregates: `extra_time_s`, `population_dependent`, `criticality`, affected, isolated and suspect lists.
 - Ranking.
 - Copying each unit's id, edges and length from `closure-units`, and the zone's alternate routes.
+- The public scoring function `score`, which the writer of `output/<id>/scenarios.json` also calls.
 - Writing `output/<id>/scenarios.json`.
 
 Non-goals:
@@ -42,6 +43,17 @@ Inputs (the stage runs after `closure-units`):
 | `work/<id>/closure_units.json` | From `closure-units`: per unit `id`, `edge_ids`, `length_m`. |
 
 Output: `output/<id>/scenarios.json`, shaped as `projects/contract/schemas/scenarios.schema.json` at `schema_version` `"0.3"`.
+
+Public function (decided 15 Nov, for `rank-sensitivity`): besides the file, the stage exposes `score(graph, units, alternates=())` in `pipeline.impact_scoring`.
+
+| Part | Contract |
+|---|---|
+| `graph` | The content of `graph.json`, already loaded. Hospitals (`graph["hospitals"]`) and every `time_s` are read from it, never from the zone config or a module value. |
+| `units` | A list of `{id, edge_ids, length_m}`, already loaded. |
+| `alternates` | A list of `{name, vehicles}`, copied to every unit; empty by default, so the function does not depend on the zone config. |
+| Returns | The content of `scenarios.json`: a dict with `schema_version`, `baseline` and `candidates`. Not a tuple, and it never rewrites the graph. |
+
+`rank-sensitivity` calls it as `scorer(graph, units)` with copies of the graph (every `time_s` scaled, or one hospital less) and compares the unperturbed result with the whole `scenarios.json`. For that comparison to hold, the caller binds the zone's alternates into the scorer it passes (for example with `functools.partial`). The signature is a commitment: it changes only by changing this spec.
 
 Definitions (all times are integer seconds, because every `time_s` in `graph.json` is an integer):
 
@@ -104,10 +116,18 @@ Decision notes:
   When impact-scoring writes a unit, `suspect_isolated_community_ids` is exactly the set of its isolated communities whose node is an endpoint of a closed edge or is still joined to a referral hospital when edge direction is ignored.
 - INV-20 [none]
   When a community is suspect, impact-scoring still counts it in `isolated_community_ids`, in `criticality`, in the isolated count used for ranking and in `affected_community_ids`.
+- INV-21 [none]
+  impact-scoring exposes `score(graph, units, alternates=())`, a function that returns the content of `scenarios.json` for the graph, units and alternates it is given.
+- INV-22 [none]
+  When impact-scoring writes `scenarios.json`, its content is exactly what `score` returns for the same graph, units and the zone's alternates.
+- INV-23 [none]
+  When `score` runs, it derives its result only from its arguments: it reads no file, zone config or module-level value, and it leaves its arguments unmodified.
+- INV-24 [none]
+  When `score` is called twice with equal arguments, the two results serialize to identical JSON.
 
 ## Deferred / Open questions
 
-Testing gaps (all claims are tagged `none`; the old spec on `origin/feat/impact-scoring` had 19 tests and `impact_scoring.py`, and `builder` ports them to zones and units and turns each tag into `test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py`): INV-01 to INV-13, INV-15, INV-18, INV-19, INV-20, ACC-01 to ACC-04.
+Testing gaps (all claims are tagged `none`; the old spec on `origin/feat/impact-scoring` had 19 tests and `impact_scoring.py`, and `builder` ports them to zones and units and turns each tag into `test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py`): INV-01 to INV-13, INV-15, INV-18, INV-19, INV-20, ACC-01 to ACC-04. INV-21 to INV-24 (the public function, added 15 Nov) are `none` too; their tests are plain unit tests on `score`, including one that passes a graph with scaled `time_s` and one hospital less and checks the result follows it.
 
 - **Parity with `graph.ts`:** the browser must use the same route direction (community → hospital), the same tie rule and the same "affected" rule. It does not compute suspect marks. The contract mock is the proposed shared fixture (agree with Iván).
 - **Suspect rule limits:** it only knows the two causes found in S4′ (snapped to the closed unit, isolated by `oneway`). Other artifacts, such as a community adjusted to a wrong road, are not detected; the manual review (P12) looks for them.
@@ -116,6 +136,8 @@ Testing gaps (all claims are tagged `none`; the old spec on `origin/feat/impact-
 - **Referral set meaning:** an isolated community may have a nearer regional hospital; the UI wording "sin ruta al hospital de referencia" carries that (D8). The referral hospital list is still pending (Ian).
 - **Performance:** one search per unit over a graph of about 8 700 edges is cheap, but the number of units is open (`closure-units`).
 - **Mock fixture:** ACC-01 to ACC-04 use the contract mock; `contract-update` rewrites it for 0.3, and these criteria must be checked against that mock, not the 0.1 one.
+- **Old `score`:** the function of `origin/feat/impact-scoring` returned a tuple `(scenarios, graph)`, renumbered the ids by rank and took the alternates from a module constant tied to "Ruta 32". None of that survives: the contract above returns only the scenarios and takes the alternates as an argument.
+- **Binding the alternates (`pipeline-run`):** `rank-sensitivity` raises "the baseline is not reproducible" when `scorer(graph, units)` differs from the whole `scenarios.json`. The wiring that builds the scorer must therefore bind the zone's alternates; `pipeline-run` owns that wiring, and an unbound scorer would fail the check on every run.
 - **Cross-slice edits:** `area-config` gains the required list `closure.alternates` (may be empty), updated with this spec. The old rule "final ids in rank order, graph.json rewritten" is dropped (see `closure-units`).
 
 ## Acceptance criteria
