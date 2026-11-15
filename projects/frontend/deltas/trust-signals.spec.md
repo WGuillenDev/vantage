@@ -64,7 +64,7 @@ Reads `meta.json` and `areas.json` of the active zone, and `scenarios.json` for 
 - INV-09 [test: bun test --cwd projects/frontend source/format.test.ts]
   When a population figure is shown, it is labeled "estimada", and a `null` population is shown as "sin dato".
 - INV-10 [manual]
-  When text is shown on the map panels, its contrast against its background is at least 4.5:1.
+  When text is shown on the map panels, its contrast against its background is at least 4.5:1. (axe-core 4.10, wcag2a/2aa and best-practice, 15 Nov: no violations at 390 and 1280 px; a person still checks it on a real phone.)
 - INV-11 [manual]
   When the user moves through the interface with the keyboard, every button, tab and control has a visible focus and an accessible label.
 

@@ -39,6 +39,7 @@ Reads `scenarios.json` and `graph.json` of the active zone, and the store of `ma
 | Extra time | `extra_time_s` as an approximate duration (rule in `trust-signals`: "< 5 min", "≈ 20 min", "≈ 1 h 15 min"); "sin ruta al hospital de referencia" when `extra_time_s` is `null`. |
 | Population | `population_dependent` with thousands separators, labeled "estimada" (`trust-signals`); "sin dato" when `null`, never 0. |
 | Search and filter | A text box matches the row label ignoring case and accents; three filter buttons keep all units, those with `extra_time_s` `null`, or those with suspect isolations. Both narrow the list and keep the rank order. |
+| First use | While no unit is selected, a line above the list tells the user to tap a unit; while the files load, placeholder rows stand in for the list. |
 | Hover | The row under the pointer or with focus is highlighted on the map. |
 | Criticality bar | Width proportional to `criticality` over the zone's highest `criticality`; hidden when that highest is 0. |
 
