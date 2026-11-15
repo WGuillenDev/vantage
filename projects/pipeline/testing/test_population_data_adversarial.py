@@ -7,7 +7,9 @@ import numpy as np
 import pytest
 import rasterio
 from rasterio.transform import from_origin
-from test_population_data import RES, SIZE, blank, center, graph_of, populations, report_of, setup
+from dataclasses import replace
+
+from test_population_data import RES, SIZE, blank, center, graph_of, populations, report_of, setup, write_raster
 
 from pipeline import population_data
 
@@ -84,3 +86,47 @@ def test_inv11_graph_with_extra_community_names_it(tmp_path):
   (work_dir / "communities.json").write_text(json.dumps([o for o in originals if o["id"] != "c10"]), encoding="utf-8")
   with pytest.raises(population_data.PopulationError, match="c10"):
     population_data.run(zone, work_dir)
+
+
+def test_inv04_tie_between_c2_and_c10_goes_to_c2(tmp_path):
+  # By text "c10" < "c2"; the lowest id is by number.
+  data = blank()
+  data[16, 16] = 10.0
+  lon, lat = center(16, 16)
+  zone, work_dir = setup(tmp_path, data, {"c10": (lon - RES, lat), "c2": (lon + RES, lat)}, reverse_originals=True)
+  population_data.run(zone, work_dir)
+  assert populations(zone) == {"c10": None, "c2": 10}
+
+
+def test_inv11_first_differing_id_is_ordered_by_number(tmp_path):
+  zone, work_dir = setup(tmp_path, np.ones((SIZE, SIZE), dtype="float32"), {"c1": center(5, 5), "c2": center(15, 15), "c10": center(25, 25)})
+  originals = json.loads((work_dir / "communities.json").read_text(encoding="utf-8"))
+  (work_dir / "communities.json").write_text(json.dumps([o for o in originals if o["id"] == "c1"]), encoding="utf-8")
+  with pytest.raises(population_data.PopulationError, match="differs: c2[)]"):
+    population_data.run(zone, work_dir)
+
+
+@pytest.mark.parametrize(("extra", "columns"), [(0.25, 16), (0.75, 17)])
+def test_inv07_pixel_is_read_when_its_center_is_inside_bbox(tmp_path, extra, columns):
+  # Pixel column 16 spans 0.125..0.1328; its center 0.1289 is inside only when east >= 0.1289.
+  zone, work_dir = setup(tmp_path, np.ones((SIZE, SIZE), dtype="float32"), {"c1": center(3, 3)})
+  zone = replace(zone, bbox=(0.0, 0.125, 0.125 + extra * RES, 0.25))
+  population_data.run(zone, work_dir)
+  assert report_of(work_dir)["raster_total"] == pytest.approx(16 * columns)
+
+
+def test_download_replaces_the_raster_only_with_a_file_that_opens(tmp_path):
+  source = tmp_path / "source.tif"
+  write_raster(source, np.ones((4, 4), dtype="float32"))
+  zone, _ = setup(tmp_path / "zone", None, {"c1": center(5, 5)})
+  raster = tmp_path / "target" / "raster.tif"
+  population_data.download(replace(zone, population_url=source.as_uri()), raster)
+  with rasterio.open(raster) as src:
+    assert src.count == 1
+  good = raster.read_bytes()
+  junk = tmp_path / "junk.tif"
+  junk.write_bytes(b"not a tiff")
+  with pytest.raises(population_data.PopulationError, match="junk.tif"):
+    population_data.download(replace(zone, population_url=junk.as_uri()), raster)
+  assert raster.read_bytes() == good
+  assert [f.name for f in raster.parent.iterdir()] == ["raster.tif"]
