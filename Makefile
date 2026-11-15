@@ -5,11 +5,13 @@ STORAGE  := projects/frontend/public/storage
 .PHONY: mock publish validate all osm worldpop imerg timecheck review-prepare review-summary
 
 mock:
+	test -d $(EXAMPLES)
 	rm -rf $(STORAGE)
 	mkdir -p $(STORAGE)
 	cp -r $(EXAMPLES)/. $(STORAGE)/
 
 publish:
+	test -d $(OUTPUT)
 	rm -rf $(STORAGE)
 	mkdir -p $(STORAGE)
 	cp -r $(OUTPUT)/. $(STORAGE)/

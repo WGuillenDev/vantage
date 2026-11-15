@@ -1,6 +1,7 @@
 import argparse
 import importlib
 import json
+import re
 import shutil
 from collections.abc import Callable
 from dataclasses import replace
@@ -13,6 +14,7 @@ from pipeline.validate import validate_dir
 PIPELINE_DIR = Path(__file__).resolve().parents[2]
 WORK_DIR = PIPELINE_DIR / "work"
 STAGE_NAMES = ("road-graph", "population-data", "closure-units", "impact-scoring", "rain-context")
+EXTRACT_DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 Stage = tuple[str, Callable[[Zone, Path], object]]
 
 
@@ -45,13 +47,23 @@ def _read(path: Path, hint: str) -> str:
 
 
 def _population_filled(staging: Path) -> bool:
-  graph = json.loads((staging / "graph.json").read_text(encoding="utf-8"))
-  return any(c.get("population") is not None for c in graph["communities"])
+  try:
+    graph = json.loads((staging / "graph.json").read_text(encoding="utf-8"))
+    return any(c.get("population") is not None for c in graph["communities"])
+  except (OSError, ValueError, KeyError, TypeError, AttributeError):
+    return False  # the validator reports an unreadable graph.json
 
 
 def build_meta(zone: Zone, work_dir: Path, population_filled: bool) -> dict:
-  source = json.loads(_read(work_dir / "imerg" / "source.json", f"run `make imerg AREA={zone.id}`"))
+  source_path = work_dir / "imerg" / "source.json"
+  try:
+    source = json.loads(_read(source_path, f"run `make imerg AREA={zone.id}`"))
+    product, version = source["product"], source["version"]
+  except (ValueError, KeyError, TypeError):
+    raise PipelineRunError(f"meta.json cannot be built: {source_path} must be a JSON object with product and version") from None
   extract_date = _read(work_dir / "osm" / "extract_date.txt", f"run `make osm AREA={zone.id}`")
+  if not EXTRACT_DATE.fullmatch(extract_date):
+    raise PipelineRunError(f"meta.json cannot be built: extract_date.txt must hold a YYYY-MM-DD date, got {extract_date!r}")
   attributions = [f"© OpenStreetMap contributors (ODbL), extract {extract_date}", "IMERG Late (NASA GPM)"]
   if population_filled:
     attributions.append("WorldPop (modelled population estimate)")
@@ -60,7 +72,7 @@ def build_meta(zone: Zone, work_dir: Path, population_filled: bool) -> dict:
     "generated_at": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
     "files": {"rain_csv_schema": "0.1"},
     "area": {"name": zone.name, "bbox": list(zone.bbox)},
-    "rain": {"product": source["product"], "version": source["version"], "start": zone.rain_start, "end": zone.rain_end, "aggregation": "area_mean"},
+    "rain": {"product": product, "version": version, "start": zone.rain_start, "end": zone.rain_end, "aggregation": "area_mean"},
     "speed_model_kmh": dict(zone.speed_model_kmh),
   }
   if zone.detection_limits is not None:
@@ -91,7 +103,13 @@ def run_zone(zone: Zone, work_dir: Path, stages: list[Stage] | None = None) -> P
   shutil.rmtree(old, ignore_errors=True)
   if final.exists():
     final.rename(old)
-  staging.rename(final)
+  try:
+    staging.rename(final)
+  except OSError as exc:
+    if old.exists():
+      old.rename(final)
+    shutil.rmtree(staging, ignore_errors=True)
+    raise PipelineRunError(f"cannot publish {final}, the previous output was kept: {exc}") from None
   shutil.rmtree(old, ignore_errors=True)
   return final
 
