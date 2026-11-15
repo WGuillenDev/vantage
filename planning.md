@@ -58,11 +58,21 @@ Dueños según `STATUS.md`. Cada paso termina con un criterio comprobable.
 
 | # | Paso | Dueño | Terminado cuando |
 |---|---|---|---|
-| A1 | Confirmar la lista de hospitales de referencia (Calderón Guardia, México, San Juan de Dios; decidir Tony Facio y Guápiles) y quitar `PENDING` del toml | I | La lista queda escrita con el criterio en una línea; ids verificados en OSM |
-| A2 | Si Ian tiene el extracto local, compartirlo o confirmar la fecha; si no, `make osm AREA=ruta-32` | I | Existen `work/ruta-32/osm/roads.osm`, `features.osm` y `extract_date.txt` |
+| A1 | Confirmar la lista de hospitales de referencia (Calderón Guardia, México, San Juan de Dios; decidir Tony Facio y Guápiles) y quitar `PENDING` del toml | I, R | La lista queda escrita con el criterio en una línea; ids verificados en OSM |
+| A2 | Si Ian tiene el extracto local, compartirlo o confirmar la fecha; si no, `make osm AREA=ruta-32` | I, R | Existen `work/ruta-32/osm/roads.osm`, `features.osm` y `extract_date.txt` |
 | A3 | Completar `speed_model_kmh` con todas las clases del extracto (el error de `road-graph` las lista) y una fuente por valor, incluida `unclassified` | I, R | La etapa `road-graph` ya no se detiene por velocidad faltante; las fuentes quedan citadas en el toml |
-| A4 | `make worldpop AREA=ruta-32` (archivo de 31,5 MB, no se commitea) | W | Existe `work/worldpop/cri_ppp_2020.tif` |
+| A4 | `make worldpop AREA=ruta-32` (archivo de 31,5 MB, no se commitea) | W, R | Existe `work/worldpop/cri_ppp_2020.tif` |
 | A5 | Poner `validated = false` hasta que P12 apruebe | R | El toml lo dice; la interfaz etiqueta la zona «no validada» |
+
+**Estado del bloque A (15 nov):**
+
+| # | Estado | Detalle |
+|---|---|---|
+| A1 | Pendiente de Ian | Los 5 ids existen en OSM como `amenity=hospital` (Calderón Guardia, México, San Juan de Dios, Tony Facio, Guápiles). La lista provisional sigue con los tres primeros; la decisión es de Ian |
+| A2 | Hecho | Extracto OSM del 2026-11-15 en `work/ruta-32/osm/` (`roads.osm` 14,8 MB). Overpass dio 502 dos veces; funcionó al reintentar. `road-graph` corre con el extracto real y descarta comunidades a más de 3 km de la red (visto: Peje, Bayeiñak, Playa Hermosa…) |
+| A3 | Hecho, con una reserva | `speed_model_kmh` completo con las medianas de `maxspeed` de OSM en el extracto: trunk 60; primary, secondary, tertiary y unclassified 40. Fuente anotada en el toml. `unclassified` se apoya en solo 22 vías etiquetadas; Ian debe confirmarla. Son límites publicados, no velocidades de viaje: los tiempos salen optimistas y D2 mide cuánto |
+| A4 | Hecho | `work/worldpop/cri_ppp_2020.tif`, 31,5 MB |
+| A5 | Hecho | `validated = false` en `ruta-32.toml`; ACC-01 de `area-config` y su prueba actualizados |
 
 ### Bloque B — Primera corrida real (P7)
 
@@ -71,8 +81,8 @@ Dueños según `STATUS.md`. Cada paso termina con un criterio comprobable.
 | B1 | `make all AREA=ruta-32` | R | Sale con 0 y genera `output/ruta-32/{meta,graph,scenarios}.json` y `rain.csv` más `output/areas.json` |
 | B2 | `make publish validate` | R | Ambos con 0; `meta.json` nombra «Ruta 32», sin «MOCK» |
 | B3 | **Leer los números antes de publicarlos** (ver «Revisión de sentido» abajo) | R, I | Anotado en `STATUS.md` si algo choca con S4′ |
-| B4 | Verificar ACC de `population-data`: ≥ 90 % de comunidades con valor y total dentro de ±5 % del ráster, o la diferencia explicada | W | E4 pasa a `[x]` o queda anotado por qué no |
-| B5 | Verificar E1: `rain.csv` cubre del 1 ene al 13 nov y `exposure.rain_mm_12d` aparece por tramo | I | E1 pasa a `[x]` |
+| B4 | Verificar ACC de `population-data`: ≥ 90 % de comunidades con valor y total dentro de ±5 % del ráster, o la diferencia explicada | W, R | E4 pasa a `[x]` o queda anotado por qué no |
+| B5 | Verificar E1: `rain.csv` cubre del 1 ene al 13 nov y `exposure.rain_mm_12d` aparece por tramo | I, R | E1 pasa a `[x]` |
 
 **Revisión de sentido (B3)**, comparar con lo que ya se midió en S4′ y en la corrida previa de Ian:
 - Nº de unidades de cierre: ¿pasan de 19 y vienen de cortar por uniones?
@@ -95,8 +105,8 @@ Meta: P8 antes del cierre del bloque de datos, no esperar a G2.
 
 | # | Paso | Dueño | Terminado cuando |
 |---|---|---|---|
-| D1 | **Añadir `main`, el script `rank-sensitivity` y `make sensitivity AREA=<id>`** (hoy falta) y correrlo | V | Existe `reports/ruta-32/sensitivity.json` con veredicto; las pruebas siguen pasando |
-| D2 | Escribir `reports/ruta-32/reference_times.json` (3–5 tiempos con fuente citada y fecha; nunca inventados) y correr `make timecheck AREA=ruta-32` | V | `time_crosscheck.json` con veredicto; si hay menos de 15 pares, queda `insufficient_pairs` y se dice |
+| D1 | **Añadir `main`, el script `rank-sensitivity` y `make sensitivity AREA=<id>`** (hoy falta) y correrlo | V, R | Existe `reports/ruta-32/sensitivity.json` con veredicto; las pruebas siguen pasando |
+| D2 | Escribir `reports/ruta-32/reference_times.json` (3–5 tiempos con fuente citada y fecha; nunca inventados) y correr `make timecheck AREA=ruta-32` | V, R | `time_crosscheck.json` con veredicto; si hay menos de 15 pares, queda `insufficient_pairs` y se dice |
 | D3 | `make review-prepare AREA=ruta-32`, **una persona que conozca la zona** clasifica las comunidades aisladas de las 3 unidades, luego `make review-summary` | R | `manual_review.json` con revisor, fecha y veredicto |
 | D4 | Si D3 pasa (≥ 80 % reales), `validated = true`; si no, queda `false` y se corrigen los artefactos y se vuelve a medir | R | El toml refleja el resultado de D3 |
 
@@ -106,8 +116,8 @@ Los tres veredictos se reportan tal cual. Un `fail` es un hallazgo con su númer
 
 | # | Paso | Dueño | Terminado cuando |
 |---|---|---|---|
-| E1 | F7: probar en un celular real (hoja inferior, tocar un tramo, simular un cierre) | W | F7 pasa a `[x]` o se anota qué falla |
-| E2 | Cerrar la marca de `rain-context` (las afirmaciones del spec siguen en `none`; las pruebas ya existen, `builder` cambia las etiquetas) | I | Spec en `[x]` |
+| E1 | F7: probar en un celular real (hoja inferior, tocar un tramo, simular un cierre) | W, R | F7 pasa a `[x]` o se anota qué falla |
+| E2 | Cerrar la marca de `rain-context` (las afirmaciones del spec siguen en `none`; las pruebas ya existen, `builder` cambia las etiquetas) | I, R | Spec en `[x]` |
 | E3 | Actualizar `STATUS.md`: filas, progreso, decisiones (qué quedó con qué veredicto) | R | Coincide con la realidad |
 | E4 | G2: lista de cortes anotada en el registro de decisiones | todos | Lista escrita |
 
@@ -142,4 +152,4 @@ No se corta nunca: A1–A3, B1–B3, C1–C3. Son el producto.
 
 ## 8. Convenciones de esta rama
 
-Una sola rama, `docs/close-phase-three`, parte de `main`. Contiene hoy el commit de `STATUS.md` y este plan. El trabajo de código que salga de aquí (D1, `deploy.yml`, el toml, `output/`) se hace en ramas propias de tipo `feat/`, `fix/` o `ci/` con nombres de 2–5 palabras en inglés; esta rama solo lleva documentación. Commits con Conventional Commits en inglés; empujar y fusionar es de las personas.
+Todo el trabajo de cierre de la fase 3 va en una sola rama, `docs/close-phase-three`, que sale de `main` (decisión de R, 15 nov). Lleva el plan, `STATUS.md`, la configuración de la zona, los datos de `output/`, los informes y el cambio de `deploy.yml`. R figura como co-dueño de todos los pasos pendientes y los ejecuta o los revisa con quien los haya hecho. Commits con Conventional Commits en inglés, uno por bloque de trabajo; empujar y fusionar es de las personas.
