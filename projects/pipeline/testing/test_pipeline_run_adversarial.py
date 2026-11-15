@@ -30,7 +30,7 @@ def test_adv_inv_02_failed_swap_restores_the_previous_output(tmp_path: Path, wor
 
 
 @pytest.mark.parametrize("content", ["{}", "not json", '{"product": "P"}'])
-def test_adv_inv_02_bad_imerg_source_is_a_pipeline_error(tmp_path: Path, work: Path, content: str):
+def test_adv_inv_15_bad_imerg_source_is_a_pipeline_error(tmp_path: Path, work: Path, content: str):
   (work / "imerg" / "source.json").write_text(content, encoding="utf-8")
   with pytest.raises(PipelineRunError):
     run_zone(make_zone(tmp_path), work, stages())
@@ -41,7 +41,7 @@ def test_adv_inv_02_stages_that_write_nothing_give_a_pipeline_error(tmp_path: Pa
     run_zone(make_zone(tmp_path), work, [(name, lambda z, w: None) for name, _ in stages()])
 
 
-def test_adv_inv_10_blank_extract_date_is_rejected(tmp_path: Path, work: Path):
+def test_adv_inv_15_blank_extract_date_is_rejected(tmp_path: Path, work: Path):
   (work / "osm" / "extract_date.txt").write_text("\n", encoding="utf-8")
   with pytest.raises(PipelineRunError):
     run_zone(make_zone(tmp_path), work, stages())
@@ -69,7 +69,7 @@ def test_adv_inv_02_main_exits_with_an_english_error_naming_the_stage(tmp_path: 
 
 
 @pytest.mark.skipif(shutil.which("make") is None, reason="make is not installed")
-def test_adv_inv_14_publish_from_a_missing_source_keeps_the_old_storage(tmp_path: Path):
+def test_adv_inv_19_publish_from_a_missing_source_keeps_the_old_storage(tmp_path: Path):
   storage = tmp_path / "storage"
   storage.mkdir()
   (storage / "areas.json").write_text("{}", encoding="utf-8")
@@ -143,7 +143,47 @@ def test_adv2_inv_13_areas_json_is_byte_identical_between_runs(tmp_path: Path, w
   assert "Zona José".encode("utf-8") in first
 
 
-def test_adv2_inv_13_written_json_uses_unix_line_endings(tmp_path: Path, work: Path):
+def test_adv2_inv_18_written_json_uses_unix_line_endings(tmp_path: Path, work: Path):
   zone = make_zone(tmp_path)
   run_zone(zone, work, stages())
   assert b"\r" not in (zone.output_dir / "meta.json").read_bytes()
+
+
+def test_inv_15_missing_files_are_named_in_the_error(tmp_path: Path, work: Path):
+  zone = make_zone(tmp_path)
+  run_zone(zone, work, stages())
+  before = snapshot(zone.output_dir)
+  (work / "osm" / "extract_date.txt").unlink()
+  with pytest.raises(PipelineRunError, match="extract_date.txt"):
+    run_zone(zone, work, stages())
+  (work / "imerg" / "source.json").unlink()
+  (work / "osm" / "extract_date.txt").write_text("2026-11-14\n", encoding="utf-8")
+  with pytest.raises(PipelineRunError, match="source.json"):
+    run_zone(zone, work, stages())
+  assert snapshot(zone.output_dir) == before
+
+
+def test_inv_16_old_output_is_restored_after_an_interrupted_publication(tmp_path: Path, work: Path):
+  zone = make_zone(tmp_path)
+  run_zone(zone, work, stages())
+  before = snapshot(zone.output_dir)
+  old, stale = zone.output_dir.with_name(".zone-a.old"), zone.output_dir.with_name(".zone-a.new")
+  zone.output_dir.rename(old)
+  stale.mkdir()
+  (stale / "leftover.json").write_text("{}", encoding="utf-8")
+  broken = stages()
+  broken[0] = ("road-graph", lambda z, w: 1 / 0)
+  with pytest.raises(PipelineRunError):
+    run_zone(zone, work, broken)
+  assert snapshot(zone.output_dir) == before
+  assert not old.exists() and not stale.exists()
+
+
+def test_inv_17_unknown_output_folder_is_named_and_areas_is_not_rewritten(tmp_path: Path):
+  configs, output = tmp_path / "configs", tmp_path / "output"
+  configs.mkdir()
+  (output / "stray-folder").mkdir(parents=True)
+  (output / "areas.json").write_text("previous", encoding="utf-8")
+  with pytest.raises(PipelineRunError, match="stray-folder"):
+    write_areas(output, configs)
+  assert (output / "areas.json").read_text(encoding="utf-8") == "previous"

@@ -86,6 +86,8 @@ def run_zone(zone: Zone, work_dir: Path, stages: list[Stage] | None = None) -> P
   stages = default_stages() if stages is None else stages
   final = zone.output_dir
   staging, old = final.with_name(f".{final.name}.new"), final.with_name(f".{final.name}.old")
+  if old.exists() and not final.exists():
+    old.rename(final)  # an earlier run stopped between the two moves of its publication
   shutil.rmtree(staging, ignore_errors=True)
   staging.mkdir(parents=True)
   try:
@@ -118,7 +120,13 @@ def run_zone(zone: Zone, work_dir: Path, stages: list[Stage] | None = None) -> P
 
 def write_areas(output_root: Path, configs_dir: Path = CONFIGS_DIR) -> Path:
   """Lists every zone folder of `output_root`, by id, with its config's name, bbox and validated flag."""
-  zones = [load_zone(p.name, configs_dir) for p in sorted(output_root.iterdir()) if p.is_dir() and not p.name.startswith(".")]
+  zones = []
+  for folder in sorted(output_root.iterdir()):
+    if folder.is_dir() and not folder.name.startswith("."):
+      try:
+        zones.append(load_zone(folder.name, configs_dir))
+      except ConfigError as exc:
+        raise PipelineRunError(f"output folder {folder.name!r} is not a zone with a config: {exc}") from None
   areas = [{"id": z.id, "name": z.name, "bbox": list(z.bbox), "validated": z.validated} for z in zones]
   path = output_root / "areas.json"
   tmp = output_root / ".areas.json.new"
