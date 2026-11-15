@@ -309,4 +309,4 @@ Pending and not decided here: a finer closure unit than the 33–61 km units of 
 | `scenarios.json` | Removed `exposure.soil_moisture_pctl` and `exposure.radar_evidence`. | Dead since D7. |
 | `validate.py` | `validate_storage` validates `areas.json` and every listed zone; `main` takes the `storage/` folder; non-UTF-8 files are errors, not crashes. | Validator must match the schemas. |
 
-Not decided here: a suspect reason, a check that `storage/` has no unlisted folders, and that `areas.json` bbox matches `meta.area.bbox`.
+Decided: a folder in `storage/` that `areas.json` does not list is ignored; `areas.json` bbox is not checked against `meta.area.bbox`; no suspect reason until `trust-signals` needs one.

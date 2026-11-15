@@ -65,15 +65,17 @@ Validator behavior: every error names the file, the field and the rule, in Engli
 
 ## Deferred / Open questions
 
-Testing gaps (tagged `none`; `builder` turns each into `test: <command>` as it writes the tests): INV-01, INV-02, INV-03, INV-05, INV-10, INV-12, ACC-03, ACC-04.
+Testing gaps: none; every claim has a `test:` tag.
 
 - **Shape proposals not yet confirmed:** the names `length_m` and `suspect_isolated_community_ids`. Decide at review of this spec. (Purged 14 Nov: `granularity`, `area.id`, `area.referral_hospitals` and `radar_evidence` were dropped as redundant; the UI reads the hospital names from `graph.json` and shows the length itself.)
-- **Suspect reason:** this version only says an isolation is suspect, not why (adjusted to the closed unit or `oneway`). Add a reason if `trust-signals` needs to show it.
+- **Suspect reason (decided 14 Nov):** this version only says an isolation is suspect, not why (adjusted to the closed unit or `oneway`). A reason is added only if `trust-signals` needs to show it.
+- **Unlisted folders and bbox (decided 14 Nov):** a folder in `storage/` that `areas.json` does not list is ignored, so only listed zones are published (pinned by a test). `areas.json → bbox` is not cross-checked against `meta.area.bbox`: both are written from the same zone config.
+- **Duplicate ids (decided 14 Nov):** `affected_community_ids`, `isolated_community_ids` and `suspect_isolated_community_ids` must hold unique ids.
 - **Referral list assumption (D8, contracts §13):** that `graph.json → hospitals` holds only the referral hospitals is still unconfirmed with Ian.
 - **Multi-zone layout (decided 14 Nov, user):** one folder per zone plus `areas.json`; the zone picker and the second zone are cuttable at G2 (`zone-picker` in `STATUS.md`), but the layout is not. Which second zone, if any, is not chosen and is never invented.
 - **Mock layout and `make` targets:** `make mock` and `make validate` must move to the per-zone layout; that wiring is `pipeline-run`, and the mock files move here. Until both land, ACC-01 and ACC-02 describe the target layout.
 - **Docs out of sync:** `context/contracts.md` §0 still says "not committed yet" and `CLAUDE.md` says the pipeline and `Makefile` do not exist. A person edits both.
-- **Frontend breakage on 0.3:** `App.tsx` reads `meta.overlays` without a guard and will fail where it is absent; it belongs to `map-corridor`.
+- **Frontend on 0.3 (done 14 Nov):** `App.tsx` and `graph.ts` read the first zone of `areas.json` and `App.tsx` guards the optional overlay; the zone picker and the full map stay with `zone-picker` and `map-corridor`.
 
 ## Acceptance criteria
 
