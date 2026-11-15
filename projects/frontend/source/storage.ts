@@ -82,6 +82,8 @@ async function readJson<T>(url: string, file: string): Promise<T> {
   return data as T
 }
 
+export const rainUrl = (zoneId: string): string => `${STORAGE}${zoneId}/rain.csv`
+
 export async function loadAreas(): Promise<Area[]> {
   return (await readJson<{ areas: Area[] }>(`${STORAGE}areas.json`, 'areas.json')).areas
 }

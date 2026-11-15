@@ -7,6 +7,7 @@ export interface TrustMeta {
   speed_model_kmh: Record<string, number>
   detection_limits?: { note?: string }
   attributions: string[]
+  rain?: { end: string }
 }
 
 export const attributionLines = (meta: Pick<TrustMeta, 'attributions'>): string[] => meta.attributions
