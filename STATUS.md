@@ -96,7 +96,7 @@ Un delta por rebanada, en `projects/<proyecto>/deltas/<delta>.spec.md`. Nombres 
 | 13 | `road-graph` | pipeline | M | I | P3 | area-config | sí | [x] |
 | 14 | `impact-scoring` | pipeline | M | I | P5, E5 | closure-units, population-data | sí | [x] |
 | 15 | `pipeline-run` | pipeline | M | R | P7, P8 | todos los del pipeline | sí | [x] |
-| 16 | `population-data` | pipeline | M | W | E4 | road-graph | sí | [~] |
+| 16 | `population-data` | pipeline | M | W | E4 | road-graph | sí | [x] |
 | 17 | `rain-context` | pipeline | M | I | E1 | area-config | no | [~] |
 | 18 | `closure-units` | pipeline | L | I | P9 | road-graph | sí | [~] |
 
@@ -122,7 +122,7 @@ Un delta por rebanada, en `projects/<proyecto>/deltas/<delta>.spec.md`. Nombres 
 | ID | Tarea | Dueño | Estado | Terminada cuando |
 |---|---|---|---|---|
 | P3 | Grafo vial de OSM para el área configurada: tramos, hospitales, comunidades → `graph.json` (spec: `projects/pipeline/deltas/road-graph.spec.md`) | I | [ ] | Valida; los ids se cruzan. Existe en `origin/feat/road-graph`; falta que ajuste comunidades y hospitales a la mayor componente fuertemente conexa y que la lista de hospitales sea el conjunto de referencia de la zona, como parámetro (D8) |
-| E4 | Población WorldPop sobre las comunidades (para que la criticidad deje de dar 0) | W | [ ] | `population` poblada donde hay dato |
+| E4 | Población WorldPop sobre las comunidades (para que la criticidad deje de dar 0) | W | [ ] | `population` poblada donde hay dato. Código y pruebas listos en `feat/population-data`; falta la corrida real con el ráster de la Ruta 32 (ACC-01: ≥ 90 % de comunidades con valor; ACC-02: total asignado dentro de ±5 % del ráster o con la diferencia explicada) |
 | E5 | Decidir la métrica de impacto (hospital de referencia vs. más cercano; con el más cercano el parque da 0 comunidades afectadas) y revisar a mano la 1 aislada hasta Limón | R | [ ] | Una sola cifra por tramo y la decisión anotada abajo — **recomendación S4′: R2, con límites; decisión pendiente**. Métrica decidida en D8; queda la revisión manual de un caso y la lista de hospitales con Ian |
 | P5 | Impacto: quitar un tramo a la vez → tiempo extra, población, aisladas, ranking → `scenarios.json` (clave `candidates`, `source: "network_consequence"`; spec: `projects/pipeline/deltas/impact-scoring.spec.md`) | I | [ ] | Valida; un caso revisado a mano; sin aislamientos falsos (comunidades ajustadas a la vía cortada, `oneway`). Existe en `origin/feat/impact-scoring`; falta que cierre **ambas calzadas** por tramo y que use el hospital de referencia (D8). Unidad de cierre más fina que 33–61 km: pendiente |
 | E1 | IMERG: `rain.csv` y lluvia acumulada por tramo (`exposure.rain_mm_12d`) | I | [ ] | Valida; las fechas cubren el periodo. Lectura ya probada en S5; no afirmar relación con los cierres |
