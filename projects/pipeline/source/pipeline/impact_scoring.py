@@ -74,7 +74,8 @@ def _joined_ignoring_direction(graph: dict, closed: set[str], start: str) -> boo
 
 def _closed_edges(given: dict, edges: dict[str, dict]) -> set[str]:
   for edge_id in given["edge_ids"]:
-    if edge_id not in edges:
+    # A non-text id (a list, for one) would raise TypeError on the lookup, so it is checked first.
+    if not isinstance(edge_id, str) or edge_id not in edges:
       raise ImpactScoringError(f"unit {given['id']} lists edge {edge_id}, which is not in the graph")
   return set(given["edge_ids"])
 
