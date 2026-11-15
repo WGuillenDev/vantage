@@ -1,7 +1,7 @@
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEffect, useRef, useState } from 'react'
-import { colorForCriticality, fitBounds, GRAY, legendRange, pointFeatures, unitFeatures } from './mapCorridor.ts'
+import { colorForCriticality, fitBounds, GRAY, legendRange, pointFeatures, rankingUnknown, unitFeatures } from './mapCorridor.ts'
 import { useAppStore } from './store.ts'
 import type { ZoneData } from './zoneData.ts'
 
@@ -23,6 +23,9 @@ function Legend({ data }: { data: ZoneData }) {
         <span>{format(min)}</span>
         <span>{format(max)}</span>
       </p>
+      {rankingUnknown(data.units) && (
+        <p className="mt-1 w-40">El color no ordena los tramos: se desconoce la población.</p>
+      )}
       <p className="mt-1 flex items-center gap-1">
         <span aria-hidden="true" className="inline-block h-1 w-4 rounded" style={{ background: GRAY }} />
         sin impacto

@@ -10,6 +10,7 @@ import {
   GRAY,
   legendRange,
   pointFeatures,
+  rankingUnknown,
   unitFeatures,
   type CorridorGraph,
 } from './mapCorridor.ts'
@@ -92,10 +93,36 @@ describe('map-corridor: pure rules', () => {
     expect(colorForCriticality(0, { min: 0, max: 0 })).toMatch(/^#[0-9a-f]{6}$/)
   })
 
-  test('INV-07 the legend range is the lowest and highest criticality of the zone', () => {
+  test('INV-07 the legend range is the lowest and highest criticality among units with an affected community', () => {
     const units = [unit('T-01', 3, ['c1']), unit('T-02', 8, ['c1']), unit('T-03', 0, [])]
-    expect(legendRange(units)).toEqual({ min: 0, max: 8 })
+    expect(legendRange(units)).toEqual({ min: 3, max: 8 })
+    expect(legendRange([unit('T-03', 5, [])])).toEqual({ min: 0, max: 0 })
     expect(legendRange([])).toEqual({ min: 0, max: 0 })
+  })
+
+  test('INV-07 the colors use the legend range: the lowest affected unit is the ramp start, the highest its end', () => {
+    const units = [unit('T-01', 3, ['c1']), unit('T-02', 8, ['c1']), unit('T-03', 0, [])]
+    const g: CorridorGraph = {
+      ...graph,
+      edges: ['T-01', 'T-02', 'T-03'].map((id) => ({
+        id: `e-${id}`, from: 'n1', to: 'n2', time_s: 1, candidate_id: id, geometry: [[-83.9, 10.1], [-83.8, 10.2]],
+      })),
+    }
+    const color = (id: string) => unitFeatures(g, units).features.find((f) => f.properties.id === id)!.properties.color
+    expect(color('T-01')).toBe('#fde725')
+    expect(color('T-02')).toBe('#440154')
+    expect(color('T-03')).toBe(GRAY)
+  })
+
+  test('INV-16 the ranking is unknown when every unit with an affected community has criticality 0', () => {
+    expect(rankingUnknown([unit('T-01', 0, ['c1']), unit('T-02', 0, ['c2']), unit('T-03', 0, [])])).toBe(true)
+    expect(rankingUnknown([unit('T-01', 0, ['c1']), unit('T-02', 2, ['c2'])])).toBe(false)
+    expect(rankingUnknown([unit('T-03', 0, [])])).toBe(false)
+    expect(rankingUnknown([])).toBe(false)
+  })
+
+  test('INV-16 a unit with an unknown criticality is not mistaken for 0', () => {
+    expect(rankingUnknown([unit('T-01', Number.NaN, ['c1'])])).toBe(false)
   })
 
   test('INV-08 hospitals and communities are exactly those of graph.json, at their nodes', () => {

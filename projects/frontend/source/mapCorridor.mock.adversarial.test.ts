@@ -29,9 +29,9 @@ describe.each(['mock-validated', 'mock-unvalidated'])('map-corridor adversarial:
     expect(points.communities.features).toHaveLength(graph.communities.length)
   })
 
-  test('INV-07 the legend range covers every unit criticality', () => {
+  test('INV-07 the legend range covers every criticality of the units with an affected community', () => {
     const { min, max } = legendRange(units)
-    for (const unit of units) {
+    for (const unit of units.filter((u) => u.affected_community_ids.length > 0)) {
       expect(unit.criticality).toBeGreaterThanOrEqual(min)
       expect(unit.criticality).toBeLessThanOrEqual(max)
     }

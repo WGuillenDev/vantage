@@ -60,10 +60,19 @@ export function colorForCriticality(value: number, range: { min: number; max: nu
   return toHex(from.map((channel, i) => channel + (to[i]! - channel) * (scaled - index)))
 }
 
+const withCommunity = (units: RankedUnit[]): RankedUnit[] => units.filter((unit) => unit.affected_community_ids.length > 0)
+
+// The scale spans only the units that are colored by it (INV-07).
 export function legendRange(units: RankedUnit[]): { min: number; max: number } {
-  if (units.length === 0) return { min: 0, max: 0 }
-  const values = units.map((unit) => unit.criticality)
+  const values = withCommunity(units).map((unit) => unit.criticality)
+  if (values.length === 0) return { min: 0, max: 0 }
   return { min: Math.min(...values), max: Math.max(...values) }
+}
+
+// INV-16: with no population every criticality is 0, so the color says nothing about the order.
+export function rankingUnknown(units: RankedUnit[]): boolean {
+  const affected = withCommunity(units)
+  return affected.length > 0 && affected.every((unit) => unit.criticality === 0)
 }
 
 export function unitFeatures(graph: CorridorGraph, units: RankedUnit[]): Collection<UnitFeature> {
