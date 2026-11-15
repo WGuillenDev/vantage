@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Hand-made fixture for road-graph tests: two ways join the same pair of end nodes. Synthetic, not real data. -->
+<osm version="0.6" generator="hand-made fixture">
+  <node id="1" lat="0.0000" lon="10.0000"/>
+  <node id="2" lat="0.0000" lon="10.0060"/>
+  <node id="3" lat="0.0010" lon="10.0030"/>
+  <node id="4" lat="-0.0010" lon="10.0030"/>
+  <node id="5" lat="0.0000" lon="9.9980"/>
+  <node id="6" lat="0.0000" lon="10.0080"/>
+  <!-- stubs keep nodes 1 and 2 as junctions, so the pair is not dropped as an isolated ring -->
+  <way id="703">
+    <nd ref="5"/><nd ref="1"/>
+    <tag k="highway" v="trunk"/><tag k="name" v="Fixture Stub West"/><tag k="maxspeed" v="60"/>
+  </way>
+  <way id="704">
+    <nd ref="2"/><nd ref="6"/>
+    <tag k="highway" v="trunk"/><tag k="name" v="Fixture Stub East"/><tag k="maxspeed" v="60"/>
+  </way>
+  <!-- the larger way id comes first in the file, so file order alone would number it first -->
+  <way id="702">
+    <nd ref="1"/><nd ref="4"/><nd ref="2"/>
+    <tag k="highway" v="trunk"/><tag k="name" v="Fixture Larger Way Id"/><tag k="maxspeed" v="60"/>
+  </way>
+  <way id="701">
+    <nd ref="1"/><nd ref="3"/><nd ref="2"/>
+    <tag k="highway" v="trunk"/><tag k="name" v="Fixture Smaller Way Id"/><tag k="maxspeed" v="60"/>
+  </way>
+</osm>
