@@ -1,21 +1,21 @@
 import maplibregl from 'maplibre-gl'
 import { useEffect, useRef, useState } from 'react'
-
-const STORAGE = `${import.meta.env.BASE_URL}storage/`
+import { loadDefaultZone } from './storage.ts'
 
 type Bounds = [number, number, number, number] // west, south, east, north
 
 interface Meta {
   area: { name: string; bbox: Bounds }
-  overlays: { id: string; file: string; bounds: Bounds }[]
+  overlays?: { id: string; file: string; bounds: Bounds }[]
 }
 
-async function loadMeta(): Promise<Meta> {
-  const response = await fetch(`${STORAGE}meta.json`)
+async function loadMeta(): Promise<{ meta: Meta; base: string }> {
+  const { base } = await loadDefaultZone()
+  const response = await fetch(`${base}meta.json`)
   if (!response.ok) {
     throw new Error(`Could not load meta.json (${response.status}); run "make mock"`)
   }
-  return (await response.json()) as Meta
+  return { meta: (await response.json()) as Meta, base }
 }
 
 function App() {
@@ -28,13 +28,11 @@ function App() {
     let cancelled = false
 
     loadMeta()
-      .then((meta) => {
+      .then(({ meta, base }) => {
         const element = container.current
         if (cancelled || !element) return
-        const overlay = meta.overlays.find((item) => item.id === 'change')
-        if (!overlay) throw new Error('meta.json has no "change" overlay')
+        const overlay = meta.overlays?.find((item) => item.id === 'change')
         setAreaName(meta.area.name)
-        const [west, south, east, north] = overlay.bounds
 
         map = new maplibregl.Map({
           container: element,
@@ -54,9 +52,11 @@ function App() {
           },
         })
         map.on('load', () => {
+          if (!overlay) return // the radar change layer is optional since 0.2
+          const [west, south, east, north] = overlay.bounds
           map?.addSource('change', {
             type: 'image',
-            url: `${STORAGE}${overlay.file}`,
+            url: `${base}${overlay.file}`,
             coordinates: [
               [west, north],
               [east, north],

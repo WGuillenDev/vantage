@@ -14,10 +14,8 @@ export interface CommunityAccess {
 type Arc = { to: string; time_s: number }
 type HeapItem = [time_s: number, node: string]
 
-const STORAGE = `${import.meta.env.BASE_URL}storage/`
-
-export async function loadGraph(): Promise<GraphData> {
-  const response = await fetch(`${STORAGE}graph.json`)
+export async function loadGraph(zoneBase: string): Promise<GraphData> {
+  const response = await fetch(`${zoneBase}graph.json`)
   if (!response.ok) {
     throw new Error(`Could not load graph.json (${response.status}); run "make mock"`)
   }

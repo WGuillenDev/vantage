@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { readFileSync } from 'node:fs'
 import { computeAccess, type CommunityAccess, type GraphData } from './graph.ts'
 
-const examples = new URL('../../contract/examples/', import.meta.url)
+const examples = new URL('../../contract/examples/mock-validated/', import.meta.url)
 const read = <T>(name: string): T => JSON.parse(readFileSync(new URL(name, examples), 'utf-8')) as T
 
 interface Scenarios {
