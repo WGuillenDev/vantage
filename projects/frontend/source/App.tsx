@@ -10,7 +10,8 @@ import { ZonePicker } from './ZonePicker.tsx'
 
 function App() {
   const zoneData = useZoneData()
-  const status = zoneData === null ? 'Cargando…' : typeof zoneData === 'string' ? zoneData : zoneData.zone.name
+  // The zone name is shown by the picker, so the status only says loading or the error.
+  const status = zoneData === null ? 'Cargando…' : typeof zoneData === 'string' ? zoneData : null
 
   return (
     <Layout
@@ -24,7 +25,7 @@ function App() {
       overlay={
         <div className="absolute left-2 right-2 top-2 flex flex-wrap items-center gap-x-3 rounded bg-white/90 px-2 py-1 text-sm md:right-auto">
           <ZonePicker />
-          <p role={typeof zoneData === 'string' ? 'alert' : undefined}>{status}</p>
+          {status !== null && <p role={typeof zoneData === 'string' ? 'alert' : undefined}>{status}</p>}
         </div>
       }
     />
