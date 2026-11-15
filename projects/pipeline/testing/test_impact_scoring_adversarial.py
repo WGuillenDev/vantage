@@ -113,6 +113,10 @@ def test_unit_with_a_null_edge_id_stops_cleanly(tmp_path):
   stops_cleanly(tmp_path, [{"id": "T-01", "edge_ids": [None], "length_m": 1000}], "T-01")
 
 
+def test_unit_with_a_nested_list_as_edge_id_stops_cleanly(tmp_path):
+  stops_cleanly(tmp_path, [{"id": "T-01", "edge_ids": [["e1"]], "length_m": 1000}], "T-01")
+
+
 @pytest.mark.parametrize("length", [0, -5, "1000", None])
 def test_unit_with_an_invalid_length_stops_cleanly(tmp_path, length):
   stops_cleanly(tmp_path, [{"id": "T-01", "edge_ids": ["e2"], "length_m": length}])
