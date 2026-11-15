@@ -46,8 +46,9 @@ def round_half_up(x: float) -> int:
 def _first(value) -> str | None:
   """First value of a multi-valued OSM tag (a list from merged ways, or `a;b`)."""
   if isinstance(value, list):
-    # osmnx merges ways through a set, so the list order changes between runs: sort it
-    value = min((item for item in value if isinstance(item, str)), default=None)
+    # osmnx merges ways through a set, so the list order changes between runs: pick by a fixed rule (shortest first, so
+    # "32" beats "100" for a route number)
+    value = min((item for item in value if isinstance(item, str)), key=lambda item: (len(item), item), default=None)
   if not isinstance(value, str):
     return None
   return value.split(";")[0].strip() or None
@@ -57,6 +58,8 @@ def _road_class(data: dict) -> str:
   # a merged way can carry several classes in no fixed order: keep the highest of ROAD_CLASSES
   value = data["highway"]
   classes = [first.removesuffix("_link") for first in map(_first, value if isinstance(value, list) else [value]) if first]
+  if not classes:
+    raise RoadGraphError("A road of the extract has no usable highway class")
   return min(classes, key=lambda c: (ROAD_CLASSES.index(c) if c in ROAD_CLASSES else len(ROAD_CLASSES), c))
 
 
