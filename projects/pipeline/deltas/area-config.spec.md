@@ -72,41 +72,52 @@ Values above only show the shape. Real values are not final (see Deferred).
 | Zone id | The file name without `.toml`: lowercase letters, digits and single hyphens. |
 | `bbox` | Four numbers `[w, s, e, n]` with `w < e`, `s < n`, longitude in [-180, 180] and latitude in [-90, 90]. |
 | Dates | `YYYY-MM-DD`, with `start` not after `end`. |
-| Speeds | Each greater than 0. |
-| Optional table | `detection_limits` (`min_detectable_area_ha` and `min_delta_db` above 0, non-empty `note`); when absent the zone makes no radar claim. |
+| Speeds | Each a finite number greater than 0; each road class name non-empty. |
+| Optional table | `detection_limits` (`min_detectable_area_ha` and `min_delta_db` finite and above 0, non-empty `note`); when absent the zone makes no radar claim. |
 | Unknown keys | Rejected. |
+| Repeated values | `hospitals.referral`, `closure.roads` and the `name` of each `closure.alternates` entry have no repeats. |
+| File | UTF-8 TOML, with or without a byte-order mark. The loader only finds files whose name is a valid zone id, with exactly that spelling. |
 | Errors | In English; they name the config file and the key. A failed load stops the run before any output is written. |
 
 ## Invariants
 
-- INV-01 [none]
+- INV-01 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_area_config.py]
   When a valid config is loaded, the zone it yields has the file's id (its name without `.toml`) and the same `name`, `validated`, `bbox`, referral hospital ids, speed model, raster path and rain period as the file.
-- INV-02 [none]
+- INV-02 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_area_config.py]
   If a required key is missing or empty, then the loader exits non-zero with an English error naming the file and the key, and writes no output.
-- INV-03 [none]
+- INV-03 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_area_config.py]
   If a config contains a key the format does not define, then the loader exits non-zero with an English error naming the key.
-- INV-04 [none]
-  If a value is invalid (a zone id that is not lowercase words joined by hyphens, a `bbox` that is not four numbers with `w < e`, `s < n`, valid longitudes and latitudes, a date that is not `YYYY-MM-DD` or a `start` after `end`, or a speed not above 0), then the loader exits non-zero with an English error naming the key.
-- INV-07 [none]
-  If `--area` names an id with no file in `configs/`, then the loader exits non-zero with an English error that lists the available ids.
-- INV-10 [none]
+- INV-04 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_area_config.py]
+  If a value is invalid (a zone id that is not lowercase words joined by hyphens, a `bbox` that is not four numbers with `w < e`, `s < n`, valid longitudes and latitudes, a date that is not `YYYY-MM-DD` or a `start` after `end`, or a speed that is not a finite number above 0, or an empty road class name), then the loader exits non-zero with an English error naming the key.
+- INV-07 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_area_config.py]
+  If `--area` names an id with no file in `configs/` (a file whose name differs only by case does not count), then the loader exits non-zero with an English error that lists the available ids. Only files that can be loaded are listed: a name that is not a valid zone id, or a folder named `*.toml`, is not.
+- INV-10 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_area_config.py]
   When a zone is loaded, its output folder is `output/<id>/`.
+
+- INV-11 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_area_config.py]
+  If `hospitals.referral`, `closure.roads` or the `name` of the `closure.alternates` entries contain the same value twice, then the loader exits non-zero with an English error naming the key.
+- INV-12 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_area_config.py]
+  When a config file starts with a UTF-8 byte-order mark or uses CRLF line endings, then the loader reads it as it would the same file without them.
+- INV-13 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_area_config.py]
+  If the config file cannot be read or is not valid UTF-8 TOML, then the loader exits non-zero with an English error naming the file, and never raises an unhandled exception.
 
 ## Deferred / Open questions
 
-Testing gaps (all claims are tagged `none`; `builder` turns each into `test: <command>` against `projects/pipeline/testing/test_area_config.py`): INV-01, INV-02, INV-03, INV-04, INV-07, INV-10, ACC-01, ACC-02.
+Testing gaps: none. All claims run `projects/pipeline/testing/test_area_config.py`; `test_area_config_adversarial.py` adds boundary cases found by `breaker`.
 
-- **Referral hospital ids (Ian):** the list for Ruta 32 (Calderón Guardia, México, San Juan de Dios) is not confirmed, and only Calderón Guardia has an id seen in spike S4 (`way/1168011056`). `ruta-32.toml` cannot be completed until Ian confirms; the loader stops on an empty list by INV-02.
+- **Referral hospital ids (Ian):** the list for Ruta 32 (Calderón Guardia, México, San Juan de Dios) is not confirmed, and only Calderón Guardia has an id seen in spike S4 (`way/1168011056`). `ruta-32.toml` carries the three ids looked up in OSM on 2026-11-15 (México `way/25400008`, San Juan de Dios `way/24857117`) as a provisional list until Ian confirms; Tony Facio (`way/1451665976`) and Guápiles (`way/326924912`) are not included. The loader stops on an empty list by INV-02.
 - **`unclassified` speed (Ian):** needs a value with a cited source before the real run (the 14 Nov extract has too few tagged edges for a median).
 - **Population raster delivery (decided in `population-data`):** `population.raster` is the local path and `population.url` is where `make worldpop` fetches it from (S7: a 31.5 MB HTTPS file). The raster is never committed.
 - **Second zone:** which zone, if any, joins Ruta 32 is not chosen, and its hospitals, speeds and raster are not prepared. A zone with `validated: false` is allowed by this contract; the label it gets in the UI is `zone-picker`.
 - **Referral criterion outside Costa Rica:** the idea of a "referral hospital" may not carry over to another country; not tested (`approach.md`).
+- **`validated` for Ruta 32:** ACC-01 sets `validated: true`, but no result has been checked by hand yet. Revisit before the real run so the label does not overclaim.
 - **Rain end date:** `ruta-32.toml` pins `rain.end` for reproducibility, so it must be advanced by hand before a new run; a "latest available" option is not specified.
 - **Docs out of sync:** `context/structure.md` §4 shows an `[area]` table with `bbox` and `referral_hospitals`; this spec's flat layout supersedes it. A person updates the doc.
+- **Road class names:** the loader only requires a non-empty name; it does not check the name is an OSM `highway` class. A typo surfaces in `road-graph`, which uses the speeds.
 
 ## Acceptance criteria
 
-- ACC-01 [none]
+- ACC-01 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_area_config.py]
   Given `configs/ruta-32.toml`, when the loader runs with `--area ruta-32`, then it yields a zone with id `ruta-32`, `validated: true` and its output folder `output/ruta-32/`.
-- ACC-02 [none]
+- ACC-02 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_area_config.py]
   Given a copy of `ruta-32.toml` saved as `other-zone.toml` with a different `name` and `bbox`, when the loader runs with `--area other-zone`, then the zone carries the new values and no source file was changed.
