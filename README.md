@@ -26,7 +26,7 @@ Proyecto del hackathon (14–15 de noviembre de 2026). El pipeline y la aplicaci
 | Red y zona | Extracto OSM del 15 nov 2026; 7 136 nodos, 8 715 aristas, 758 comunidades (WorldPop 2020, estimada; 2 899 678 hab. frente a 2 957 560 del ráster, −2 %) |
 | Hospitales de referencia | Calderón Guardia, México y San Juan de Dios (San José). **El orden de los tramos depende de este conjunto:** con Tony Facio y Guápiles añadidos, el top 20 no coincide en ninguno (`planning.md`, D5) |
 | Unidades de cierre | 115, cortadas en cada unión de la red, con las dos calzadas; 100 con impacto. Los cinco primeros son tramos de un mismo cuello de botella (~311 comunidades afectadas) |
-| Estabilidad del ranking | Top 5 y top 10 iguales al variar ×0,8 y ×1,2 todas las velocidades y al quitar cada hospital (`pass`). El factor de velocidad es uniforme, así que casi no puede cambiar el orden |
+| Estabilidad del ranking | Top 5 y top 10 iguales al variar ×0,8 y ×1,2 todas las velocidades y al quitar cada hospital (`pass`), y top 20 igual con distancias máximas de ajuste de 1 500 y 5 000 m. El factor de velocidad es uniforme, así que casi no puede cambiar el orden |
 | Tiempos | 20 pares contra el router público OSRM: error relativo mediano 15,3 % (umbral 25 %, `pass`), el modelo es 15 % más rápido. Las velocidades son los límites publicados de OSM por clase de vía, no velocidades de viaje; 4 tiempos de referencia citados (errores de 10 % a 34 %) |
 | Revisión manual | 4 comunidades aisladas de 3 unidades: **0 reales**, las 4 son artefactos de enganche (veredicto `fail`, se exigía ≥ 80 %). 208 de 965 aislamientos (21,6 %) están marcados como sospechosos; excluirlos o reenganchar las comunidades deja el top 10 igual |
 | Lluvia | IMERG Late diario, 317 días (1 ene–13 nov 2026), acumulado de 12 días por tramo, como contexto |
@@ -138,6 +138,7 @@ Informes de confiabilidad, cada uno escribe en `projects/pipeline/reports/<zona>
 | `make sensitivity AREA=ruta-32` | Cuánto cambia el ranking al variar las velocidades y quitar cada hospital |
 | `make timecheck AREA=ruta-32` | Tiempos del modelo contra el router OSRM público y contra referencias citadas (`reference_times.json`) |
 | `make review-prepare AREA=ruta-32` y `make review-summary AREA=ruta-32` | Hoja para clasificar a mano los aislamientos, y su veredicto |
+| `make inputs AREA=ruta-32` y `make inputs-check AREA=ruta-32` | Escribe y comprueba `inputs.json`: SHA-256 de las entradas (configuración, OSM, ráster, IMERG) y de las salidas, para saber de qué datos sale cada resultado |
 
 ### Datos (desde la raíz)
 
