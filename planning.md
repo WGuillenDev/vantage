@@ -155,6 +155,21 @@ El ranking depende casi por completo del conjunto de referencia. Con tres hospit
 
 Decisión (R, 15 nov): **se mantienen los tres hospitales de San José**, porque la pregunta del producto es el acceso a un hospital nacional de referencia. Se dice sin matices en la presentación y en la interfaz: «referencia = hospitales nacionales de San José»; el ranking no es válido para otro conjunto, y la variante de cinco queda como hallazgo (X4). La interfaz no debe presentar el ranking como estable ante este supuesto.
 
+**Estado del bloque D (15 nov):**
+
+| # | Estado | Detalle |
+|---|---|---|
+| D1 | Hecho | Faltaba el punto de entrada: se añadió `rank-sensitivity` y `make sensitivity`. La corrida real falló al principio porque la comprobación de la línea base comparaba `exposure` (que añade `rain-context` después del scoring); se corrigió con prueba. Veredicto `pass`: top 5 = 5 y top 10 = 10 en ×0,8, ×1,2 y al quitar cada hospital (correlación 1,0). Reportes en `reports/ruta-32/sensitivity.json` |
+| D2 | Hecho | `time_crosscheck.json`: 20 pares contra OSRM, error relativo mediano 15,3 % (umbral 25 %), sesgo −15,2 %, veredicto `pass`. `reference_times.json`: 4 referencias citadas (Enter Costa Rica y Anywhere.com, consultadas el 2026-11-15) con errores de 12 % (Limón), 33 % (Siquirres), 34 % (Turrialba) y 10 % (Guápiles); no se califican |
+| D3 | Esperando a una persona | Hoja `reports/ruta-32/manual_review.json` preparada, sin commitear mientras esté vacía. 3 unidades (T-20, T-56, T-24) y solo 4 comunidades aisladas que clasificar (Germania, Altos de Germania, Trinidad, Las Minas). La herramienta sugiere `snapping_artifact` en las cuatro |
+| D4 | Depende de D3 | `validated` sigue en `false` |
+| D5 | Hecho | Ver «Resultado de D5» |
+
+Lectura honesta de D1 y D2:
+- **El `pass` de velocidad es casi automático.** Los dos factores escalan todas las velocidades por igual, así que el orden no puede cambiar salvo por el redondeo. Pesa más la prueba de quitar hospitales, y esa solo habla de los tres de San José, que están a pocos kilómetros entre sí (ver D5).
+- **El router comparte datos con el modelo** (OSM): comprueba la cuenta, no la realidad. Las referencias son tiempos de San José a cada ciudad de portales de viaje, no al hospital, y la de Turrialba no pasa por la Ruta 32.
+- **Dos pares quedan lejos del router:** c497 y c520 (62 y 74 min frente a unos 180). No se investigaron.
+
 ### Bloque E — Cierre
 
 | # | Paso | Dueño | Terminado cuando |

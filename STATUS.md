@@ -22,16 +22,16 @@ Prioridad ahora: la mitad de datos reales (grafo con las dos calzadas y hospital
 
 ## Progreso
 
-**34 / 46 tareas · 74 %** `██████████████░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman; las `[-]` descartadas no cuentan)_
+**36 / 46 tareas · 78 %** `███████████████░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman; las `[-]` descartadas no cuentan)_
 
 | Fase | Hechas | % |
 |---|---|---|
 | 1 · Bootstrap | 9 / 9 | 100 % |
 | 2 · Spiking | 9 / 9 | 100 % |
-| 3 · Building | 16 / 23 | 70 % |
+| 3 · Building | 18 / 23 | 78 % |
 | 4 · Polish | 0 / 5 | 0 % |
 
-_Actualizá este bloque cada vez que marques una tarea `[x]`. Una tarea es `[x]` si su código está en `main`, sus pruebas pasan y cumple su «Terminada cuando» sin datos reales. Quedan `[~]` las que piden datos reales, una revisión manual o el celular (P5, P10, P11, P12, E5, F7): ver su fila._
+_Actualizá este bloque cada vez que marques una tarea `[x]`. Una tarea es `[x]` si su código está en `main`, sus pruebas pasan y cumple su «Terminada cuando» sin datos reales. Quedan `[~]` las que piden datos reales, una revisión manual o el celular (P5, P12, E5, F7): ver su fila._
 
 ## Puertas
 
@@ -131,8 +131,8 @@ Un delta por rebanada, en `projects/<proyecto>/deltas/<delta>.spec.md`. Nombres 
 | P8 | **Primer despliegue con datos reales** | R, W | [~] | El sitio publicado muestra datos reales (meta: sáb 21:00) **15 nov:** `output/` real commiteado, `deploy.yml` corre `make publish` y el build de producción servido en local pasa la comprobación (sin «MOCK», con aviso, banner y atribuciones). Falta empujar la rama, fusionarla y abrir el sitio publicado en ventana privada (lo hace una persona) |
 | E2 | S2c (SME2), solo si sobra tiempo | R | [x] | FALLA (ver S2c); sin humedad en la exposición |
 | P9 | Unidad de cierre fina: ambas calzadas, cortada en cada unión del grafo, más de 19 cierres (`RELIABILITY.md` paso 5; el tope de ~5 km se descartó, ver spec) | I | [x] | Spec `closure-units` aprobado; unidades por uniones, no por cadenado. Hecho en `main` (PR #36); cuántos cierres da sobre la red real se verá en P7 |
-| P10 | Sensibilidad: velocidad ×0,8/×1,2 y quitar cada hospital de referencia (paso 1; el ajuste a la red no se varía, ver spec) | V | [~] | Top 5 comparte ≥ 4 tramos en las dos de velocidad; quitar hospital se reporta, no se juzga. Código en `main` (PR #23); falta correrlo con datos reales |
-| P11 | Contraste de tiempos con fuente externa (paso 3) | V | [~] | 15–20 pares y 3–5 referencias citadas; mediana del error relativo ≤ 25 %. Código en `main` (PR #22); falta la lista de pares y referencias citadas |
+| P10 | Sensibilidad: velocidad ×0,8/×1,2 y quitar cada hospital de referencia (paso 1; el ajuste a la red no se varía, ver spec) | V | [x] | Top 5 comparte ≥ 4 tramos en las dos de velocidad; quitar hospital se reporta, no se juzga. Código en `main` (PR #23); falta correrlo con datos reales **Hecho (15 nov):** `make sensitivity AREA=ruta-32` (comando que faltaba); veredicto `pass`, top 5 = 5 en ×0,8, ×1,2 y al quitar cada hospital. Reservas en `planning.md` (D1): el factor de velocidad es uniforme y los tres hospitales están juntos en San José. |
+| P11 | Contraste de tiempos con fuente externa (paso 3) | V | [x] | 15–20 pares y 3–5 referencias citadas; mediana del error relativo ≤ 25 %. Código en `main` (PR #22); falta la lista de pares y referencias citadas **Hecho (15 nov):** 20 pares OSRM, error relativo mediano 15,3 % (veredicto `pass`, sesgo −15,2 %: el modelo es más rápido) y 4 referencias citadas (12 %, 33 %, 34 %, 10 % de error). |
 | P12 | Revisión manual de 3 cierres: mayor criticidad, mediano y el más largo (paso 2) | R | [~] | ≥ 80 % de las aisladas reales; artefactos corregidos y vuelto a medir. Herramienta en `main` (PR #24, `make review-prepare/summary`); falta la revisión sobre resultados reales |
 
 Descartadas `[-]`: **P1** (obtener pasadas GCOV) y **P2** (detección de cambio como generador de candidatos): la detección no genera tramos (G1). **P4** (tramos candidatos por zona de cambio) se fundió en P5: los tramos salen de la red.
