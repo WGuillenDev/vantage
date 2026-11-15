@@ -33,3 +33,6 @@ bun.lock    text -diff merge=binary
 *.docx      binary
 *.woff      binary
 *.woff2     binary
+
+# Pipeline output is generated: GitHub collapses it in pull request diffs.
+projects/pipeline/output/** linguist-generated=true
