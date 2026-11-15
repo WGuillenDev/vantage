@@ -37,13 +37,13 @@ Reads `areas.json` (`id`, `name`, `validated` per zone) and the active zone from
 
 ## Invariants
 
-- INV-01 [none]
+- INV-01 [test: bun test --cwd projects/frontend source/zones.test.ts]
   When `areas.json` lists two or more zones, the control lists all of them in file order with the active zone selected.
-- INV-02 [none]
+- INV-02 [test: bun test --cwd projects/frontend source/zones.test.ts]
   When a listed zone has `validated: false`, the control shows its name followed by "(no validada)".
-- INV-03 [none]
+- INV-03 [test: bun test --cwd projects/frontend source/zones.test.ts]
   When `areas.json` lists one zone, the header shows its name and no control.
-- INV-04 [none]
+- INV-04 [test: bun test --cwd projects/frontend source/zones.test.ts]
   When the user chooses a zone, the store's active zone becomes that zone and the URL's `area` parameter becomes its id without adding a history entry.
 
 ## Deferred / Open questions
