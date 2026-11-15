@@ -59,29 +59,29 @@ Rules:
 
 ## Invariants
 
-- INV-01 [none]
+- INV-01 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_population_data.py]
   When population-data finishes, the `graph.json` it wrote passes `make validate` and differs from its input only in `communities[].population`.
-- INV-02 [none]
+- INV-02 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_population_data.py]
   When population-data writes a community, its `population` is a non-negative integer or `null`.
-- INV-03 [none]
+- INV-03 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_population_data.py]
   When no valid pixel is assigned to a community, population-data writes `population: null` for it and never `0`.
-- INV-04 [none]
+- INV-04 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_population_data.py]
   When population-data assigns pixels, each valid pixel is counted for at most one community.
-- INV-05 [none]
+- INV-05 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_population_data.py]
   When a valid pixel is farther than 3000 m from every community, population-data leaves it unassigned and adds its people to the report's unassigned total.
-- INV-06 [none]
+- INV-06 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_population_data.py]
   When a pixel holds the raster's nodata value, population-data counts it in no total.
-- INV-07 [none]
+- INV-07 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_population_data.py]
   When population-data finishes, the report's assigned total plus its unassigned total equals the raster total inside `bbox`, within floating-point tolerance, before any rounding.
-- INV-08 [none]
+- INV-08 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_population_data.py]
   When population-data finishes, `work/<id>/population_report.json` states the raster total, the assigned and unassigned totals, the number of communities with and without a value, and the share with a value.
-- INV-09 [none]
+- INV-09 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_population_data.py]
   If the raster file does not exist and `--no-population` is not given, then population-data exits non-zero with an English error that names the path and says to run `make worldpop`, and leaves `graph.json` unchanged.
-- INV-10 [none]
+- INV-10 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_population_data.py]
   When population-data runs with `--no-population`, every community has `population: null` and the log says that population was skipped.
-- INV-11 [none]
+- INV-11 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_population_data.py]
   If the community ids of `communities.json` and `graph.json` are not the same set, then population-data exits non-zero with an English error naming the first id that differs and leaves `graph.json` unchanged.
-- INV-14 [none]
+- INV-14 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_population_data.py]
   If the raster is not in EPSG:4326 or does not intersect the zone `bbox`, then population-data exits non-zero with an English error naming the raster and the problem and leaves `graph.json` unchanged.
 
 ## Deferred / Open questions
