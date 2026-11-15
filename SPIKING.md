@@ -18,7 +18,7 @@
 | S1 | PASA con reservas | NISAR cubre la ruta desde el 19 jun 2026, pasada cada 12 días; los datos se leen sin bajar el archivo. Par principal: 069 D, 1→13 jul (`P05023`). |
 | S2 | **FALLA** | 3 pruebas + paso A sintético: sin separar evento de control. Mínimo detectable ≈10×10 px (≈1 ha) a −5 dB. B exploratorio negativo; C (GUNW) sin correr. |
 | S1′ | PASA con reserva | SME2: 55 granos desde el 19 jun; IMERG Late diario, 136 días. Ver ficha. |
-| S2c | **FALLA** | SME2 no sube antes de los cierres: 1 de 4 eventos sobre p75 (hacían falta 3); la mediana de eventos queda por debajo de la línea base. Ningún retrieval «recomendado» en la franja. |
+| S2c | **FALLA** | SME2 no sube antes de los cierres: en v2 (lista corregida en S3) 2 de 6 eventos sobre p75 (hacían falta 5), y en v1 1 de 4 (hacían falta 3); la mediana de eventos (0,310) queda por debajo de la línea base (0,325). Ningún retrieval «recomendado» en la franja. |
 | S3 | PARCIAL | Cierres de 2026 con prensa que cita al MOPT; sigue sin comunicado primario (se revisó `mopt.go.cr` y `conavi.go.cr`). Se reincorporó el cierre del 17 jul y se añadieron el 8 oct y el segundo episodio de feb. |
 | S4′ | **R2 PASA; N y R FALLAN** | Sobre la red real (191 tramos de Ruta 32), con cierre de una calzada todo falla; cerrando las dos calzadas (19 cierres) pasa solo «hospital nacional» (R2), con límites. Ver ficha. |
 | S4 | PARCIAL | Red regional conecta; un corte en el parque da +77,6 min San José→Guápiles por alterna. Con «hospital más cercano» el parque afecta a 0 comunidades; recortar al corredor crea aislamientos falsos (ver ficha). |
