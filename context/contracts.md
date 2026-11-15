@@ -13,7 +13,7 @@
 
 ## 0. Status: v0.2 (14 Nov, after G1)
 
-The schemas in `projects/contract/schemas/`, the mocks and the validator are at `schema_version` `"0.2"` in the working tree (not committed yet). The six decisions are closed in §11; the 0.2 change is in §12. Changes follow §10.
+The schemas in `projects/contract/schemas/`, the mocks and the validator are at `schema_version` `"0.2"` in the working tree (not committed yet). The six decisions are closed in §11; the 0.2 change is in §12. Changes follow §10. **After the spikes (D8, §13) the semantics of some fields change; the shape does not.**
 
 Key names are kept (`candidates`, `zone_ids`, ...) so the frozen shape does not break. In the UI a "candidate" is a *critical segment* (*tramo crítico*).
 
@@ -181,11 +181,11 @@ Per critical segment (key `candidates`): the result of removing it from the netw
 | `zone_ids` | May be empty (no change zone). Already allowed in 0.1. |
 | `mean_delta_db` | `null` when there is no zone. Already allowed in 0.1. |
 | `source` | Optional (0.2). Only value: `"network_consequence"` (the segment was chosen by consequence, not by detection). |
-| `exposure` | Optional, nullable (0.2): `rain_mm_12d` (number or `null`), `soil_moisture_pctl` (0–100 or `null`), `radar_evidence` (`"not_detectable_at_scale"` or `null`). Unknown stays `null`. |
+| `exposure` | Optional, nullable (0.2): `rain_mm_12d` (number or `null`), `soil_moisture_pctl` (0–100 or `null`; stays `null`, S2c failed), `radar_evidence` (`"not_detectable_at_scale"` or `null`). Unknown stays `null`. |
 | `extra_time_s` | The headline number: the maximum `extra_s` among affected, non-isolated communities. |
 | `criticality` | Sum over affected communities of `population × extra_s`. An isolated community uses as `extra_s` the largest finite `extra_s` across all candidates (its penalty). A community with `population: null` adds 0. Ties, and the case where no population is known, rank by `extra_time_s` and then by isolated count. |
 | `population_dependent` | Integer or `null`. Total population of affected communities. |
-| `isolated_community_ids` | Communities with **no path** to any hospital. Subset of `affected_community_ids`. Their `per_community.time_s` is `null`. |
+| `isolated_community_ids` | Communities with **no path** to any hospital in `graph.json` (since D8, the referral hospitals; the UI says "sin ruta al hospital de referencia"). Subset of `affected_community_ids`. Their `per_community.time_s` is `null`. |
 | `per_community[].time_s`, `extra_s` | `time_s` is `null` if isolated; then `extra_s` is `null` too. |
 | `alternates` | Alternate routes shown in the panel. Source: project knowledge (Ruta 126 light only, Ruta 10 freight); do not add routes without a source. |
 
@@ -264,3 +264,15 @@ New `meta.json` fields to add to the schema (B4): `speed_model_kmh`, `overlays[]
 Not decided here: how `rain.start/end` is chosen when there are no passes (it is still required and `rain.csv` must cover it).
 
 The UI infers "no change layer" from empty `change.geojson` and absent `overlays`; there is no explicit flag.
+
+## 13. After the spikes (D8, 14 Nov): semantics, no schema change
+
+| Field | Before | Now |
+|---|---|---|
+| `graph.json → hospitals` | Allowlisted hospitals | Only the area's referral hospitals (a config list; for Ruta 32: Calderón Guardia, México, San Juan de Dios), so the browser and the pipeline both mean "nearest referral hospital". **Assumption, not yet confirmed with Ian.** |
+| `scenarios.json → baseline`, `per_community` | Time to the nearest hospital | Time to the nearest referral hospital |
+| `isolated_community_ids` | No path to any hospital | No path to any referral hospital (not "no road") |
+| `candidates[].edge_ids` | Edges of one segment | Edges of **both carriageways** of the closure unit |
+| `exposure.soil_moisture_pctl` | Percentile when SME2 passes | Always `null`; open: remove it in a later version |
+
+Pending and not decided here: a finer closure unit than the 33–61 km units of S4′, and whether the validator should flag an edge set that leaves one carriageway open.

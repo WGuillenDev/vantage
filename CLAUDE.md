@@ -1,6 +1,6 @@
 # VANTAGE
 
-VANTAGE shows which road segments of Ruta 32 (Costa Rica), if cut, leave communities without a good route to a hospital, and how exposed they are (rainfall, optional NISAR soil moisture): risk = consequence × exposure. Landslide-scale detection with NISAR GCOV was tested and is a NO-GO (G1, 14 Nov); the radar change layer is optional. Entry for NASA Space Apps 2026, "Dancing with the SARs".
+VANTAGE shows which road segments of a road corridor, if cut, leave communities without a route to a referral hospital, and for how long; the method is designed for any corridor with an OSM road network, and Ruta 32 (Costa Rica) is the demonstration case and the only one tested; recent rain is shown as context. Three signal tests were negative (NISAR GCOV detection, SME2 soil moisture, rain before closures) and are reported as findings; the radar change layer is optional (decision D8 in `STATUS.md`). Entry for NASA Space Apps 2026, "Dancing with the SARs".
 
 ## Read first
 

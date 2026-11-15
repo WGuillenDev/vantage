@@ -17,7 +17,7 @@ If a doc and the code disagree, flag it; do not silently pick one.
 ## Hard rules
 
 - Say "critical segment" (*tramo crítico*), "signal", "hypothesis". Never "confirmed closure" or "caused by rain", and never "works anywhere". The word "candidate" survives only as a key name in the data files (`candidates`).
-- Product direction after G1 (14 Nov): risk = consequence × exposure. Detecting landslide scars with NISAR GCOV was a NO-GO; the radar change layer is optional and may be empty. See `context/approach.md` §5.
+- Product direction after the spikes (14 Nov, decision D8 in `STATUS.md`): consequence (criticality) with rain as context; not "risk = consequence × exposure". GCOV detection, SME2 and rain did not anticipate closures. The radar change layer is optional and may be empty. See `context/approach.md` §5.
 - No fixed data as a seed: no Lanamme sites, MOPT kilometres or press coordinates to decide which segments matter. Press dates are validation labels only.
 - The analysis area is a pipeline parameter (config), not a constant in code.
 - Do not invent data: unknown values stay `null` or pending.

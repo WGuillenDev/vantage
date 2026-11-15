@@ -8,7 +8,7 @@ One user type: someone who monitors the route and needs to know which segments m
 
 Flow: open the map → see the critical segments → pick one → read how hospital access changes if it is cut → read its exposure → optionally simulate closing more segments.
 
-> After G1 (Sat 14 Nov, NO-GO on landslide detection with GCOV) the product is risk = consequence × exposure.
+> After the spikes (Sat 14 Nov, decision D8 in `STATUS.md`) the product is the consequence (criticality) of each segment, with rain as context. Detection, SME2 and rain did not anticipate closures.
 
 ## 2. Web app functions
 
@@ -26,9 +26,9 @@ Flow: open the map → see the critical segments → pick one → read how hospi
 
 ### F4. Segment detail
 On selecting a segment, show:
-- **Extra time to hospital** and **population that depends on the segment** (the headline metrics).
+- **Extra time to the referral hospital** and **population that depends on the segment** (the headline metrics).
 - **Affected communities** and **alternate routes** (for example Ruta 126, light vehicles only; Ruta 10, freight).
-- A block **Exposure**: accumulated rainfall (`rain_mm_12d`), soil moisture percentile if it exists (`soil_moisture_pctl`), and "radar evidence: not detectable at this scale" (`radar_evidence`). Each value handles `null`.
+- A block **Exposure**: accumulated rainfall (`rain_mm_12d`), no soil moisture (`soil_moisture_pctl` stays `null`; S2c failed), and "radar evidence: not detectable at this scale" (`radar_evidence`). Each value handles `null`.
 - The mean backscatter change (ΔdB) only if the zone has one.
 - A label saying it is a critical segment by consequence, not a confirmed closure.
 - Two actions: "Simulate closure of this segment" and "Why?".
@@ -38,11 +38,12 @@ On selecting a segment, show:
 - Closed segments appear as chips that can be removed individually, plus a **Reset** action.
 - Summary figures: total extra time, number of isolated communities, affected population.
 - Per-community comparison: time without closures versus with closures.
-- A community is marked **isolated** only when it has no path to any hospital. Alternate routes are highlighted on the map.
+- A community is marked **isolated** only when it has no path to any referral hospital; the UI says "sin ruta al hospital de referencia", not "aislada". Alternate routes are highlighted on the map.
 
 ### F6. "Why?" panel (exposure context)
 - Daily rainfall chart for the period, with the pass dates marked when passes exist.
-- A short list of hypotheses explaining the **exposure**: rain accumulated; slope and soil of the segment; soil moisture if available (it also changes the radar return).
+- A short list of hypotheses explaining the **exposure**: rain accumulated; slope and soil of the segment.
+- State plainly that in our test the 12-day rain exceeded its baseline before only 3 of 8 closures.
 - Always labeled **"Hypothesis, not confirmed cause"**.
 
 ### F7. Responsive behavior
@@ -60,16 +61,16 @@ On selecting a segment, show:
 |---|---|---|
 | P1 | Acquire NISAR data | **Discarded as generator of candidates** (G1). The spike code was removed from the repo (it was never versioned); rebuild it for SME2 or the optional layer: two compatible passes (same track, direction, CRID; outside the Jul 27 – Aug 10 gap), corridor only. |
 | P2 | Detect change | **Experimental / discarded as a generator of candidates.** ΔdB between two passes; negative at landslide scale (`approach.md` §5). May output an empty layer. |
-| P3 | Build road network | Turn the area's OpenStreetMap roads into segments, with hospitals and communities. The area comes from config. |
+| P3 | Build road network | Turn the area's OpenStreetMap roads into segments, with hospitals and communities. The area comes from config. Hospitals are the referral hospitals; communities and hospitals snap to the largest strongly connected component (D8). |
 | P4 | Critical segments by consequence | Rank segments by the consequence of cutting them (formerly "find candidate segments that touch a change zone"). Key name `candidates` stays in the files. Built together with P5 (`STATUS.md`). |
-| P5 | Compute impact | For each community, find the fastest route to the nearest hospital. Remove one segment at a time to get extra time, dependent population and communities left without a path. Rank by criticality. If population is unavailable, fall back to extra time and the count of communities (E4 joins WorldPop so criticality stops being 0). |
+| P5 | Compute impact | For each community, find the fastest route to the nearest referral hospital. Remove one segment at a time, closing both carriageways, to get extra time, dependent population and communities left without a path. Rank by criticality. If population is unavailable, fall back to extra time and the count of communities (E4 joins WorldPop so criticality stops being 0). |
 | P6 | Add rain context | Fetch daily IMERG rainfall for the period. |
 | P7 | Export and validate | Write every result with its version and sources, and check it before use. |
-| P9 | Exposure layer | IMERG accumulated rain per segment and, if S2c passes, NISAR SME2 soil moisture percentile. Context signals, not detection. Written to `scenarios.json → exposure`. Tasks E1 (IMERG) and E2 (SME2) in `STATUS.md`. |
+| P9 | Exposure layer | IMERG accumulated rain per segment, as context, not detection. SME2 failed S2c and is not used. Written to `scenarios.json → exposure`. Task E1 in `STATUS.md`. |
 
 ## 3b. Note on generalization
 
-Designed for corridors with an OSM road network; Ruta 32 is the demonstration case. Not tested elsewhere. Named limits: variable OSM quality, badly registered hospitals, SME2 possibly unreliable in dense forest.
+Designed for corridors with an OSM road network; Ruta 32 is the demonstration case. Not tested elsewhere. Named limits: variable OSM quality, badly registered hospitals, and the referral-hospital metric (a referral hospital outside the corridor).
 
 ## 4. Out of scope
 

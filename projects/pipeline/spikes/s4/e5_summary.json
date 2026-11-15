@@ -1,0 +1,455 @@
+{
+ "graph": {
+  "nodes": 7136,
+  "edges": 8715,
+  "hospitals": [
+   "Hospital Cima",
+   "Hospital Clínica Bíblica",
+   "Hospital Clínica Bíblica",
+   "Hospital Dr. Adolfo Carit Eva",
+   "Hospital Dr. Maximiliano Peralta Jiménez",
+   "Hospital Dr. Rafael Ángel Calderón Guardia",
+   "Hospital Dr. Raúl Blanco Cervantes",
+   "Hospital Dr. Tony Facio Castro",
+   "Hospital Guápiles",
+   "Hospital Internacional La Católica",
+   "Hospital Metropolitano",
+   "Hospital Metropolitano",
+   "Hospital Metropolitano",
+   "Hospital Metropolitano",
+   "Hospital Metropolitano",
+   "Hospital México",
+   "Hospital Nacional de Niños Dr. Carlos Sáenz Herrera",
+   "Hospital Nacional de Salud Mental Pbro. Manuel Antonio Chapuí y Torres",
+   "Hospital Psiquiátrico Dr. Roberto Chacón Paut",
+   "Hospital San Juan de Dios",
+   "Hospital San Rafael",
+   "Hospital San Vicente de Paúl",
+   "Hospital Universal",
+   "Hospital William Allen Taylor",
+   "Hospital del Trauma"
+  ],
+  "communities": 758,
+  "scc_nodes": 6870,
+  "communities_moved": 8,
+  "max_move_m": 3100,
+  "median_move_m": 503
+ },
+ "reference_found": [
+  "Hospital Dr. Rafael Ángel Calderón Guardia",
+  "Hospital Dr. Tony Facio Castro",
+  "Hospital Guápiles"
+ ],
+ "reference_missing": [],
+ "national_found": [
+  "Hospital Dr. Rafael Ángel Calderón Guardia",
+  "Hospital México",
+  "Hospital San Juan de Dios"
+ ],
+ "v1_N": {
+  "no_path_baseline": 7,
+  "share_with_affected": 0.602,
+  "park_segments_affected": [
+   1
+  ],
+  "isolated_pairs": 103,
+  "suspect_pairs": 103,
+  "suspect_share": 1.0,
+  "why_totals": {
+   "on_cut_node": 38,
+   "oneway_only": 65
+  },
+  "unique_isolated_communities": 56,
+  "segments_with_isolated": 44,
+  "share_with_clean_affected": 0.482,
+  "park_clean_affected": [
+   0
+  ],
+  "Q1": true,
+  "Q2": false
+ },
+ "v1_R": {
+  "no_path_baseline": 7,
+  "share_with_affected": 0.628,
+  "park_segments_affected": [
+   1
+  ],
+  "isolated_pairs": 103,
+  "suspect_pairs": 103,
+  "suspect_share": 1.0,
+  "why_totals": {
+   "on_cut_node": 38,
+   "oneway_only": 65
+  },
+  "unique_isolated_communities": 56,
+  "segments_with_isolated": 44,
+  "share_with_clean_affected": 0.508,
+  "park_clean_affected": [
+   0
+  ],
+  "Q1": true,
+  "Q2": false
+ },
+ "v2_N": {
+  "no_path_baseline": 0,
+  "share_with_affected": 0.613,
+  "park_segments_affected": [
+   1
+  ],
+  "isolated_pairs": 103,
+  "suspect_pairs": 103,
+  "suspect_share": 1.0,
+  "why_totals": {
+   "on_cut_node": 38,
+   "oneway_only": 65
+  },
+  "unique_isolated_communities": 56,
+  "segments_with_isolated": 44,
+  "share_with_clean_affected": 0.492,
+  "park_clean_affected": [
+   0
+  ],
+  "Q1": false,
+  "Q2": false
+ },
+ "v2_R": {
+  "no_path_baseline": 0,
+  "share_with_affected": 0.639,
+  "park_segments_affected": [
+   1
+  ],
+  "isolated_pairs": 103,
+  "suspect_pairs": 103,
+  "suspect_share": 1.0,
+  "why_totals": {
+   "on_cut_node": 38,
+   "oneway_only": 65
+  },
+  "unique_isolated_communities": 56,
+  "segments_with_isolated": 44,
+  "share_with_clean_affected": 0.518,
+  "park_clean_affected": [
+   0
+  ],
+  "Q1": false,
+  "Q2": false
+ },
+ "v2_R2": {
+  "no_path_baseline": 0,
+  "share_with_affected": 0.702,
+  "park_segments_affected": [
+   311
+  ],
+  "isolated_pairs": 1219,
+  "suspect_pairs": 1219,
+  "suspect_share": 1.0,
+  "why_totals": {
+   "on_cut_node": 38,
+   "oneway_only": 1181
+  },
+  "unique_isolated_communities": 109,
+  "segments_with_isolated": 59,
+  "share_with_clean_affected": 0.45,
+  "park_clean_affected": [
+   310
+  ],
+  "Q1": false,
+  "Q2": false
+ },
+ "v3_N": {
+  "no_path_baseline": 0,
+  "share_with_affected": 0.947,
+  "park_segments_affected": [
+   139
+  ],
+  "isolated_pairs": 129,
+  "suspect_pairs": 70,
+  "suspect_share": 0.543,
+  "why_totals": {
+   "on_cut_node": 43,
+   "oneway_only": 27
+  },
+  "unique_isolated_communities": 106,
+  "segments_with_isolated": 12,
+  "share_with_clean_affected": 0.842,
+  "park_clean_affected": [
+   133
+  ],
+  "Q1": true,
+  "Q2": false
+ },
+ "v3_R": {
+  "no_path_baseline": 0,
+  "share_with_affected": 1.0,
+  "park_segments_affected": [
+   191
+  ],
+  "isolated_pairs": 129,
+  "suspect_pairs": 70,
+  "suspect_share": 0.543,
+  "why_totals": {
+   "on_cut_node": 43,
+   "oneway_only": 27
+  },
+  "unique_isolated_communities": 106,
+  "segments_with_isolated": 12,
+  "share_with_clean_affected": 0.895,
+  "park_clean_affected": [
+   185
+  ],
+  "Q1": true,
+  "Q2": false
+ },
+ "v3_R2": {
+  "no_path_baseline": 0,
+  "share_with_affected": 1.0,
+  "park_segments_affected": [
+   311
+  ],
+  "isolated_pairs": 498,
+  "suspect_pairs": 63,
+  "suspect_share": 0.127,
+  "why_totals": {
+   "on_cut_node": 43,
+   "oneway_only": 20
+  },
+  "unique_isolated_communities": 139,
+  "segments_with_isolated": 12,
+  "share_with_clean_affected": 0.947,
+  "park_clean_affected": [
+   305
+  ],
+  "Q1": true,
+  "Q2": true
+ },
+ "v3_R2_units": [
+  {
+   "length_km": 3.1,
+   "lon_range": [
+    -84.067,
+    -84.053
+   ],
+   "park": false,
+   "affected": 321,
+   "isolated": 0,
+   "suspect_isolated": 0,
+   "max_extra_min": 1.4
+  },
+  {
+   "length_km": 10.0,
+   "lon_range": [
+    -84.053,
+    -84.003
+   ],
+   "park": false,
+   "affected": 318,
+   "isolated": 1,
+   "suspect_isolated": 1,
+   "max_extra_min": 144.4
+  },
+  {
+   "length_km": 1.2,
+   "lon_range": [
+    -84.077,
+    -84.074
+   ],
+   "park": false,
+   "affected": 324,
+   "isolated": 0,
+   "suspect_isolated": 0,
+   "max_extra_min": 1.9
+  },
+  {
+   "length_km": 7.4,
+   "lon_range": [
+    -84.074,
+    -84.067
+   ],
+   "park": false,
+   "affected": 324,
+   "isolated": 0,
+   "suspect_isolated": 0,
+   "max_extra_min": 2.5
+  },
+  {
+   "length_km": 2.1,
+   "lon_range": [
+    -83.786,
+    -83.777
+   ],
+   "park": false,
+   "affected": 211,
+   "isolated": 0,
+   "suspect_isolated": 0,
+   "max_extra_min": 0.0
+  },
+  {
+   "length_km": 46.1,
+   "lon_range": [
+    -83.777,
+    -83.585
+   ],
+   "park": false,
+   "affected": 211,
+   "isolated": 8,
+   "suspect_isolated": 8,
+   "max_extra_min": 99.7
+  },
+  {
+   "length_km": 1.1,
+   "lon_range": [
+    -83.459,
+    -83.454
+   ],
+   "park": false,
+   "affected": 88,
+   "isolated": 88,
+   "suspect_isolated": 3,
+   "max_extra_min": 0.0
+  },
+  {
+   "length_km": 9.7,
+   "lon_range": [
+    -83.454,
+    -83.415
+   ],
+   "park": false,
+   "affected": 85,
+   "isolated": 85,
+   "suspect_isolated": 5,
+   "max_extra_min": 0.0
+  },
+  {
+   "length_km": 12.7,
+   "lon_range": [
+    -83.207,
+    -83.154
+   ],
+   "park": false,
+   "affected": 29,
+   "isolated": 29,
+   "suspect_isolated": 6,
+   "max_extra_min": 0.0
+  },
+  {
+   "length_km": 1.2,
+   "lon_range": [
+    -83.155,
+    -83.149
+   ],
+   "park": false,
+   "affected": 27,
+   "isolated": 27,
+   "suspect_isolated": 6,
+   "max_extra_min": 0.0
+  },
+  {
+   "length_km": 1.0,
+   "lon_range": [
+    -83.069,
+    -83.064
+   ],
+   "park": false,
+   "affected": 15,
+   "isolated": 0,
+   "suspect_isolated": 0,
+   "max_extra_min": 4.5
+  },
+  {
+   "length_km": 1.9,
+   "lon_range": [
+    -83.033,
+    -83.024
+   ],
+   "park": false,
+   "affected": 1,
+   "isolated": 1,
+   "suspect_isolated": 1,
+   "max_extra_min": 0.0
+  },
+  {
+   "length_km": 1.6,
+   "lon_range": [
+    -83.04,
+    -83.033
+   ],
+   "park": false,
+   "affected": 7,
+   "isolated": 0,
+   "suspect_isolated": 0,
+   "max_extra_min": 5.6
+  },
+  {
+   "length_km": 40.4,
+   "lon_range": [
+    -83.415,
+    -83.265
+   ],
+   "park": false,
+   "affected": 68,
+   "isolated": 68,
+   "suspect_isolated": 6,
+   "max_extra_min": 0.0
+  },
+  {
+   "length_km": 5.3,
+   "lon_range": [
+    -83.064,
+    -83.04
+   ],
+   "park": false,
+   "affected": 15,
+   "isolated": 0,
+   "suspect_isolated": 0,
+   "max_extra_min": 9.3
+  },
+  {
+   "length_km": 18.5,
+   "lon_range": [
+    -83.149,
+    -83.069
+   ],
+   "park": false,
+   "affected": 27,
+   "isolated": 27,
+   "suspect_isolated": 7,
+   "max_extra_min": 0.0
+  },
+  {
+   "length_km": 13.8,
+   "lon_range": [
+    -83.265,
+    -83.206
+   ],
+   "park": false,
+   "affected": 34,
+   "isolated": 34,
+   "suspect_isolated": 6,
+   "max_extra_min": 0.0
+  },
+  {
+   "length_km": 33.1,
+   "lon_range": [
+    -83.585,
+    -83.459
+   ],
+   "park": false,
+   "affected": 146,
+   "isolated": 94,
+   "suspect_isolated": 8,
+   "max_extra_min": 54.2
+  },
+  {
+   "length_km": 60.7,
+   "lon_range": [
+    -84.014,
+    -83.786
+   ],
+   "park": true,
+   "affected": 311,
+   "isolated": 36,
+   "suspect_isolated": 6,
+   "max_extra_min": 140.2
+  }
+ ]
+}
