@@ -15,14 +15,6 @@ type Arc = { from: string; time_s: number }
 // time, hospital number, node, hospital id: the heap orders by time and then by hospital number.
 type HeapItem = [time_s: number, number: number, node: string, hospital_id: string]
 
-export async function loadGraph(zoneBase: string): Promise<GraphData> {
-  const response = await fetch(`${zoneBase}graph.json`)
-  if (!response.ok) {
-    throw new Error(`Could not load graph.json (${response.status}); run "make mock"`)
-  }
-  return (await response.json()) as GraphData
-}
-
 // Routes run community -> hospital, so the search walks the edges backwards from the hospitals.
 function buildReverseAdjacency(graph: GraphData, closed: ReadonlySet<string>): Map<string, Arc[]> {
   const reverse = new Map<string, Arc[]>()

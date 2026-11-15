@@ -13,7 +13,6 @@ dependencies = [
 ]
 
 [project.scripts]
-pipeline = "pipeline:main"
 validate = "pipeline.validate:main"
 area-config = "pipeline.area_config:main"
 timecheck = "pipeline.time_crosscheck:main"
