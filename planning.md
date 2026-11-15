@@ -194,6 +194,15 @@ Conclusión: **no hace falta tocar el modelo para el ranking**. D4 no se aplica;
 | E3 | Actualizar `STATUS.md`: filas, progreso, decisiones (qué quedó con qué veredicto) | R | Coincide con la realidad |
 | E4 | G2: lista de cortes anotada en el registro de decisiones | todos | Lista escrita |
 
+**Estado del bloque E (15 nov):**
+
+| # | Estado | Detalle |
+|---|---|---|
+| E1 | Hecho, con reserva | Viewport móvil emulado de 390×844 con Playwright: la hoja inferior se expande, abrir un tramo, simular un cierre y las pestañas Simulación y «¿Por qué?» funcionan. No se probó en un celular físico (queda en X2). Detalle menor: la leyenda del mapa se cruza con el texto de atribución |
+| E2 | Hecho | Los invariantes de `rain-context` ya tenían etiqueta `test:`; lo desactualizado era el párrafo «Testing gaps». Corregido en el spec. ACC-01 verificado con la corrida real (317 días sin huecos, 115 de 115 unidades con lluvia); ACC-02 sigue manual |
+| E3 | Hecho | `STATUS.md` actualizado: 39 de 46 tareas (85 %) y Fase 3 en 21 de 23 |
+| E4 | Hecho como propuesta | Lista de cortes y límites para G2 en la decisión D11 del registro; el equipo la confirma a las 14:00 |
+
 ## 5. Decisiones que hacen falta (del equipo, no mías)
 
 1. **Velocidades por clase de vía y su fuente** (A3). Sin eso no hay corrida. ¿Medianas de OSM de Costa Rica (lo que dice D8) o valores de otra fuente?
