@@ -89,8 +89,12 @@ def score(graph: dict, units: list[dict], alternates: list[dict] | tuple = ()) -
   edges = {e["id"]: e for e in graph["edges"]}
   baseline = _routes(graph, set())
 
+  seen_ids: set[str] = set()
   results = []
   for given in units:
+    if given["id"] in seen_ids:
+      raise ImpactScoringError(f"unit id {given['id']} appears more than once")
+    seen_ids.add(given["id"])
     closed = _closed_edges(given, edges)
     after = _routes(graph, closed)
     per_community = []
