@@ -43,26 +43,26 @@ Reads `scenarios.json`, `graph.json` and `rain.csv` of the active zone and the s
 
 ## Invariants
 
-- INV-01 [none]
+- INV-01 [test: bun test --cwd projects/frontend source/segmentDetail]
   When a unit is selected, the card shows its extra time and dependent population from `scenarios.json`, with "sin ruta al hospital de referencia" for a `null` extra time and "sin dato" for a `null` population.
-- INV-02 [none]
+- INV-02 [test: bun test --cwd projects/frontend source/segmentDetail]
   When the card lists affected communities, they are exactly the unit's `affected_community_ids`, with isolated ones first, then extra time descending, then id, each showing the name of the hospital it reaches from `graph.json` or "sin ruta al hospital de referencia" (never the word "aislada") when it has no route.
-- INV-05 [none]
+- INV-05 [test: bun test --cwd projects/frontend source/segmentDetail]
   When a unit has no alternates, the card shows "sin alternas registradas", and otherwise each alternate with "livianos" or "pesados".
-- INV-06 [none]
+- INV-06 [test: bun test --cwd projects/frontend source/segmentDetail]
   When `rain_mm_12d` is `null`, the Exposición block shows "sin dato" and never 0.
-- INV-08 [none]
+- INV-08 [test: bun test --cwd projects/frontend source/segmentDetail]
   When the Exposición block is visible, the label "Hipótesis, no causa confirmada" is visible with it.
-- INV-11 [none]
+- INV-11 [test: bun test --cwd projects/frontend source/segmentDetail]
   When the "¿Por qué?" panel opens, it shows the `rain.csv` chart for the whole period with the 12 days ending at `rain.end` highlighted, and the fixed hypothesis text with the label "Hipótesis, no causa confirmada".
-- INV-12 [none]
+- INV-12 [test: bun test --cwd projects/frontend source/segmentDetail]
   If `rain.csv` cannot be loaded, then the panel shows a Spanish message naming the file and the card still works.
-- INV-13 [none]
+- INV-13 [test: bun test --cwd projects/frontend source/segmentDetail]
   When the user presses "Simular cierre de este tramo", the unit is added to the closed set of the simulation.
 
 ## Deferred / Open questions
 
-Testing gaps (all claims are tagged `none`; `builder` turns the formatting rules into `test: bun test --cwd projects/frontend` files and leaves rendering `manual`): INV-01, INV-02, INV-05, INV-06, INV-08, INV-11, INV-12, INV-13.
+Testing gaps: the tests cover the pure logic (formatting, ordering, rain parsing and window, the closed set). Rendering of the card and the chart is checked by hand (ACC-01, ACC-02).
 
 - **Dependencies:** `recharts` is not installed; the chart needs it (`structure.md`).
 - **Simulation action:** the closed set belongs to `closure-whatif`; if that slice is cut at G2, the action "Simular cierre de este tramo" is removed and INV-13 with it.
