@@ -59,25 +59,25 @@ Rules:
 
 ## Invariants
 
-- INV-01 [none]
+- INV-01 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_closure_units.py]
   When closure-units finishes, the `graph.json` it wrote passes `make validate` and differs from its input only in `candidate_id`.
-- INV-02 [none]
+- INV-02 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_closure_units.py]
   When closure-units writes `graph.json`, an edge has a non-null `candidate_id` if and only if its `road` is in the zone's `closure.roads`.
-- INV-03 [none]
+- INV-03 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_closure_units.py]
   When closure-units writes `graph.json`, every corridor edge has exactly one `candidate_id`, and it is in `closure_units.json`.
-- INV-04 [none]
+- INV-04 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_closure_units.py]
   When closure-units numbers the units, the ids are unique, have the form `T-NN`, and follow ascending midpoint longitude with ties broken by latitude.
-- INV-05 [none]
+- INV-05 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_closure_units.py]
   When a one-way corridor edge has an opposite-direction corridor edge whose midpoint is within 120 m, closure-units puts both in the same unit.
-- INV-06 [none]
+- INV-06 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_closure_units.py]
   When a junction joins two consecutive edges of a two-way corridor, closure-units puts them in different units.
-- INV-07 [none]
+- INV-07 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_closure_units.py]
   When a junction lies on both carriageways of a dual carriageway within 120 m, closure-units puts the edges before it and after it in different units.
-- INV-09 [none]
+- INV-09 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_closure_units.py]
   When a unit holds two parallel one-way carriageways of equal length L, closure-units gives it `length_m` equal to L and not 2L.
-- INV-11 [none]
+- INV-11 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_closure_units.py]
   If none of the zone's `closure.roads` matches an edge, then closure-units exits non-zero with an English error naming the roads and writes no output.
-- INV-12 [none]
+- INV-12 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_closure_units.py]
   When closure-units finishes, `work/<id>/closure_units.json` has one entry per unit, and each entry's `edge_ids` is exactly the set of edges carrying that `candidate_id`.
 
 ## Deferred / Open questions
