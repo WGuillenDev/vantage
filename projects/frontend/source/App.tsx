@@ -1,4 +1,3 @@
-import { Route } from 'lucide-react'
 import { lazy, Suspense } from 'react'
 import { Layout } from './Layout.tsx'
 import { MapView } from './MapView.tsx'
@@ -14,14 +13,18 @@ const WhyPanel = lazy(() => import('./WhyPanel.tsx'))
 
 function TopBar({ state }: { state: ZoneState }) {
   return (
-    <div className="flex items-center gap-4 border-b border-line bg-white px-3 py-1.5">
-      <h1 className="flex items-center gap-1.5 text-base font-bold tracking-wide">
-        <Route aria-hidden="true" className="h-5 w-5 text-brand" />
-        VANTAGE
+    <div className="flex items-center gap-4 border-b border-line bg-surface/95 px-3 py-2 backdrop-blur">
+      <h1 className="flex items-center gap-2.5 text-lg font-extrabold tracking-[0.14em]">
+        {/* The logo's navy outline needs a light plate to read on the dark bar. */}
+        <span aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-50 p-0.5 shadow-[0_0_0_1px_rgb(255_255_255/0.1),0_4px_14px_-4px_rgb(45_212_191/0.5)]">
+          <img src={`${import.meta.env.BASE_URL}vantage-logo.png`} alt="" width={32} height={32} className="h-8 w-8" />
+        </span>
+        <span className="bg-gradient-to-r from-white to-brand-strong bg-clip-text text-transparent">VANTAGE</span>
       </h1>
+      <span aria-hidden="true" className="hidden h-5 w-px bg-line sm:block" />
       <ZonePicker />
       {state.status === 'loading' && <p className="text-sm text-muted">Cargando…</p>}
-      {state.status === 'error' && <p className="truncate text-sm text-red-800">{state.message}</p>}
+      {state.status === 'error' && <p className="truncate text-sm text-red-300">{state.message}</p>}
     </div>
   )
 }

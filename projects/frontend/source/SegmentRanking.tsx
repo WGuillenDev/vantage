@@ -30,7 +30,7 @@ export function SegmentRanking({ state }: { state: ZoneState }) {
         const without = countWithoutImpact(data.units)
         return (
           <section className="text-sm" aria-label="Tramos críticos">
-            <div className="sticky top-0 z-10 space-y-2 border-b border-line bg-white p-3">
+            <div className="sticky top-0 z-10 space-y-2 border-b border-line bg-surface p-3">
               <h2 className="font-semibold">Tramos críticos por criticidad</h2>
               {selected === null && <p className="text-muted">Toca un tramo para ver sus comunidades afectadas y simular su cierre.</p>}
               {noPopulationNote(data.units) && (
@@ -44,7 +44,7 @@ export function SegmentRanking({ state }: { state: ZoneState }) {
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder="Buscar por vía o código"
-                  className="w-full rounded-lg border border-line py-2 pl-8 pr-2 max-md:min-h-11"
+                  className="w-full rounded-lg border border-line bg-raised py-2 pl-8 pr-2 text-ink placeholder:text-slate-400 focus:border-brand/60 max-md:min-h-11"
                 />
               </label>
               <div role="group" aria-label="Filtrar tramos" className="flex flex-wrap gap-1">
@@ -54,7 +54,7 @@ export function SegmentRanking({ state }: { state: ZoneState }) {
                     type="button"
                     aria-pressed={filter === item.id}
                     onClick={() => setFilter(item.id)}
-                    className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors max-md:min-h-11 ${filter === item.id ? 'border-brand bg-brand-soft text-amber-900' : 'border-line text-muted hover:bg-slate-50'}`}
+                    className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors max-md:min-h-11 ${filter === item.id ? 'border-brand/60 bg-brand-soft text-brand-strong' : 'border-line text-muted hover:bg-white/5'}`}
                   >
                     {item.label}
                   </button>
@@ -80,7 +80,7 @@ export function SegmentRanking({ state }: { state: ZoneState }) {
                         onMouseLeave={() => hoverUnit(null)}
                         onFocus={() => hoverUnit(unit.id)}
                         onBlur={() => hoverUnit(null)}
-                        className={`flex w-full items-stretch gap-3 px-3 py-2.5 text-left transition-colors max-md:min-h-11 ${isSelected ? 'bg-brand-soft' : 'hover:bg-slate-50'}`}
+                        className={`flex w-full items-stretch gap-3 px-3 py-2.5 text-left transition-colors max-md:min-h-11 ${isSelected ? 'bg-brand-soft shadow-[inset_2px_0_0_var(--color-brand)]' : 'hover:bg-white/5'}`}
                       >
                         <span
                           aria-hidden="true"
@@ -107,7 +107,7 @@ export function SegmentRanking({ state }: { state: ZoneState }) {
                             </span>
                           </span>
                           {row.barFraction !== null && (
-                            <span className="mt-1.5 block h-1.5 overflow-hidden rounded-full bg-slate-200" aria-hidden="true">
+                            <span className="mt-1.5 block h-1.5 overflow-hidden rounded-full bg-white/10" aria-hidden="true">
                               <span className="block h-full rounded-full bg-brand" style={{ width: `${row.barFraction * 100}%` }} />
                             </span>
                           )}

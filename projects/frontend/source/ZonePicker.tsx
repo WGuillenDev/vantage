@@ -28,7 +28,7 @@ export function ZonePicker() {
     <label className="flex items-center gap-1.5 text-sm">
       <MapPin aria-hidden="true" className="h-4 w-4 text-brand" />
       <span className="sr-only sm:not-sr-only">Zona</span>
-      <select className="rounded-lg border border-line bg-white px-2 py-1 max-md:min-h-11" value={current} onChange={(event) => chooseZone(event.target.value)}>
+      <select className="rounded-lg border border-line bg-raised px-2 py-1 text-ink max-md:min-h-11" value={current} onChange={(event) => chooseZone(event.target.value)}>
         {zoneOptions(areas).map((option) => (
           <option key={option.id} value={option.id}>
             {option.label}

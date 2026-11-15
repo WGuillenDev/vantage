@@ -18,7 +18,7 @@ export function Simulation({ state }: { state: ZoneState }) {
     <section aria-label="Simulación de cierre" className="space-y-3 p-3 text-sm">
       <h2 className="font-semibold">Simulación de cierre</h2>
       {view.chips.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-line p-3 text-muted">
+        <p className="rounded-lg border border-dashed border-line bg-raised/50 p-3 text-muted">
           Ningún tramo cerrado. Elige un tramo y pulsa «Simular cierre de este tramo».
         </p>
       ) : (
@@ -26,13 +26,13 @@ export function Simulation({ state }: { state: ZoneState }) {
           <div className="flex items-start justify-between gap-2">
             <ul className="flex flex-wrap gap-1.5" aria-label="Tramos cerrados">
               {view.chips.map((chip) => (
-                <li key={chip.id} className="flex items-center rounded-full bg-red-50 pl-3 text-red-900">
+                <li key={chip.id} className="flex items-center rounded-full bg-red-500/15 pl-3 text-red-200 ring-1 ring-inset ring-red-400/30">
                   <span>{chip.label}</span>
                   <button
                     type="button"
                     aria-label={`Quitar ${chip.label}`}
                     onClick={() => openUnit(chip.id)}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-full hover:bg-red-100 max-md:h-11 max-md:w-11"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full hover:bg-red-500/25 max-md:h-11 max-md:w-11"
                   >
                     <X aria-hidden="true" className="h-4 w-4" />
                   </button>
@@ -51,7 +51,7 @@ export function Simulation({ state }: { state: ZoneState }) {
               <Stat label="Comunidades sin ruta al hospital de referencia" value={view.summary.withoutRoute} />
             </div>
           </dl>
-          {view.summary.note && <p className="rounded-lg bg-amber-50 p-2 text-amber-900">{view.summary.note}</p>}
+          {view.summary.note && <p className="rounded-lg border border-amber-400/25 bg-amber-400/10 p-2 text-amber-100">{view.summary.note}</p>}
           {view.alternateEdgeIds.length > 0 && (
             <p className="text-muted">Rutas alternas resaltadas en el mapa por su nombre: no es el desvío que tomaría cada comunidad.</p>
           )}

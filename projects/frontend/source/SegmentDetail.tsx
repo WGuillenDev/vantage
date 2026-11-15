@@ -19,7 +19,7 @@ export function SegmentDetail({ state, onWhy }: { state: ZoneState; onWhy: () =>
   const isClosed = closed.includes(unit.id)
 
   return (
-    <section aria-label="Detalle del tramo" className="space-y-3 border-b border-line bg-white p-3 text-sm">
+    <section aria-label="Detalle del tramo" className="space-y-3 border-b border-line bg-surface p-3 text-sm">
       <header className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <h2 className="font-semibold">{view.header}</h2>

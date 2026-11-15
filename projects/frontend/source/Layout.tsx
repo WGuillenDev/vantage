@@ -66,7 +66,7 @@ export function Layout({ header, footer, map, ranking, detail, simulation, why }
       {header}
       <main className="relative flex min-h-0 min-w-0 flex-1 flex-col md:flex-row">
         <div className="relative min-h-0 min-w-0 flex-1 md:order-2">{map}</div>
-        <aside className="relative z-10 flex min-w-0 shrink-0 flex-col rounded-t-2xl border-t border-line bg-white shadow-sheet md:order-1 md:w-96 md:rounded-none md:border-r md:border-t-0 md:shadow-none">
+        <aside className="relative z-10 flex min-w-0 shrink-0 flex-col rounded-t-2xl border-t border-line bg-surface shadow-sheet md:order-1 md:w-96 md:rounded-none md:border-r md:border-t-0 md:shadow-none">
           <button
             type="button"
             aria-expanded={expanded}
@@ -91,7 +91,7 @@ export function Layout({ header, footer, map, ranking, detail, simulation, why }
             onPointerCancel={() => (dragStart.current = null)}
             className="flex min-h-11 min-w-11 touch-none flex-col items-center justify-center gap-0.5 text-xs text-muted md:hidden"
           >
-            <span aria-hidden="true" className="h-1 w-10 rounded-full bg-slate-300" />
+            <span aria-hidden="true" className="h-1 w-10 rounded-full bg-white/20" />
             {expanded ? 'Contraer panel' : 'Expandir panel'}
           </button>
           <div role="tablist" className="flex gap-1 border-b border-line p-1.5">
@@ -107,7 +107,7 @@ export function Layout({ header, footer, map, ranking, detail, simulation, why }
                   setTab(id)
                   setExpanded(true)
                 }}
-                className={`flex min-h-11 min-w-11 flex-1 items-center justify-center gap-1.5 rounded-lg px-2 text-sm transition-colors md:min-h-9 ${tab === id ? 'bg-brand-soft font-semibold text-amber-900' : 'text-muted hover:bg-slate-100'}`}
+                className={`flex min-h-11 min-w-11 flex-1 items-center justify-center gap-1.5 rounded-lg px-2 text-sm transition-colors md:min-h-9 ${tab === id ? 'bg-brand-soft font-semibold text-brand-strong' : 'text-muted hover:bg-white/5'}`}
               >
                 <Icon aria-hidden="true" className="h-4 w-4" />
                 {label}

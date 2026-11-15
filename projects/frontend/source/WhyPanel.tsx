@@ -6,8 +6,8 @@ import type { ZoneState } from './zoneData.ts'
 
 const W = 300
 const H = 100
-const HIGHLIGHT = '#d97706'
-const BASE = '#94a3b8'
+const HIGHLIGHT = '#f59e0b'
+const BASE = '#475569'
 
 function RainChart({ days }: { days: ReturnType<typeof highlightedDays> }) {
   const max = Math.max(1, ...days.map((d) => d.mm))
@@ -16,7 +16,7 @@ function RainChart({ days }: { days: ReturnType<typeof highlightedDays> }) {
   const last = days[days.length - 1]?.date
   return (
     <figure className="space-y-1">
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Lluvia diaria del periodo, con los últimos 12 días resaltados" className="w-full rounded-lg bg-slate-50">
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Lluvia diaria del periodo, con los últimos 12 días resaltados" className="w-full rounded-lg bg-raised">
         {days.map((d, i) => {
           const h = (d.mm / max) * (H - 4)
           return (

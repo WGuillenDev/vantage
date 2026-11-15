@@ -24,7 +24,7 @@ export function MapLegend({ data, hasClosed }: { data: ZoneData; hasClosed: bool
   const gradient = [0, 0.25, 0.5, 0.75, 1].map((t) => colorForCriticality(min + (max - min) * t, range)).join(', ')
 
   return (
-    <div className="absolute bottom-6 left-2 max-w-[calc(100%-4rem)] rounded-card bg-white/95 text-xs shadow-card backdrop-blur" role="group" aria-label="Leyenda de criticidad">
+    <div className="absolute bottom-6 left-2 max-w-[calc(100%-4rem)] rounded-card bg-surface/90 text-xs shadow-card backdrop-blur" role="group" aria-label="Leyenda de criticidad">
       <button
         type="button"
         aria-expanded={open}

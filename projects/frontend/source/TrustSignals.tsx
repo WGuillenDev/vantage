@@ -7,10 +7,10 @@ export function TrustHeader({ state }: { state: ZoneState }) {
   const zone = readyData(state)?.zone
   const [open, setOpen] = useState(false)
   return (
-    <div className="border-b border-amber-200 bg-amber-50 px-3 py-1.5 text-xs text-amber-950 md:text-sm">
+    <div className="border-b border-amber-400/20 bg-amber-400/8 px-3 py-1.5 text-xs text-amber-100 md:text-sm">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
         <p className="flex min-w-0 flex-1 items-center gap-1.5 leading-tight md:flex-none">
-          <Info aria-hidden="true" className="h-4 w-4 shrink-0" />
+          <Info aria-hidden="true" className="h-4 w-4 shrink-0 text-amber-300" />
           {NOTICE}
         </p>
         {isUnvalidated(zone) && (
@@ -21,12 +21,12 @@ export function TrustHeader({ state }: { state: ZoneState }) {
               aria-expanded={open}
               aria-label={UNVALIDATED_BANNER}
               onClick={() => setOpen((value) => !value)}
-              className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full bg-red-100 px-2.5 font-medium text-red-900 md:hidden"
+              className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full bg-red-500/15 px-2.5 font-medium text-red-200 ring-1 ring-inset ring-red-400/30 md:hidden"
             >
               <TriangleAlert aria-hidden="true" className="h-4 w-4" />
               No validada
             </button>
-            <p role="status" className={`${open ? 'flex' : 'hidden md:flex'} basis-full items-center gap-1.5 rounded-full bg-red-100 px-2.5 py-0.5 font-medium text-red-900 md:basis-auto`}>
+            <p role="status" className={`${open ? 'flex' : 'hidden md:flex'} basis-full items-center gap-1.5 rounded-full bg-red-500/15 px-2.5 py-0.5 font-medium text-red-200 ring-1 ring-inset ring-red-400/30 md:basis-auto`}>
               <TriangleAlert aria-hidden="true" className="h-4 w-4 shrink-0" />
               {UNVALIDATED_BANNER}
             </p>
@@ -42,7 +42,7 @@ export function TrustFooter({ state }: { state: ZoneState }) {
   if (data === null) return null
   const panel = readingPanel(data.meta, data.graph)
   return (
-    <footer className="border-t border-line bg-white px-3 text-xs text-muted">
+    <footer className="border-t border-line bg-surface px-3 text-xs text-muted">
       <details className="group">
         <summary className="flex cursor-pointer list-none items-center gap-1.5 py-2 font-medium text-ink max-md:min-h-11">
           <ChevronDown aria-hidden="true" className="h-4 w-4 transition-transform group-open:rotate-180" />
