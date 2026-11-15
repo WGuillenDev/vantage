@@ -53,23 +53,21 @@ def _routes(graph: dict, closed: set[str]) -> dict[str, Route]:
   return {c["id"]: nearest.get(c["node"]) for c in graph["communities"]}
 
 
-def _joined_ignoring_direction(graph: dict, closed: set[str], start: str) -> bool:
+def _nodes_joined_to_hospitals(graph: dict, closed: set[str]) -> set[str]:
+  """Nodes that still touch a hospital node with the closed edges removed and direction ignored, found in one pass."""
   neighbours: dict[str, list[str]] = {}
   for e in graph["edges"]:
     if e["id"] not in closed:
       neighbours.setdefault(e["from"], []).append(e["to"])
       neighbours.setdefault(e["to"], []).append(e["from"])
-  targets = {h["node"] for h in graph["hospitals"]}
-  seen, queue = {start}, deque([start])
+  seen = {h["node"] for h in graph["hospitals"]}
+  queue = deque(seen)
   while queue:
-    node = queue.popleft()
-    if node in targets:
-      return True
-    for other in neighbours.get(node, ()):
+    for other in neighbours.get(queue.popleft(), ()):
       if other not in seen:
         seen.add(other)
         queue.append(other)
-  return False
+  return seen
 
 
 def _closed_edges(given: dict, edges: dict[str, dict]) -> set[str]:
@@ -116,9 +114,9 @@ def score(graph: dict, units: list[dict], alternates: list[dict] | tuple = ()) -
     finite = [p["extra_s"] for p in rows if p["extra_s"] is not None]
     known = [population[c] for c in affected if population[c] is not None]
     ends = {end for edge_id in closed for end in (edges[edge_id]["from"], edges[edge_id]["to"])}
-    suspect = [
-      c for c in isolated if node_of[c] in ends or _joined_ignoring_direction(graph, closed, node_of[c])
-    ]
+    # One pass per unit, and only when something is isolated: the check used to walk the whole graph per community.
+    joined = _nodes_joined_to_hospitals(graph, closed) if isolated else set()
+    suspect = [c for c in isolated if node_of[c] in ends or node_of[c] in joined]
     scored.append({
       "id": given["id"],
       "source": "network_consequence",
