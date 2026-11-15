@@ -1,0 +1,38 @@
+import { ArrowRight, Hospital } from 'lucide-react'
+import { NO_ROUTE } from './trustSignals.ts'
+import { Badge } from './ui.tsx'
+
+export interface CommunityRowData {
+  name: string
+  withoutClosure: string
+  withClosure: string
+  extra: string
+  hospital: string
+}
+
+// One affected community: the time before and after the closure, the extra time and the hospital it reaches.
+export function CommunityRow({ row, suspect = false }: { row: CommunityRowData; suspect?: boolean }) {
+  const isolated = row.withClosure.startsWith(NO_ROUTE)
+  return (
+    <li className="rounded-lg border border-line px-3 py-2 text-sm">
+      <div className="flex items-start justify-between gap-2">
+        <span className="min-w-0 font-medium">{row.name}</span>
+        <span className="flex shrink-0 flex-wrap justify-end gap-1">
+          {isolated ? <Badge tone="danger">Sin ruta</Badge> : <Badge tone="warning">+{row.extra}</Badge>}
+          {suspect && <Badge tone="info">Posible artefacto del modelo</Badge>}
+        </span>
+      </div>
+      <p className="mt-1 flex flex-wrap items-center gap-1 text-xs text-muted tabular-nums">
+        {row.withoutClosure}
+        <ArrowRight aria-label="con cierre" className="h-3 w-3" />
+        {isolated ? NO_ROUTE : row.withClosure}
+      </p>
+      {!isolated && (
+        <p className="mt-0.5 flex items-center gap-1 text-xs text-muted">
+          <Hospital aria-hidden="true" className="h-3 w-3" />
+          {row.hospital}
+        </p>
+      )}
+    </li>
+  )
+}

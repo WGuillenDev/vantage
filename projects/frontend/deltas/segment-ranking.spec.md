@@ -16,13 +16,14 @@ Owns:
 
 - The list of units with impact, in rank order, with the counter of units without impact.
 - The row content: label, extra time, dependent population, criticality bar, long-corridor badge.
+- The search box and the filter (all, without route, with suspect isolations) that narrow the list.
 - Selecting a unit from the list, and keeping the list in step with the selection made on the map.
 
 Non-goals:
 
 - The map and the selected-unit state: `map-corridor`. The detail card: `segment-detail`. Closing units: `closure-whatif`.
 - Suspect-isolation marks and the "estimate" labels: `trust-signals`.
-- Sorting or filtering controls: the order is the pipeline's `rank`, always.
+- Sorting controls: the order is the pipeline's `rank`, always. The search box and the kind filter only narrow the list, never reorder it.
 - Computing rank, criticality or any number: all come from `scenarios.json`.
 
 ## Contract
@@ -37,6 +38,9 @@ Reads `scenarios.json` and `graph.json` of the active zone, and the store of `ma
 | Length | `length_m` below 1 000 as "N m", otherwise as "N,N km" (comma decimal). |
 | Extra time | `extra_time_s` as an approximate duration (rule in `trust-signals`: "< 5 min", "≈ 20 min", "≈ 1 h 15 min"); "sin ruta al hospital de referencia" when `extra_time_s` is `null`. |
 | Population | `population_dependent` with thousands separators, labeled "estimada" (`trust-signals`); "sin dato" when `null`, never 0. |
+| Search and filter | A text box matches the row label ignoring case and accents; three filter buttons keep all units, those with `extra_time_s` `null`, or those with suspect isolations. Both narrow the list and keep the rank order. |
+| First use | While no unit is selected, a line above the list tells the user to tap a unit; while the files load, placeholder rows stand in for the list. |
+| Hover | The row under the pointer or with focus is highlighted on the map. |
 | Criticality bar | Width proportional to `criticality` over the zone's highest `criticality`; hidden when that highest is 0. |
 
 ## Invariants
@@ -53,6 +57,9 @@ Reads `scenarios.json` and `graph.json` of the active zone, and the store of `ma
   When a row is activated by click or by Enter, the store's selected unit becomes that unit and the row is highlighted.
 - INV-08 [none]
   When the selected unit changes from the map, the list highlights its row and scrolls it into view.
+
+- INV-09 [test: bun test --cwd projects/frontend source/ranking.filter.test.ts]
+  When the user types a text or picks a filter, the list keeps only the units that match, in the same rank order, ignoring case and accents.
 
 ## Deferred / Open questions
 

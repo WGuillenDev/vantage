@@ -1,49 +1,75 @@
-import { useAppStore } from './store.ts'
+import { CloudRain, Route, X } from 'lucide-react'
+import { CommunityRow } from './CommunityRow.tsx'
 import { detailView } from './segmentDetail.ts'
-import type { ZoneData } from './zoneData.ts'
+import { useAppStore } from './store.ts'
+import { Badge, Button, Stat } from './ui.tsx'
+import { readyData, type ZoneState } from './zoneData.ts'
 
-export function SegmentDetail({ data, onWhy }: { data: ZoneData | string | null; onWhy?: () => void }) {
-  const selected = useAppStore((state) => state.selectedUnitId)
-  const closeUnit = useAppStore((state) => state.closeUnit)
-  if (typeof data !== 'object' || data === null || selected === null) return null
+export function SegmentDetail({ state, onWhy }: { state: ZoneState; onWhy: () => void }) {
+  const selected = useAppStore((s) => s.selectedUnitId)
+  const selectUnit = useAppStore((s) => s.selectUnit)
+  const closed = useAppStore((s) => s.closedUnitIds)
+  const closeUnit = useAppStore((s) => s.closeUnit)
+  const data = readyData(state)
+  if (data === null || selected === null) return null
   const unit = data.units.find((item) => item.id === selected)
   if (!unit) return null
   const view = detailView(unit, data.graph, data.baseline)
+  const suspects = new Set(unit.suspect_isolated_community_ids ?? [])
+  const isClosed = closed.includes(unit.id)
 
   return (
-    <section aria-label="Detalle del tramo" className="border-b p-2 text-sm">
-      <h2 className="font-semibold">{view.header}</h2>
-      <p>Posición {view.rank}</p>
-      <p>
-        Tiempo extra: {view.extraTime} · Población que depende: {view.population}
-      </p>
-      <h3 className="mt-2 font-medium">Comunidades afectadas</h3>
-      <ul className="list-disc pl-5">
-        {view.communities.map((c) => (
-          <li key={c.id}>
-            <span className="font-medium">{c.name}</span>: sin cierre {c.withoutClosure}, con cierre {c.withClosure}, extra {c.extra}. Hospital: {c.hospital}
-          </li>
-        ))}
-      </ul>
-      <h3 className="mt-2 font-medium">Alternas</h3>
-      <ul className="list-disc pl-5">
-        {view.alternates.map((line) => (
-          <li key={line}>{line}</li>
-        ))}
-      </ul>
-      <h3 className="mt-2 font-medium">Exposición</h3>
-      <p>
-        Lluvia: {view.rain} <em className="text-gray-700">({view.rainLabel})</em>
-      </p>
-      <div className="mt-2 flex flex-wrap gap-2">
-        <button type="button" onClick={() => closeUnit(unit.id)} className="rounded border px-3 py-1 max-md:min-h-11">
-          Simular cierre de este tramo
-        </button>
-        {onWhy && (
-          <button type="button" onClick={onWhy} className="rounded border px-3 py-1 md:hidden max-md:min-h-11">
-            ¿Por qué?
-          </button>
-        )}
+    <section aria-label="Detalle del tramo" className="space-y-3 border-b border-line bg-white p-3 text-sm">
+      <header className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <h2 className="font-semibold">{view.header}</h2>
+          <p className="text-muted">Posición {view.rank}</p>
+        </div>
+        <Button variant="ghost" aria-label="Cerrar detalle" onClick={() => selectUnit(null)} className="px-2!">
+          <X aria-hidden="true" className="h-4 w-4" />
+        </Button>
+      </header>
+      <dl className="grid grid-cols-2 gap-2">
+        <Stat label="Tiempo extra" value={view.extraTime} />
+        <Stat label="Población que depende" value={view.population} />
+      </dl>
+
+      <div>
+        <h3 className="mb-1.5 font-medium">Comunidades afectadas</h3>
+        <ul className="space-y-1.5">
+          {view.communities.map((c) => (
+            <CommunityRow key={c.id} row={c} suspect={suspects.has(c.id)} />
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h3 className="mb-1.5 flex items-center gap-1.5 font-medium">
+          <Route aria-hidden="true" className="h-4 w-4" />
+          Alternas
+        </h3>
+        <ul className="space-y-0.5 text-muted">
+          {view.alternates.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h3 className="mb-1.5 flex items-center gap-1.5 font-medium">
+          <CloudRain aria-hidden="true" className="h-4 w-4" />
+          Exposición
+        </h3>
+        <p>
+          Lluvia: {view.rain} <Badge tone="info">{view.rainLabel}</Badge>
+        </p>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <Button variant="primary" disabled={isClosed} onClick={() => closeUnit(unit.id)}>
+          {isClosed ? 'Cerrado en la simulación' : 'Simular cierre de este tramo'}
+        </Button>
+        <Button onClick={onWhy}>¿Por qué?</Button>
       </div>
     </section>
   )

@@ -1,11 +1,48 @@
 @import "tailwindcss";
 @import "maplibre-gl/dist/maplibre-gl.css";
 
+/* Design tokens. The map colors in colors.ts repeat the hex values of --color-closed and --color-alternate. */
+@theme {
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --color-ink: #0f172a;
+  --color-muted: #475569;
+  --color-line: #e2e8f0;
+  --color-canvas: #f8fafc;
+  --color-brand: #b45309;
+  --color-brand-soft: #fef3c7;
+  --color-closed: #b91c1c;
+  --color-alternate: #0284c7;
+  --radius-card: 0.75rem;
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.06), 0 4px 16px rgb(15 23 42 / 0.08);
+  --shadow-sheet: 0 -4px 24px rgb(15 23 42 / 0.12);
+}
+
 html,
 body,
 #root {
   height: 100%;
   margin: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: var(--color-canvas);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Touch target for the map's attribution button on narrow screens (mobile-layout INV-06). */
@@ -14,4 +51,27 @@ body,
     min-width: 44px;
     min-height: 44px;
   }
+}
+
+.maplibregl-popup-content {
+  border-radius: 0.5rem;
+  padding: 0.375rem 0.625rem;
+  font-size: 0.75rem;
+  box-shadow: var(--shadow-card);
+}
+
+/* Keep the attribution on one line; the 44 px touch button must not repeat its icon (mobile-layout INV-06). */
+.maplibregl-ctrl-attrib.maplibregl-compact {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.maplibregl-ctrl-attrib-button {
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-inner a {
+  text-decoration: underline;
 }

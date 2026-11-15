@@ -35,8 +35,8 @@ Reads `meta.json` and `areas.json` of the active zone, and `scenarios.json` for 
 | Element | Behavior |
 |---|---|
 | Notice | Always visible: "Tramos críticos por consecuencia; no son derrumbes confirmados." |
-| Footer | One line per string of `meta.attributions`. |
-| Banner | "Zona no validada: sus resultados no se han revisado." while the active zone has `validated: false`. |
+| Footer | One line per string of `meta.attributions`, inside the footer's collapsible panel "Cómo leer estos números y fuentes". |
+| Banner | "Zona no validada: sus resultados no se han revisado." while the active zone has `validated: false`. Always visible from 768 px; below that, a "No validada" chip (with the full text as its label) opens it. |
 | "Cómo leer estos números" | A panel with: times use one constant speed per road class (the table from `meta.speed_model_kmh`), the referral hospitals (the names in `graph.json → hospitals`), the radar finding (`meta.detection_limits.note`) when the zone has one, "sin ruta al hospital de referencia" means no route to them, population is a modelled estimate, and OpenStreetMap quality varies. |
 | Suspect mark | In the detail card, a community in `suspect_isolated_community_ids` shows "sin ruta al hospital de referencia (posible artefacto del modelo)". |
 | Simulation note | While the simulation shows a community without a route: "Las comunidades sin ruta pueden incluir artefactos del modelo." |
@@ -64,7 +64,7 @@ Reads `meta.json` and `areas.json` of the active zone, and `scenarios.json` for 
 - INV-09 [test: bun test --cwd projects/frontend source/format.test.ts]
   When a population figure is shown, it is labeled "estimada", and a `null` population is shown as "sin dato".
 - INV-10 [manual]
-  When text is shown on the map panels, its contrast against its background is at least 4.5:1.
+  When text is shown on the map panels, its contrast against its background is at least 4.5:1. (axe-core 4.10, wcag2a/2aa and best-practice, 15 Nov: no violations at 390 and 1280 px; a person still checks it on a real phone.)
 - INV-11 [manual]
   When the user moves through the interface with the keyboard, every button, tab and control has a visible focus and an accessible label.
 
