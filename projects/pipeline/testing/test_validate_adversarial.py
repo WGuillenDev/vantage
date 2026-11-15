@@ -86,3 +86,9 @@ def test_adversarial_rain_date_that_is_not_a_calendar_day_is_an_error(storage: P
   lines[1] = "2026-13-45," + lines[1].split(",")[1]
   path.write_text("\n".join(lines) + "\n", encoding="utf-8")
   assert any("valid ISO dates" in e for e in validate_dir(storage / "mock-validated"))
+
+
+def test_adversarial_folder_not_listed_in_areas_is_ignored(storage: Path):
+  shutil.copytree(storage / "mock-validated", storage / "stray-zone")
+  (storage / "stray-zone" / "graph.json").unlink()
+  assert validate_storage(storage) == []
