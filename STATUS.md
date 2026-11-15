@@ -14,24 +14,24 @@ Leyenda: `[ ]` pendiente · `[~]` en curso · `[x]` hecha · `[-]` descartada (c
 | 1 | **Bootstrap** | Sáb 09:00–11:00 | Repo, herramientas, contrato y mocks, esqueleto desplegado | [x] |
 | 2 | **Spiking** | Sáb 11:00–15:00 | Probar los supuestos riesgosos y decidir en la **Puerta 1** | [x] Cerrada: G1 NO-GO de detección; S2c y S5 (señal) FALLAN; S4′ solo pasa «hospital de referencia»; S3 queda parcial (sin comunicado primario) |
 | 3 | **Building** | Sáb ~17:00 → dom 14:00 | Datos reales por el pipeline y UI completa sobre el contrato | [x] Cerrada (dom 15 nov): 18 de 18 deltas con spec aprobado y código en `main`; corrida real de la Ruta 32 publicada (P8); 996 pruebas de pipeline y 189 de frontend pasan |
-| 4 | **Polish** | Dom 14:00 → cierre | Congelar, corregir errores, probar, desplegar, presentar | [~] En curso: G2 decidida (X1); sitio publicado verificado con datos reales (X2); README y guion escritos; etiqueta `v1.0` creada en local. Faltan: subir la etiqueta (X3), ensayar (X4) y entregar (X5) |
+| 4 | **Polish** | Dom 14:00 → cierre | Congelar, corregir errores, probar, desplegar, presentar | [~] En curso: G2 decidida (X1); sitio publicado verificado con datos reales (X2); README y guion escritos; etiqueta `v1.0` subida (X3). Faltan: ensayar (X4) y entregar (X5) |
 
 **G1 decidida (sáb 14 nov ~16:35): NO-GO** para detectar derrumbes con GCOV de NISAR (mínimo detectable ≈10×10 px ≈ 1 ha a −5 dB; detalle en `SPIKING.md` S2 y `context/approach.md` §5). Tras los demás spikes (S2c, S4′, S5; ver `SPIKING.md`) ninguna señal de exposición anticipó los cierres, y el producto se redefine en la **D8**: es la **consecuencia (criticidad)** de cada tramo de la Ruta 32, con la lluvia IMERG como contexto etiquetado «hipótesis». «Riesgo = consecuencia × exposición» (D2) ya no se usa. La capa de radar es opcional y puede ir vacía.
 
-Prioridad ahora: cerrar la fase 4. Subir la etiqueta `v1.0` (`git push origin v1.0`), ensayar el guion una vez (X4) y entregar (X5).
+Prioridad ahora: cerrar la fase 4. Ensayar el guion una vez (X4) y entregar (X5).
 
 ## Progreso
 
-**43 / 46 tareas · 93 %** `███████████████████░` _(solo cuentan las `[x]`; las `[~]` aún no suman; las `[-]` descartadas no cuentan)_
+**44 / 46 tareas · 96 %** `███████████████████░` _(solo cuentan las `[x]`; las `[~]` aún no suman; las `[-]` descartadas no cuentan)_
 
 | Fase | Hechas | % |
 |---|---|---|
 | 1 · Bootstrap | 9 / 9 | 100 % |
 | 2 · Spiking | 9 / 9 | 100 % |
 | 3 · Building | 23 / 23 | 100 % |
-| 4 · Polish | 2 / 5 | 40 % |
+| 4 · Polish | 3 / 5 | 60 % |
 
-_Actualizá este bloque cada vez que marques una tarea `[x]`. Una tarea es `[x]` si su código está en `main`, sus pruebas pasan y cumple su «Terminada cuando». Hoy quedan `[~]` X3 y X4, y X5 sin empezar._
+_Actualizá este bloque cada vez que marques una tarea `[x]`. Una tarea es `[x]` si su código está en `main`, sus pruebas pasan y cumple su «Terminada cuando». Hoy queda `[~]` X4, y X5 sin empezar._
 
 ## Puertas
 
@@ -167,7 +167,7 @@ Cortadas `[-]`: **F2** (mostrar pasadas) y **F9** (alternar antes/después): dep
 |---|---|---|---|---|
 | X1 | G2 (dom 14:00): cortar lo que no esté listo y anotarlo en decisiones | todos | [x] | Lista de cortes **15 nov:** G2 adopta la D11: no se corta ninguna funcionalidad y los no hechos y límites quedan listados ahí. |
 | X2 | G3 (dom 18:00): solo errores; probar el sitio en ventana privada y en celular | todos | [x] | El flujo principal funciona **15 nov:** el sitio responde (200) y sirve los datos reales (mismo SHA-256 que `output/`). Abierto en Chrome sin sesión ni datos previos del sitio (el sitio no tiene cuentas): carga el mapa con la Ruta 32, el ranking, el detalle de T-20 (#1), «Simular cierre de este tramo» y la pestaña Simulación (≈3 h 35 min, 377 447 personas estimadas), sin errores en la consola. El móvil está probado con viewport emulado (F7); la prueba en celular físico queda como límite declarado (D11 c). |
-| X3 | README final (cómo correrlo, `make all`, atribuciones, límites) y etiqueta `v1.0` | R, W | [~] | Alguien nuevo puede correrlo **15 nov:** README final escrito (estado, resultados con datos reales, comandos del pipeline, límites, atribuciones). Etiqueta `v1.0` creada en local sobre `656051d` (el `main` publicado); falta subirla con `git push origin v1.0`. |
+| X3 | README final (cómo correrlo, `make all`, atribuciones, límites) y etiqueta `v1.0` | R, W | [x] | Alguien nuevo puede correrlo **15 nov:** README final escrito (estado, resultados con datos reales, comandos del pipeline, límites, atribuciones). Etiqueta `v1.0` subida sobre `0d7c334` (el `main` publicado, con el cambio del icono); el despliegue terminó bien. |
 | X4 | Presentación: el resultado negativo de detectabilidad como hallazgo con su número; texto cauto | todos | [~] | Ensayada una vez **15 nov:** guion en `presentation.md` con los hallazgos y sus números; cifras de S2c, S5, contraste de tiempos y las 115 unidades contrastadas con `SPIKING.md`, `RELIABILITY.md` y `scenarios.json`, sin discrepancias. Los tiempos por sección suman 5 min 30 s frente a los 5 min objetivo. Falta que el equipo lo ensaye en voz alta una vez. |
 | X5 | Entrega a Space Apps con los enlaces finales | R | [ ] | Enviada antes del cierre |
 
