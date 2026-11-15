@@ -1,41 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
-import { loadAreas, loadZoneFile } from './storage.ts'
+import { useEffect, useRef } from 'react'
 import { useAppStore } from './store.ts'
-import { countWithoutImpact, listedUnits, maxCriticality, noPopulationNote, rowView, type RankedUnit } from './ranking.ts'
-import { resolveActiveZone } from './zones.ts'
+import { countWithoutImpact, listedUnits, maxCriticality, noPopulationNote, rowView } from './ranking.ts'
+import type { ZoneData } from './zoneData.ts'
 
-type Edge = { id: string; road?: string | null }
-
-// Loads the active zone's units; `map-corridor` will take over zone loading and this will read from its store.
-function useZoneUnits(): { units: RankedUnit[]; edges: Edge[] } | string | null {
-  const activeId = useAppStore((state) => state.activeZoneId)
-  const [data, setData] = useState<{ units: RankedUnit[]; edges: Edge[] } | string | null>(null)
-
-  useEffect(() => {
-    let cancelled = false
-    loadAreas()
-      .then(async (areas) => {
-        const zone = resolveActiveZone(areas, activeId, new URLSearchParams(window.location.search).get('area'))
-        if (!zone) throw new Error('areas.json lists no zones')
-        const [scenarios, graph] = await Promise.all([
-          loadZoneFile<{ candidates: RankedUnit[] }>(zone.id, 'scenarios.json'),
-          loadZoneFile<{ edges: Edge[] }>(zone.id, 'graph.json'),
-        ])
-        if (!cancelled) setData({ units: scenarios.candidates, edges: graph.edges })
-      })
-      .catch((reason: unknown) => {
-        if (!cancelled) setData(reason instanceof Error ? reason.message : String(reason))
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [activeId])
-
-  return data
-}
-
-export function SegmentRanking() {
-  const data = useZoneUnits()
+export function SegmentRanking({ data }: { data: ZoneData | string | null }) {
   const selected = useAppStore((state) => state.selectedUnitId)
   const selectUnit = useAppStore((state) => state.selectUnit)
   const selectedRow = useRef<HTMLLIElement>(null)
@@ -64,7 +32,7 @@ export function SegmentRanking() {
       ) : (
         <ol className="min-h-0 flex-1 overflow-y-auto">
           {rows.map((unit) => {
-            const row = rowView(unit, data.edges, maxCrit)
+            const row = rowView(unit, data.graph.edges, maxCrit)
             const isSelected = unit.id === selected
             return (
               <li key={unit.id} ref={isSelected ? selectedRow : undefined}>
