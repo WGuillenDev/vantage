@@ -32,3 +32,8 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .DS_Store
 # data files served to the frontend (mock copy or pipeline output)
 projects/frontend/public/storage/
+
+# pipeline downloads and intermediates (rasters, OSM extracts, regenerable files);
+# only the IMERG cells are versioned: getting them needs an Earthdata account and ~48 min
+projects/pipeline/work/*/*
+!projects/pipeline/work/*/imerg/
