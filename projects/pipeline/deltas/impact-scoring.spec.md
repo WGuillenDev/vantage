@@ -124,9 +124,9 @@ Decision notes:
   When `score` runs, it derives its result only from its arguments: it reads no file, zone config or module-level value, and it leaves its arguments unmodified.
 - INV-24 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   When `score` is called twice with equal arguments, the two results serialize to identical JSON.
-- INV-25 [none]
+- INV-25 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   If two units passed to `score` have the same `id`, then `score` raises an English error that names the id.
-- INV-26 [none]
+- INV-26 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_impact_scoring.py]
   If `closure_units.json` lists two units with the same `id`, then impact-scoring exits non-zero with an English error that names the id and writes no `scenarios.json`.
 
 ## Deferred / Open questions
