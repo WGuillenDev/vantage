@@ -2,9 +2,10 @@ import * as maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
 import { useEffect, useRef, useState } from 'react'
-import { ALTERNATE_COLOR, CLOSED_COLOR, COMMUNITY_COLOR, HOSPITAL_COLOR, SELECTED_COLOR } from './colors.ts'
+import { ALTERNATE_COLOR, CLOSED_COLOR, SELECTED_COLOR } from './colors.ts'
 import { alternateEdgeIds, alternateFeatures, alternateRoads, closedFeatures } from './closureWhatif.ts'
 import { fitBounds, pointFeatures, unitFeatures } from './mapCorridor.ts'
+import { iconDataUrl, type PointKind } from './mapIcons.tsx'
 import { MapLegend } from './MapLegend.tsx'
 import { rowView } from './ranking.ts'
 import { useAppStore } from './store.ts'
@@ -18,6 +19,15 @@ const CLICK_TOLERANCE = 6 // px around the pointer, so thin roads are easy to hi
 const NONE = ['==', ['get', 'id'], ''] as maplibregl.FilterSpecification
 
 const SOURCES = ['units', 'hospitals', 'communities', 'closed', 'alternates']
+
+const ICON_SIZE = 24 // css px; drawn at 2x so it stays sharp
+
+async function addPointIcon(map: maplibregl.Map, kind: PointKind) {
+  const image = new Image(ICON_SIZE * 2, ICON_SIZE * 2)
+  image.src = iconDataUrl(kind, ICON_SIZE * 2)
+  await image.decode()
+  map.addImage(kind, image, { pixelRatio: 2 })
+}
 
 const setSource = (map: maplibregl.Map, id: string, collection: unknown) =>
   (map.getSource(id) as maplibregl.GeoJSONSource).setData(collection as typeof EMPTY)
@@ -72,7 +82,9 @@ export function MapView({ state }: { state: ZoneState }) {
     })
     mapRef.current = map
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right')
-    map.on('load', () => {
+    map.on('load', async () => {
+      await Promise.all([addPointIcon(map, 'community'), addPointIcon(map, 'hospital')])
+      if (mapRef.current !== map) return // unmounted while the icons were loading
       for (const id of SOURCES) map.addSource(id, { type: 'geojson', data: EMPTY })
       // closure-whatif: the alternate roads sit under the units, the closed units on top of them.
       map.addLayer({
@@ -106,15 +118,15 @@ export function MapView({ state }: { state: ZoneState }) {
       })
       map.addLayer({
         id: 'communities',
-        type: 'circle',
+        type: 'symbol',
         source: 'communities',
-        paint: { 'circle-radius': 5, 'circle-color': COMMUNITY_COLOR, 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 1.5 },
+        layout: { 'icon-image': 'community', 'icon-size': 0.8, 'icon-allow-overlap': true },
       })
       map.addLayer({
         id: 'hospitals',
-        type: 'circle',
+        type: 'symbol',
         source: 'hospitals',
-        paint: { 'circle-radius': 7, 'circle-color': HOSPITAL_COLOR, 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 2 },
+        layout: { 'icon-image': 'hospital', 'icon-allow-overlap': true },
       })
       setReady(true)
     })

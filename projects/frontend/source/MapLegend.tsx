@@ -1,6 +1,7 @@
 import { Layers } from 'lucide-react'
 import { useState } from 'react'
-import { ALTERNATE_COLOR, CLOSED_COLOR, COMMUNITY_COLOR, HOSPITAL_COLOR } from './colors.ts'
+import { ALTERNATE_COLOR, CLOSED_COLOR } from './colors.ts'
+import { PointIcon } from './mapIcons.tsx'
 import { colorForCriticality, GRAY, legendRange, rankingUnknown } from './mapCorridor.ts'
 import type { ZoneData } from './zoneData.ts'
 
@@ -10,10 +11,6 @@ const Swatch = ({ color, dashed = false }: { color: string; dashed?: boolean }) 
   ) : (
     <span aria-hidden="true" className="inline-block h-1 w-4 rounded" style={{ background: color }} />
   )
-
-const Dot = ({ color }: { color: string }) => (
-  <span aria-hidden="true" className="inline-block h-2.5 w-2.5 rounded-full border border-white" style={{ background: color }} />
-)
 
 export function MapLegend({ data, hasClosed }: { data: ZoneData; hasClosed: boolean }) {
   // Collapsed on phones so it does not cover the map or the attribution.
@@ -59,11 +56,11 @@ export function MapLegend({ data, hasClosed }: { data: ZoneData; hasClosed: bool
             </>
           )}
           <p className="flex items-center gap-1.5">
-            <Dot color={HOSPITAL_COLOR} />
+            <PointIcon kind="hospital" />
             hospital de referencia
           </p>
           <p className="flex items-center gap-1.5">
-            <Dot color={COMMUNITY_COLOR} />
+            <PointIcon kind="community" />
             comunidad
           </p>
         </div>
