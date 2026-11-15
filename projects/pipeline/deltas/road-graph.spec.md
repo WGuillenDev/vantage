@@ -60,9 +60,12 @@ Rules:
 | Snapping | Hospitals and communities snap to the nearest node of the largest strongly connected component of the directed graph (two-way edges count in both directions, `oneway` edges in one), measured from the feature's original OSM coordinates. |
 | `road` | `"Ruta <ref>"` from the first OSM `ref` when present, else the OSM `name`, else `null`. |
 | Hospitals | Exactly the zone's referral hospital ids, each found in the extract; `name` is the OSM `name`. A hospital with no `name`, one not found, or one farther than `MAX_SNAP_M` from its snapped node stops the run (names and places are never made up). |
+| Referral ids | Compared by kind and number, so `way/301` and `way/0301` name the same hospital. The zone config does not forbid writing both, so this stage rejects the pair (decided 15 Nov; `area-config` could reject it earlier, see Deferred). |
 | Communities | OSM `place` nodes of type `city`, `town`, `village` or `hamlet` with a `name`, snapped as above; dropped when farther than `MAX_SNAP_M`, and each drop is logged. Accepted coverage limit for Ruta 32 (Ian, 14 Nov): the first real run dropped 73 communities, mostly in Talamanca and southern Limón, far from the road. |
 | Ids | Nodes `n1…` in ascending OSM node id, then the nodes created by splitting long edges, numbered after all OSM nodes in edge order and, within an edge, from `from` to `to`; edges `e1…` in ascending `(from, to)` OSM ids of their ends, then ascending smallest OSM way id (parallel edges), then split order; hospitals `h1…` and communities `c1…` in ascending OSM id. |
 | Size | `graph.json` is at most 3 MB, written as compact JSON; a larger result stops the run without writing the file. The first real run over the Ruta 32 network area measured 2.29 MB (7 136 nodes, 8 715 edges, 758 communities). |
+| Extract files | `roads.osm` and `features.osm` must each be well-formed OSM XML, and `roads.osm` must hold at least one road. A `features.osm` that is well-formed but holds no features is not unreadable: the zone always lists at least one referral hospital, so it is the case of INV-07. |
+| Download | Both Overpass answers are obtained and checked before any file of the extract is replaced, and `extract_date.txt` is written last. An answer is unusable when it is not well-formed OSM XML, holds no elements or contains a `remark` element (how Overpass reports a runtime error such as a timeout, inside a 200 answer). A failed request (network error, timeout or HTTP error status) is an English exit, never a traceback (decided 15 Nov). |
 
 ## Invariants
 
@@ -116,10 +119,23 @@ Rules:
   If a referral hospital lies more than 3000 m from its snapped node, then road-graph exits non-zero with an English error that names the hospital and the distance and writes no `graph.json`.
 - INV-26 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py]
   When road-graph writes `graph.json`, it also writes `work/<id>/communities.json` with exactly one entry per community of `graph.json`, holding its id, its OSM id and its original `lon` and `lat`.
+- INV-27 [none]
+  If `roads.osm` is empty, is not well-formed OSM XML or holds no roads, or `features.osm` is empty or is not well-formed OSM XML, then road-graph exits non-zero with an English error that names the file and writes no `graph.json` and no `communities.json`.
+- INV-28 [none]
+  If any Overpass request of `--download` fails (network error, timeout or HTTP error status), then road-graph exits non-zero with an English error and leaves the zone's `roads.osm`, `features.osm` and `extract_date.txt` as they were.
+- INV-29 [none]
+  If an Overpass answer is not well-formed OSM XML, holds no elements or contains a `remark` element, then road-graph with `--download` exits non-zero with an English error and leaves the zone's `roads.osm`, `features.osm` and `extract_date.txt` as they were.
+- INV-30 [none]
+  If the zone's referral hospital ids include two that name the same OSM element (for example `way/301` and `way/0301`), then road-graph exits non-zero with an English error that names both ids and writes no `graph.json`.
 
 ## Deferred / Open questions
 
-Testing gaps (every claim is tagged `none`, because `test_road_graph.py` is not on this branch; the 23 tests of `origin/feat/road-graph` and the adversarial ones of `origin/test/road-graph-adversarial` cover INV-01 to INV-22 in the old form, and `builder` ports them to zones and turns each tag into `test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py`): INV-01 to INV-24, INV-26, ACC-01.
+Testing gaps: ACC-01 is `none` because it needs the real extract, which needs the network and a complete `speed_model_kmh`. INV-27 to INV-30 are `none` until `builder` runs: their tests already exist as the 8 tests of `test_road_graph_findings.py`, red on purpose. `builder` moves them to `test_road_graph.py` and turns each tag into `test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_road_graph.py`. One of them changes with this revision: the test for `way/0301` expects one hospital and must expect the INV-30 error instead.
+
+- **Network without cycles (undecided):** when no strongly connected component has more than one node (for example a network of only one-way roads), every hospital and community snaps to the same node and the run succeeds without a warning. Whether to stop the run, and below what component size, is not decided; the first real run shows how large the component is for Ruta 32 and settles it.
+- **Duplicate ids at load (undecided):** INV-30 rejects the pair in this stage. `area-config` could reject it when it loads the config, which fails earlier; that is its contract, not this slice's.
+- **Overpass `remark` check:** INV-29 relies on Overpass reporting a runtime error as a `remark` element inside a 200 answer. If that changes, a truncated extract can pass the download.
+- **Replacing the extract is not atomic across files:** a crash between replacing `roads.osm` and `features.osm` can still leave a mixed extract. `extract_date.txt` is written last, so a stale date is the sign.
 
 - **Referral hospital ids and criterion (Ian):** the list and the criterion for what counts are decided in the zone config (`area-config`). S4 found 27 `amenity=hospital` features in the corridor, including a dental clinic, a blood bank and a psychiatric hospital.
 - **`unclassified` speed (Ian):** the zone config needs a value with a cited source before the real run; until then the real run stops by INV-17, which is the intended behavior.
