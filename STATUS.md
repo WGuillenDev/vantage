@@ -97,7 +97,7 @@ Un delta por rebanada, en `projects/<proyecto>/deltas/<delta>.spec.md`. Nombres 
 | 14 | `impact-scoring` | pipeline | M | I | P5, E5 | closure-units, population-data | sí | [x] |
 | 15 | `pipeline-run` | pipeline | M | R | P7, P8 | todos los del pipeline | sí | [x] |
 | 16 | `population-data` | pipeline | M | W | E4 | road-graph | sí | [x] |
-| 17 | `rain-context` | pipeline | M | I | E1 | area-config | no | [~] |
+| 17 | `rain-context` | pipeline | M | I | E1 | area-config | no | [x] |
 | 18 | `closure-units` | pipeline | L | I | P9 | road-graph | sí | [~] |
 
 `graph.ts` (S8) ya pasa y no tiene delta propio; si hace falta cruzarlo con el grafo real, entra en `closure-whatif`.
