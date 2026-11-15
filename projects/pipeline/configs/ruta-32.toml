@@ -1,20 +1,21 @@
-# Ruta 32 (San José–Limón): the demonstration zone. Values marked PENDING are not final.
+# Ruta 32 (San José–Limón): the demonstration zone. Values marked PENDING have a known limit (see the notes).
 name = "Ruta 32 (San José–Limón)"
 # Nobody has checked the results by hand yet (manual-review, P12): stays false until that review passes.
 validated = false
 bbox = [-84.30, 9.80, -82.95, 10.45]  # [w, s, e, n]
 
 [hospitals]
-# PENDING (Ian): the list is not confirmed. Ids looked up in OSM on 2026-11-15 (amenity=hospital):
-# Hospital Dr. Rafael Ángel Calderón Guardia, Hospital México, Hospital San Juan de Dios.
-# Not included until confirmed: Hospital Dr. Tony Facio Castro (way/1451665976), Hospital Guápiles (way/326924912).
+# Decided 15 Nov 2026 (STATUS.md, D9): the three national referral hospitals of San José, ids checked in OSM
+# (amenity=hospital): Hospital Dr. Rafael Ángel Calderón Guardia, Hospital México, Hospital San Juan de Dios.
+# Left out on purpose: the regional Hospital Dr. Tony Facio Castro (way/1451665976) and Hospital Guápiles (way/326924912).
+# Measured with them added: the top 20 of the ranking shares no unit with this list (planning.md, D5).
 referral = ["way/1168011056", "way/25400008", "way/24857117"]
 
 [speed_model_kmh]
 # Source: median of the OSM `maxspeed` tag per road class in the extract of 2026-11-15 (Overpass, bbox above),
 # ways with a plain km/h value. It is the posted limit, not the travel speed, so times are optimistic:
 # `make timecheck` measures that gap. Tagged ways per class: trunk 901, primary 273, secondary 1449, tertiary 512.
-# `unclassified` has only 22 tagged ways (8 at 40): weakest value, PENDING team confirmation (Ian).
+# `unclassified` has only 22 tagged ways (8 at 40): the weakest value, a known limit (STATUS.md, D11).
 # No motorway exists in the extract, so none is listed.
 trunk = 60
 primary = 40
