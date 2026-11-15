@@ -63,7 +63,44 @@ def rank_correlation(baseline: dict, run: dict) -> tuple[float | None, int]:
   return (covariance / spread if spread else None), len(common)
 
 
+def _check_scenarios(scenarios: object, label: str) -> None:
+  """The fields this module reads, checked where the data comes from a file or from the scorer."""
+  if not isinstance(scenarios, dict):
+    raise SensitivityError(f"{label}: must be a JSON object")
+  candidates = scenarios.get("candidates")
+  if not isinstance(candidates, list):
+    raise SensitivityError(f"{label}: candidates must be a list")
+  for number, unit in enumerate(candidates, start=1):
+    if not isinstance(unit, dict) or not isinstance(unit.get("id"), str):
+      raise SensitivityError(f"{label}: candidate {number} needs a text id")
+    if isinstance(unit.get("rank"), bool) or not isinstance(unit.get("rank"), int):
+      raise SensitivityError(f"{label}: candidate {unit['id']} needs an integer rank")
+    if not isinstance(unit.get("affected_community_ids"), list):
+      raise SensitivityError(f"{label}: candidate {unit['id']} needs affected_community_ids as a list")
+
+
+def _check_graph(graph: object) -> None:
+  if not isinstance(graph, dict):
+    raise SensitivityError("graph.json: must be a JSON object")
+  for key in ("edges", "hospitals"):
+    if not isinstance(graph.get(key), list):
+      raise SensitivityError(f"graph.json: {key} must be a list")
+  for hospital in graph["hospitals"]:
+    if not isinstance(hospital, dict) or "id" not in hospital or "name" not in hospital:
+      raise SensitivityError("graph.json: every hospital needs an id and a name")
+
+
+def _as_json(value: object, label: str) -> object:
+  """The value as it would read back from a file, so a tuple and a list with the same content compare equal."""
+  try:
+    return json.loads(json.dumps(value))
+  except (TypeError, ValueError):
+    raise SensitivityError(f"{label}: contains data that is not JSON-serializable") from None
+
+
 def _run(kind: str, value: float | str, baseline: dict, scenarios: dict) -> dict:
+  scenarios = _as_json(scenarios, "scorer output")
+  _check_scenarios(scenarios, "scorer output")
   correlation, compared = rank_correlation(baseline, scenarios)
   return {
     "kind": kind,
@@ -76,7 +113,9 @@ def _run(kind: str, value: float | str, baseline: dict, scenarios: dict) -> dict
 
 
 def build_report(graph: dict, units: list[dict], scenarios: dict, scorer: Scorer) -> dict:
-  if scorer(graph, units) != scenarios:
+  _check_graph(graph)
+  _check_scenarios(scenarios, "scenarios.json")
+  if _as_json(scorer(graph, units), "scorer output") != _as_json(scenarios, "scenarios.json"):
     raise SensitivityError("the baseline is not reproducible: scoring the unperturbed graph does not give scenarios.json")
   with_impact = len(_impact_ranks(scenarios))
   gradable = with_impact >= MIN_UNITS_WITH_IMPACT
