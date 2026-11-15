@@ -199,9 +199,14 @@ Conclusión: **no hace falta tocar el modelo para el ranking**. D4 no se aplica;
 | # | Estado | Detalle |
 |---|---|---|
 | E1 | Hecho, con reserva | Viewport móvil emulado de 390×844 con Playwright: la hoja inferior se expande, abrir un tramo, simular un cierre y las pestañas Simulación y «¿Por qué?» funcionan. No se probó en un celular físico (queda en X2). Detalle menor: la leyenda del mapa se cruza con el texto de atribución |
-| E2 | Hecho | Los invariantes de `rain-context` ya tenían etiqueta `test:`; lo desactualizado era el párrafo «Testing gaps». Corregido en el spec. ACC-01 verificado con la corrida real (317 días sin huecos, 115 de 115 unidades con lluvia); ACC-02 sigue manual |
+| E2 | Hecho | Los invariantes de `rain-context` ya tenían etiqueta `test:`; lo desactualizado era el párrafo «Testing gaps». Corregido en el spec. ACC-01 verificado con la corrida real (317 días sin huecos, 115 de 115 unidades con lluvia); ACC-02 verificado después: 8 de 8 celdas del granulo del 2026-11-13 leídas aparte con h5py coinciden exactamente con `cells.csv` |
 | E3 | Hecho | `STATUS.md` actualizado: 39 de 46 tareas (85 %) y Fase 3 en 21 de 23 |
 | E4 | Hecho como propuesta | Lista de cortes y límites para G2 en la decisión D11 del registro; el equipo la confirma a las 14:00 |
+
+**Cierre de límites con datos (15 nov, tras el bloque E):**
+- **Limón aislada en 22 unidades:** no es un artefacto. Las 22 unidades están al este de Siquirres (longitud −83,51 a −83,03), el único tramo sin alternativa. Con toda la Ruta 32 cerrada Limón no llega a ningún hospital, y las unidades al oeste no la aíslan porque hay camino por la Ruta 10. 16 no están marcadas como sospechosas y las 6 marcadas están junto a Limón (p. ej. T-113). Depende de D9: Limón tiene su hospital propio, que no cuenta como referencia.
+- **Pares c497 (Colonia Nazareth) y c520 (Finca 4):** el modelo da 62 y 73 min (61 y 66 km por la Ruta 32); el router público da 180 y 181 min (119 y 122 km, otro camino). La referencia documentada de Guápiles (~1 h) coincide con el modelo, así que el valor atípico parece del router. Los pares sanos del mismo tipo (c305, c14) coinciden con el router en distancia (7,1 y 9,4 km frente a 7,1 y 9,3).
+- **ACC-02 de `rain-context`:** ver E2.
 
 ## 5. Decisiones que hacen falta (del equipo, no mías)
 
