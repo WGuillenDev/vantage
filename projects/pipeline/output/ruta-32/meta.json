@@ -1,0 +1,35 @@
+{
+  "schema_version": "0.3",
+  "generated_at": "2026-11-15T16:30:05Z",
+  "files": {
+    "rain_csv_schema": "0.1"
+  },
+  "area": {
+    "name": "Ruta 32 (San José–Limón)",
+    "bbox": [
+      -84.3,
+      9.8,
+      -82.95,
+      10.45
+    ]
+  },
+  "rain": {
+    "product": "GPM_3IMERGDL",
+    "version": "07",
+    "start": "2026-01-01",
+    "end": "2026-11-13",
+    "aggregation": "area_mean"
+  },
+  "speed_model_kmh": {
+    "trunk": 60,
+    "primary": 40,
+    "secondary": 40,
+    "tertiary": 40,
+    "unclassified": 40
+  },
+  "attributions": [
+    "© OpenStreetMap contributors (ODbL), extract 2026-11-15",
+    "IMERG Late (NASA GPM)",
+    "WorldPop (modelled population estimate)"
+  ]
+}
