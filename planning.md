@@ -125,8 +125,24 @@ Meta: P8 antes del cierre del bloque de datos, no esperar a G2.
 | D2 | Escribir `reports/ruta-32/reference_times.json` (3–5 tiempos con fuente citada y fecha; nunca inventados) y correr `make timecheck AREA=ruta-32` | V, R | `time_crosscheck.json` con veredicto; si hay menos de 15 pares, queda `insufficient_pairs` y se dice |
 | D3 | `make review-prepare AREA=ruta-32`, **una persona que conozca la zona** clasifica las comunidades aisladas de las 3 unidades, luego `make review-summary` | R | `manual_review.json` con revisor, fecha y veredicto |
 | D4 | Si D3 pasa (≥ 80 % reales), `validated = true`; si no, queda `false` y se corrigen los artefactos y se vuelve a medir | R | El toml refleja el resultado de D3 |
+| D5 | Variante con los 5 hospitales (añadir Tony Facio y Guápiles) para medir cuánto depende el ranking de qué hospitales cuentan como referencia | R | **Hecho (15 nov):** ver «Resultado de D5». No se publica |
 
 Los tres veredictos se reportan tal cual. Un `fail` es un hallazgo con su número (principio del proyecto), no un motivo para ocultarlo ni para ajustar el modelo a última hora.
+
+**Resultado de D5 (15 nov).** Método: copia aislada del pipeline con la misma red, población y lluvia, y `hospitals.referral` con los cinco ids (los tres de San José más `way/1451665976` Tony Facio y `way/326924912` Guápiles). Mismas 115 unidades de cierre.
+
+| Medida | 3 hospitales (San José) | 5 hospitales |
+|---|---|---|
+| Mediana del tiempo base al hospital | 86,6 min | 43,1 min |
+| Comunidades a más de 2 h en el estado base | 139 | 20 |
+| Unidades con impacto | 100 | 97 |
+| Pares comunidad-unidad aislados | 965 | 103 |
+| Coincidencia del top 5 / top 10 / top 20 | 0 / 0 / 0 | |
+| Correlación de rangos (Spearman, 89 unidades en común) | 0,53 | |
+
+El ranking depende casi por completo del conjunto de referencia. Con tres hospitales mide el acceso a los hospitales nacionales de San José (el cuello de botella es la zona de Braulio Carrillo, unas 311 comunidades afectadas por unidad). Con cinco mide el acceso local, y el primer lugar pasa a ser una unidad de 107 m junto a Limón con una sola comunidad aislada (la ciudad de Limón, 34 253 habitantes) que además está marcada como sospechosa, o sea un posible artefacto de la red.
+
+Decisión (R, 15 nov): **se mantienen los tres hospitales de San José**, porque la pregunta del producto es el acceso a un hospital nacional de referencia. Se dice sin matices en la presentación y en la interfaz: «referencia = hospitales nacionales de San José»; el ranking no es válido para otro conjunto, y la variante de cinco queda como hallazgo (X4). La interfaz no debe presentar el ranking como estable ante este supuesto.
 
 ### Bloque E — Cierre
 
@@ -140,7 +156,7 @@ Los tres veredictos se reportan tal cual. Un `fail` es un hallazgo con su númer
 ## 5. Decisiones que hacen falta (del equipo, no mías)
 
 1. **Velocidades por clase de vía y su fuente** (A3). Sin eso no hay corrida. ¿Medianas de OSM de Costa Rica (lo que dice D8) o valores de otra fuente?
-2. **Hospitales de referencia** (A1): ¿se incluyen Tony Facio (Limón) y Guápiles? Es un criterio que cambia el mapa entero.
+2. **Hospitales de referencia** (A1): decidido el 15 nov tras medirlo (D5): se mantienen los tres de San José; con cinco el top 20 no coincide en ninguno.
 3. **Alternas** (`closure.alternates`): ¿se cita una fuente o se publica sin alternas? Recomendado: sin alternas, dicho en la interfaz, antes que alternas sin fuente.
 4. **Periodo de lluvia** (pregunta abierta de `STATUS.md`): hoy 1 ene–13 nov 2026 por configuración. Si no se re-descarga, se queda; si se re-descarga, se mueve la fecha fin a mano.
 5. **Si algún informe no llega a G2:** se publica sin él y la interfaz no afirma lo que no se midió.
