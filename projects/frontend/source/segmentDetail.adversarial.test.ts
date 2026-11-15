@@ -40,8 +40,6 @@ describe('segment-detail adversarial', () => {
   })
 
   test('rain.csv rejects negative rainfall', () => {
-    expect(() => parseRain('date,precip_mm
-2026-06-28,-1
-')).toThrow('rain.csv')
+    expect(() => parseRain('date,precip_mm\n2026-06-28,-1\n')).toThrow('rain.csv')
   })
 })
