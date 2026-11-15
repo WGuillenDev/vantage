@@ -83,8 +83,8 @@ Un delta por rebanada, en `projects/<proyecto>/deltas/<delta>.spec.md`. Nombres 
 |---|---|---|---|---|---|---|---|---|
 | 1 | `contract-update` | contract | S | R | C1 | — | sí | [x] |
 | 2 | `area-config` | pipeline | S | I | E3 | — | sí | [x] |
-| 3 | `zone-picker` | frontend | S | V | F11 | map-corridor, pipeline-run | no | [~] |
-| 4 | `segment-ranking` | frontend | S | V | F3 | contract-update | sí | [~] |
+| 3 | `zone-picker` | frontend | S | V | F11 | map-corridor, pipeline-run | no | [x] |
+| 4 | `segment-ranking` | frontend | S | V | F3 | contract-update | sí | [x] |
 | 5 | `trust-signals` | frontend | S | V | F8, F10 | segment-detail | F8 sí; F10 no | [~] |
 | 6 | `time-crosscheck` | pipeline | S | V | P11 | road-graph | no | [~] |
 | 7 | `rank-sensitivity` | pipeline | S | V | P10 | impact-scoring | no | [~] |
