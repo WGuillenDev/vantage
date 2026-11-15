@@ -10,6 +10,7 @@ import urllib.request
 from datetime import UTC, datetime
 from itertools import pairwise
 from pathlib import Path
+from xml.etree import ElementTree
 
 import networkx as nx
 import numpy as np
@@ -31,6 +32,7 @@ SIMPLIFY_TOLERANCE_DEG = 0.0001  # ~11 m at Costa Rica's latitude
 OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 USER_AGENT = "vantage-pipeline"  # generic on purpose: no name, email or machine data
 OSM_ID = re.compile(r"(node|way|relation)/([0-9]+)")
+OSM_ELEMENTS = {"node", "way", "relation"}
 
 
 class RoadGraphError(Exception):
@@ -118,7 +120,10 @@ def _coords(graph, u: int, v: int, data: dict) -> list[tuple]:
 
 def _load_network(roads_osm: Path, bbox: tuple) -> list:
   """Kept road pieces as (u, v, key, data): largest weakly connected component, simplified, one per piece."""
-  graph = ox.graph_from_xml(roads_osm, simplify=False, retain_all=True)
+  try:
+    graph = ox.graph_from_xml(roads_osm, simplify=False, retain_all=True)
+  except (ElementTree.ParseError, InsufficientResponseError) as exc:
+    raise RoadGraphError(f"{roads_osm.name}: not usable OSM data ({exc})") from None
   graph = ox.truncate.truncate_graph_bbox(graph, bbox)
   if len(graph) == 0:
     raise RoadGraphError(f"No roads of the extract lie inside the bbox {list(bbox)}")
@@ -242,14 +247,26 @@ def _communities(features, snapper: _Snapper) -> tuple[list[dict], list[dict]]:
   return communities, originals
 
 
+def _check_referral_ids(referral: tuple[str, ...]) -> None:
+  seen: dict[tuple[int, str], str] = {}
+  for entry in referral:
+    key = _osm_key(entry)
+    if key in seen:
+      raise RoadGraphError(f"Referral hospital ids {seen[key]} and {entry} name the same OSM element")
+    seen[key] = entry
+
+
 def build(roads_osm: Path, features_osm: Path, zone: Zone) -> tuple[dict, list[dict]]:
   """The zone's graph.json content and the original coordinates of its communities (work/communities.json)."""
+  _check_referral_ids(zone.referral_hospitals)
   pieces = _load_network(roads_osm, zone.bbox)
   _check_speeds(pieces, zone.speed_model_kmh)
   nodes, edges = _build_edges(pieces, zone.speed_model_kmh)
   snapper = _Snapper(_largest_strong_component(nodes, edges))
   try:
     features = ox.features_from_xml(features_osm)
+  except ElementTree.ParseError as exc:
+    raise RoadGraphError(f"{features_osm.name}: not usable OSM data ({exc})") from None
   except InsufficientResponseError:
     # The zone config always lists at least one referral hospital, so an extract with no features misses it.
     raise RoadGraphError(f"Referral hospital {min(zone.referral_hospitals, key=_osm_key)} was not found in the OSM extract") from None
@@ -279,6 +296,21 @@ def run(zone: Zone, work_dir: Path) -> Path:
   return zone.output_dir / "graph.json"
 
 
+def _check_answer(name: str, body: bytes) -> None:
+  """An Overpass answer is unusable when it is not OSM XML, holds no elements or carries a runtime-error remark."""
+  try:
+    root = ElementTree.fromstring(body)
+  except ElementTree.ParseError as exc:
+    raise RoadGraphError(f"Overpass answer for {name} is not well-formed XML ({exc})") from None
+  if root.tag != "osm":
+    raise RoadGraphError(f"Overpass answer for {name} is not an OSM document")
+  remark = root.find("remark")
+  if remark is not None:
+    raise RoadGraphError(f"Overpass answer for {name} reports an error: {(remark.text or '').strip()}")
+  if not any(child.tag in OSM_ELEMENTS for child in root):
+    raise RoadGraphError(f"Overpass answer for {name} holds no elements")
+
+
 def download(zone: Zone, osm_dir: Path) -> None:
   w, s, e, n = zone.bbox
   area = f"({s},{w},{n},{e})"
@@ -291,7 +323,8 @@ def download(zone: Zone, osm_dir: Path) -> None:
       f'node["place"~"^({places})$"]["name"]{area};);(._;>;);out body;'
     ),
   }
-  osm_dir.mkdir(parents=True, exist_ok=True)
+  # Both answers are held and checked before any file is replaced, so a failure never leaves a mixed extract.
+  answers = {}
   for name, query in queries.items():
     log.info("Downloading %s from Overpass", name)
     request = urllib.request.Request(
@@ -299,8 +332,15 @@ def download(zone: Zone, osm_dir: Path) -> None:
       data=urllib.parse.urlencode({"data": query}).encode(),
       headers={"User-Agent": USER_AGENT},
     )
-    with urllib.request.urlopen(request, timeout=900) as response:
-      (osm_dir / name).write_bytes(response.read())
+    try:
+      with urllib.request.urlopen(request, timeout=900) as response:
+        answers[name] = response.read()
+    except OSError as exc:  # URLError, HTTPError and timeouts are all OSError
+      raise RoadGraphError(f"Overpass request for {name} failed: {exc}") from None
+    _check_answer(name, answers[name])
+  osm_dir.mkdir(parents=True, exist_ok=True)
+  for name, body in answers.items():
+    (osm_dir / name).write_bytes(body)
   # pipeline-run writes this date into the OSM line of meta.json -> attributions.
   (osm_dir / "extract_date.txt").write_text(datetime.now(UTC).date().isoformat() + "\n", encoding="utf-8")
 
