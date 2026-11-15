@@ -1,5 +1,6 @@
 import argparse
 import json
+import math
 import re
 import statistics
 import time
@@ -83,9 +84,14 @@ def _route_seconds(fetch: Fetch, origin: tuple[float, float], destination: tuple
     answer = json.loads(body)
   except json.JSONDecodeError:
     raise CrossCheckError("the router answered HTTP 200 with a body that is not JSON") from None
+  if not isinstance(answer, dict):
+    raise CrossCheckError("the router answered with an unexpected shape")
   if answer.get("code") != "Ok" or not answer.get("routes"):
     return None
-  duration = answer["routes"][0]["duration"]
+  route = answer["routes"][0]
+  duration = route.get("duration") if isinstance(route, dict) else None
+  if isinstance(duration, bool) or not isinstance(duration, (int, float)) or not math.isfinite(duration):
+    raise CrossCheckError("the router answered with an unexpected shape")
   # A zero duration means both points snapped to the same spot: no usable time, and it cannot be a divisor.
   return duration if duration > 0 else None
 
@@ -103,13 +109,13 @@ def load_references(path: Path) -> list[dict]:
     label = f"{path.name}: entry {number} ({entry.get('community_id') if isinstance(entry, dict) else '?'})"
     if not isinstance(entry, dict):
       raise CrossCheckError(f"{label}: must be an object")
-    for key in ("source", "accessed_on"):
+    for key in ("community_id", "hospital_id", "source", "accessed_on"):
       value = entry.get(key)
       if not isinstance(value, str) or not value.strip():
         raise CrossCheckError(f"{label}: {key} is missing or empty")
     minutes = entry.get("minutes")
-    if isinstance(minutes, bool) or not isinstance(minutes, (int, float)) or not minutes > 0:
-      raise CrossCheckError(f"{label}: minutes must be a number greater than 0")
+    if isinstance(minutes, bool) or not isinstance(minutes, (int, float)) or not (math.isfinite(minutes) and minutes > 0):
+      raise CrossCheckError(f"{label}: minutes must be a finite number greater than 0")
   return entries
 
 
@@ -131,8 +137,13 @@ def build_report(
 ) -> dict:
   coordinates = _coordinates(graph)
   baseline = {row["community_id"]: row for row in scenarios["baseline"]}
+  selected = build_sample(graph, scenarios["baseline"])
+  for row in selected:
+    for kind, key in (("community", "community_id"), ("hospital", "hospital_id")):
+      if row[key] not in coordinates:
+        raise CrossCheckError(f"scenarios.json: baseline {kind} {row[key]} is not in graph.json")
   pairs = []
-  for index, sample in enumerate(build_sample(graph, scenarios["baseline"])):
+  for index, sample in enumerate(selected):
     if index:
       sleep(MIN_SECONDS_BETWEEN_REQUESTS)
     router_s = _route_seconds(fetch, coordinates[sample["community_id"]], coordinates[sample["hospital_id"]])
