@@ -75,6 +75,8 @@ def _read_cells(path: Path, period: list[date]) -> dict[tuple[date, Cell], Decim
       cell = (Decimal(row["cell_lon"]), Decimal(row["cell_lat"]))
     except (InvalidOperation, TypeError):
       raise RainContextError(f"{path.name}: line {line}: cell_lon and cell_lat must be numbers") from None
+    if not all(part.is_finite() for part in cell):
+      raise RainContextError(f"{path.name}: line {line}: cell_lon and cell_lat must be finite numbers")
     key = (row["date"], cell)
     if key in raw:
       raise RainContextError(f"{path.name}: line {line}: repeats {row['date']} for cell {cell[0]}, {cell[1]}")
@@ -96,6 +98,16 @@ def _read_cells(path: Path, period: list[date]) -> dict[tuple[date, Cell], Decim
 
 def _mean(values: list[Decimal], places: str) -> Decimal:
   return (sum(values) / len(values)).quantize(Decimal(places), rounding=ROUND_HALF_UP)
+
+
+def _check_units(scenarios: object) -> None:
+  """The shape of scenarios.json that this stage reads; the full schema is checked on the output."""
+  units = scenarios.get("candidates") if isinstance(scenarios, dict) else None
+  if not isinstance(units, list):
+    raise RainContextError("scenarios.json: must be an object with a candidates list")
+  for number, unit in enumerate(units, start=1):
+    if not isinstance(unit, dict) or not isinstance(unit.get("id"), str) or not isinstance(unit.get("edge_ids"), list) or not unit["edge_ids"]:
+      raise RainContextError(f"scenarios.json: candidate {number} needs an id and a non-empty edge_ids list")
 
 
 def _unit_cells(unit: dict, edges: dict[str, dict]) -> set[Cell]:
@@ -125,6 +137,7 @@ def run(zone: Zone, work_dir: Path) -> Path:
 
   graph = _read_json(zone.output_dir / "graph.json")
   scenarios = _read_json(zone.output_dir / "scenarios.json")
+  _check_units(scenarios)
   errors = _schema_errors("graph.json", graph, "graph.schema.json")
   if not errors:
     errors = _check_graph(graph)
@@ -147,9 +160,18 @@ def run(zone: Zone, work_dir: Path) -> Path:
     raise RainContextError("scenarios.json failed its checks, nothing written: " + "; ".join(errors))
 
   lines = ["date,precip_mm"] + [f"{day.isoformat()},{format(mm, 'f')}" for day, mm in rain]
-  _write_atomic(zone.output_dir / "rain.csv", ("\n".join(lines) + "\n").encode("utf-8"))
-  path = zone.output_dir / "scenarios.json"
-  _write_atomic(path, (json.dumps(scenarios, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
+  rain_path, path = zone.output_dir / "rain.csv", zone.output_dir / "scenarios.json"
+  old_rain = rain_path.read_bytes() if rain_path.is_file() else None
+  _write_atomic(rain_path, ("\n".join(lines) + "\n").encode("utf-8"))
+  try:
+    _write_atomic(path, (json.dumps(scenarios, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
+  except BaseException:
+    # shortcut: if this restore fails too, the two files disagree; fine for a rerunnable offline stage.
+    if old_rain is None:
+      rain_path.unlink(missing_ok=True)
+    else:
+      rain_path.write_bytes(old_rain)
+    raise
   return path
 
 
@@ -184,8 +206,8 @@ def _read_granule(item) -> tuple[str, list[tuple[str, str, str]]]:
   out = []
   for i, col in enumerate(cols):
     for j, row in enumerate(rows):
-      value = float(block[i, j])
-      out.append((f"{lon[col]:.2f}", f"{lat[row]:.2f}", "" if value < FILL_BELOW else repr(value)))
+      value = block[i, j]  # the float32 as stored: str() gives its short form (0.35), float() would add noise digits
+      out.append((f"{lon[col]:.2f}", f"{lat[row]:.2f}", "" if float(value) < FILL_BELOW else str(value)))
   return day, out
 
 
