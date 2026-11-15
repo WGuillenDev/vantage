@@ -1,9 +1,10 @@
 # VANTAGE — Contract reference
 
-> Field-by-field reference for the files in `projects/frontend/public/storage/`, the only coupling between the pipeline (writes) and the SPA (reads).
+> Field-by-field reference for the files in `projects/frontend/public/storage/`, the only coupling between the pipeline (writes) and the SPA (reads). Since 0.3, `storage/` holds `areas.json` and one folder per zone (`storage/<id>/`); the files below live in each zone folder (§14).
 
 | File | Written by | Read by | Format |
 |---|---|---|---|
+| `areas.json` (at `storage/`, since 0.3) | Pipeline | SPA | JSON |
 | `meta.json` | Pipeline | SPA | JSON |
 | `change.geojson` | Pipeline | SPA | GeoJSON |
 | `overlay_*.png` | Pipeline | SPA | PNG (RGBA) |
@@ -11,9 +12,9 @@
 | `scenarios.json` | Pipeline | SPA | JSON |
 | `rain.csv` | Pipeline | SPA | CSV |
 
-## 0. Status: v0.2 (14 Nov, after G1)
+## 0. Status: v0.3 (14 Nov, slice `contract-update`)
 
-The schemas in `projects/contract/schemas/`, the mocks and the validator are at `schema_version` `"0.2"` in the working tree (not committed yet). The six decisions are closed in §11; the 0.2 change is in §12. Changes follow §10. **After the spikes (D8, §13) the semantics of some fields change; the shape does not.**
+The schemas in `projects/contract/schemas/`, the mocks and the validator are at `schema_version` `"0.3"`. The six decisions are closed in §11; the 0.2 change is in §12, the D8 semantics in §13 and the 0.3 change in §14. Changes follow §10. The slice spec is `projects/contract/deltas/contract-update.spec.md`.
 
 Key names are kept (`candidates`, `zone_ids`, ...) so the frozen shape does not break. In the UI a "candidate" is a *critical segment* (*tramo crítico*).
 
@@ -34,13 +35,27 @@ This file must match the schemas exactly. If they differ, the schemas win; fix t
 | Size | Keep files light. Never embed raw NISAR data. Overlay PNGs should be small (target well under a few MB each). |
 | Extra fields | Schemas should **reject unknown top-level fields** (`additionalProperties: false`) so drift is caught by `make validate`. |
 
+## 1b. `areas.json` and the per-zone layout (0.3)
+
+`storage/areas.json` is the index of zones; each zone's files live in `storage/<id>/`.
+
+```json
+{ "schema_version": "0.3", "areas": [ { "id": "ruta-32", "name": "string", "bbox": [-84.20, 9.95, -83.70, 10.30], "validated": true } ] }
+```
+
+| Field | Notes |
+|---|---|
+| `areas` | At least one zone. |
+| `id` | Lowercase words joined by hyphens (`^[a-z0-9]+(-[a-z0-9]+)*$`), unique in the list; also the folder name. |
+| `validated` | `true` only for a zone whose results were checked; the UI labels the rest "no validada". |
+
 ## 2. `meta.json`
 
 Describes what was computed from what, and where the overlay images go on the map.
 
 ```json
 {
-  "schema_version": "0.2",
+  "schema_version": "0.3",
   "generated_at": "2026-11-14T20:00:00Z",
   "files": { "rain_csv_schema": "0.1" },
   "area": { "name": "Ruta 32 corridor", "bbox": [-84.20, 9.95, -83.70, 10.30] },
@@ -85,7 +100,7 @@ GeoJSON `FeatureCollection`, with `schema_version` as a top-level foreign member
 ```json
 {
   "type": "FeatureCollection",
-  "schema_version": "0.2",
+  "schema_version": "0.3",
   "features": [
     {
       "type": "Feature",
@@ -121,7 +136,7 @@ Road network and facilities. The browser runs shortest-path on this to simulate 
 
 ```json
 {
-  "schema_version": "0.2",
+  "schema_version": "0.3",
   "nodes": [ { "id": "n1", "lon": -83.9, "lat": 10.1 } ],
   "edges": [
     { "id": "e1", "from": "n1", "to": "n2", "length_m": 0, "time_s": 0, "road": "Ruta 32", "oneway": false, "candidate_id": null, "geometry": [[-83.9, 10.1], [-83.89, 10.11]] }
@@ -152,12 +167,13 @@ Per critical segment (key `candidates`): the result of removing it from the netw
 
 ```json
 {
-  "schema_version": "0.2",
+  "schema_version": "0.3",
   "baseline": [ { "community_id": "c1", "time_s": 0, "hospital_id": "h1" } ],
   "candidates": [
     {
       "id": "T-01",
       "rank": 1,
+      "length_m": 0,
       "edge_ids": ["e1", "e2"],
       "zone_ids": ["z1"],
       "mean_delta_db": 0.0,
@@ -166,6 +182,7 @@ Per critical segment (key `candidates`): the result of removing it from the netw
       "population_dependent": null,
       "affected_community_ids": ["c1"],
       "isolated_community_ids": [],
+      "suspect_isolated_community_ids": [],
       "per_community": [ { "community_id": "c1", "time_s": 0, "extra_s": 0, "hospital_id": "h1" } ],
       "alternates": [ { "name": "Ruta 126", "vehicles": "light" }, { "name": "Ruta 10", "vehicles": "freight" } ]
     }
@@ -181,7 +198,9 @@ Per critical segment (key `candidates`): the result of removing it from the netw
 | `zone_ids` | May be empty (no change zone). Already allowed in 0.1. |
 | `mean_delta_db` | `null` when there is no zone. Already allowed in 0.1. |
 | `source` | Optional (0.2). Only value: `"network_consequence"` (the segment was chosen by consequence, not by detection). |
-| `exposure` | Optional, nullable (0.2): `rain_mm_12d` (number or `null`), `soil_moisture_pctl` (0–100 or `null`; stays `null`, S2c failed), `radar_evidence` (`"not_detectable_at_scale"` or `null`). Unknown stays `null`. |
+| `length_m` | Required (0.3). Number > 0: length of the closure unit along the road; a paired carriageway counts once (two parallel one-way carriageways of length L give L). |
+| `exposure` | Optional, nullable. Since 0.3 only `rain_mm_12d` (number or `null`); `soil_moisture_pctl` and `radar_evidence` were removed (S2c failed, D7) and are rejected as unknown fields. The radar finding lives in `meta.json → detection_limits`. Unknown stays `null`. |
+| `suspect_isolated_community_ids` | Required (0.3). Subset of `isolated_community_ids` that the pipeline considers probable artifacts (snapped to a node of the closed unit, or isolated only because of `oneway`). Empty array when none. Says that it is suspect, not why. |
 | `extra_time_s` | The headline number: the maximum `extra_s` among affected, non-isolated communities. |
 | `criticality` | Sum over affected communities of `population × extra_s`. An isolated community uses as `extra_s` the largest finite `extra_s` across all candidates (its penalty). A community with `population: null` adds 0. Ties, and the case where no population is known, rank by `extra_time_s` and then by isolated count. |
 | `population_dependent` | Integer or `null`. Total population of affected communities. |
@@ -216,7 +235,9 @@ Header row is required. The pass dates in `meta.json` mark the interval on the c
    - If `passes` exists, `passes.before` and `passes.after` share track, direction and CRID.
    - Every `from`/`to`/`node` id exists in `graph.nodes`.
    - Every `scenarios.candidates[].edge_ids` exists in `graph.edges`; every `candidate_id` in the graph appears in `scenarios`.
-   - `isolated_community_ids ⊆ affected_community_ids`; community and hospital ids exist.
+   - `isolated_community_ids ⊆ affected_community_ids`; `suspect_isolated_community_ids ⊆ isolated_community_ids` (0.3); community and hospital ids exist.
+   - `areas.json` exists, is non-empty, has no repeated `id` and every listed zone has its folder; every listed zone is validated with the checks above and the exit code is non-zero if any fails (0.3).
+   - A file that is not valid UTF-8 or not valid JSON is reported as an error naming the file, not a crash.
    - Overlay files named in `meta.json` (if any) exist, are at most 2 MB, and `bounds` has `west < east` and `south < north`. The `change` overlay is no longer required (0.2).
    - `rain.csv` dates cover the period in `meta.json`.
    - `meta.files.rain_csv_schema` is present.
@@ -224,9 +245,10 @@ Header row is required. The pass dates in `meta.json` mark the interval on the c
 
 ## 9. Mock data (`contract/examples/`)
 
-- Mocks must satisfy the schemas and include: 4 candidates, 3 hospitals, 5 communities, one candidate with an isolated community, one community with `population: null`, and both `before`/`after` overlays absent in a second variant (to test the hidden toggle).
+- Mocks must satisfy the schemas and include: 4 candidates, 3 hospitals, 5 communities, one candidate with an isolated community (marked suspect), one community with `population: null`, and both `before`/`after` overlays absent in a second variant (to test the hidden toggle).
+- Since 0.3 the mock set has two zones, `mock-validated` (`validated: true`) and `mock-unvalidated` (`validated: false`, a marked copy without `passes` and the before/after overlays), listed in `examples/areas.json`.
 - Mock values are **fake**. Mark them clearly (for example `meta.area.name: "MOCK — not real data"`) so they never reach the demo as if real.
-- Layout: `examples/` holds the default set (3 overlays); `shared/no-toggle/meta.json` is the second variant, to be used together with the same files minus `overlay_before.png` and `overlay_after.png`. `pipeline/testing/` validates both.
+- Layout: `examples/areas.json` plus `examples/<zone>/`; `examples/mock-validated/` holds the default set (3 overlays); `shared/no-toggle/meta.json` is the second variant, to be used together with the same files minus `overlay_before.png` and `overlay_after.png`. `pipeline/testing/` validates both.
 - `make mock` copies `examples/` into `frontend/public/storage/`, replacing what was there. `storage/` is git-ignored.
 
 ## 10. Changing the contract
@@ -273,6 +295,18 @@ The UI infers "no change layer" from empty `change.geojson` and absent `overlays
 | `scenarios.json → baseline`, `per_community` | Time to the nearest hospital | Time to the nearest referral hospital |
 | `isolated_community_ids` | No path to any hospital | No path to any referral hospital (not "no road") |
 | `candidates[].edge_ids` | Edges of one segment | Edges of **both carriageways** of the closure unit |
-| `exposure.soil_moisture_pctl` | Percentile when SME2 passes | Always `null`; open: remove it in a later version |
+| `exposure.soil_moisture_pctl` | Percentile when SME2 passes | Always `null`; removed in 0.3 (§14) |
 
-Pending and not decided here: a finer closure unit than the 33–61 km units of S4′, and whether the validator should flag an edge set that leaves one carriageway open.
+Pending and not decided here: a finer closure unit than the 33–61 km units of S4′ (the `closure-units` slice), and whether the validator should flag an edge set that leaves one carriageway open.
+
+## 14. Change 0.3 (slice `contract-update`)
+
+| Area | Change | Why |
+|---|---|---|
+| All schemas and mocks | `schema_version` `"0.2"` → `"0.3"`. `rain_csv_schema` stays `"0.1"`. | Contract versioning rule (§10). |
+| Layout | `storage/areas.json` plus `storage/<id>/` per zone; new `areas.schema.json` (§1b). | The app shows several zones; only Ruta 32 is validated. |
+| `scenarios.json` | New required `candidates[].length_m` and `suspect_isolated_community_ids`; ids in `affected`, `isolated` and `suspect` lists must be unique. | Fine closure units; mark probable adjustment artifacts. |
+| `scenarios.json` | Removed `exposure.soil_moisture_pctl` and `exposure.radar_evidence`. | Dead since D7. |
+| `validate.py` | `validate_storage` validates `areas.json` and every listed zone; `main` takes the `storage/` folder; non-UTF-8 files are errors, not crashes. | Validator must match the schemas. |
+
+Decided: a folder in `storage/` that `areas.json` does not list is ignored; `areas.json` bbox is not checked against `meta.area.bbox`; no suspect reason until `trust-signals` needs one.

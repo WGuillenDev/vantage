@@ -5,7 +5,7 @@
   "additionalProperties": false,
   "required": ["schema_version", "baseline", "candidates"],
   "properties": {
-    "schema_version": { "const": "0.2" },
+    "schema_version": { "const": "0.3" },
     "baseline": {
       "type": "array",
       "items": {
@@ -25,8 +25,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "id", "rank", "edge_ids", "zone_ids", "mean_delta_db", "criticality", "extra_time_s",
-          "population_dependent", "affected_community_ids", "isolated_community_ids", "per_community", "alternates"
+          "id", "rank", "length_m", "edge_ids", "zone_ids", "mean_delta_db", "criticality", "extra_time_s",
+          "population_dependent", "affected_community_ids", "isolated_community_ids", "suspect_isolated_community_ids", "per_community", "alternates"
         ],
         "properties": {
           "id": { "type": "string", "pattern": "^T-\\d{2,}$" },
@@ -35,21 +35,21 @@
           "exposure": {
             "type": ["object", "null"],
             "additionalProperties": false,
-            "required": ["rain_mm_12d", "soil_moisture_pctl", "radar_evidence"],
+            "required": ["rain_mm_12d"],
             "properties": {
-              "rain_mm_12d": { "type": ["number", "null"], "minimum": 0 },
-              "soil_moisture_pctl": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
-              "radar_evidence": { "enum": ["not_detectable_at_scale", null] }
+              "rain_mm_12d": { "type": ["number", "null"], "minimum": 0 }
             }
           },
+          "length_m": { "type": "number", "exclusiveMinimum": 0 },
           "edge_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^e\\d+$" } },
           "zone_ids": { "type": "array", "items": { "type": "string", "pattern": "^z\\d+$" } },
           "mean_delta_db": { "type": ["number", "null"] },
           "criticality": { "type": "number", "minimum": 0 },
           "extra_time_s": { "type": ["number", "null"], "minimum": 0 },
           "population_dependent": { "type": ["integer", "null"], "minimum": 0 },
-          "affected_community_ids": { "type": "array", "items": { "$ref": "#/$defs/communityId" } },
-          "isolated_community_ids": { "type": "array", "items": { "$ref": "#/$defs/communityId" } },
+          "affected_community_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/communityId" } },
+          "isolated_community_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/communityId" } },
+          "suspect_isolated_community_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/communityId" } },
           "per_community": {
             "type": "array",
             "items": {

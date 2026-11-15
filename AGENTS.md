@@ -22,6 +22,6 @@ If a doc and the code disagree, flag it; do not silently pick one.
 - The analysis area is a pipeline parameter (config), not a constant in code.
 - Do not invent data: unknown values stay `null` or pending.
 - Never commit raw NISAR data, large rasters or credentials.
-- The pipeline and the frontend share only the data files; schemas live in `projects/contract/schemas/` and are frozen (change them as `context/contracts.md` §10 says). The contract is at 0.2.
+- The pipeline and the frontend share only the data files; schemas live in `projects/contract/schemas/` and are frozen (change them as `context/contracts.md` §10 says). The contract is at 0.3.
 - No backend, accounts or other regions without a team decision.
 - Commits, code and error messages are in English; UI copy is Spanish.

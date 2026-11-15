@@ -1,0 +1,27 @@
+{
+  "schema_version": "0.3",
+  "areas": [
+    {
+      "id": "mock-validated",
+      "name": "MOCK — validated zone",
+      "bbox": [
+        -84.2,
+        9.95,
+        -83.7,
+        10.3
+      ],
+      "validated": true
+    },
+    {
+      "id": "mock-unvalidated",
+      "name": "MOCK — second zone, not validated",
+      "bbox": [
+        -84.2,
+        9.95,
+        -83.7,
+        10.3
+      ],
+      "validated": false
+    }
+  ]
+}

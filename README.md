@@ -17,7 +17,7 @@ El proyecto tiene dos partes conectadas solo por archivos de datos:
 
 ## Estado
 
-Proyecto en construcción durante el hackathon (14–15 de noviembre de 2026). Hoy existen el esqueleto del frontend y del pipeline, y el contrato de datos (esquemas, mocks y validador). Tras la puerta G1 (sáb 14 nov, ~16:35: NO-GO para detectar cicatrices con GCOV) y tras los demás spikes el producto es la consecuencia (criticidad) de cada tramo, con la lluvia como contexto (decisión D8); ver `STATUS.md`. El contrato está en 0.2.
+Proyecto en construcción durante el hackathon (14–15 de noviembre de 2026). Hoy existen el esqueleto del frontend y del pipeline, y el contrato de datos (esquemas, mocks y validador). Tras la puerta G1 (sáb 14 nov, ~16:35: NO-GO para detectar cicatrices con GCOV) y tras los demás spikes el producto es la consecuencia (criticidad) de cada tramo, con la lluvia como contexto (decisión D8); ver `STATUS.md`. El contrato está en 0.3.
 
 ## Estructura
 
