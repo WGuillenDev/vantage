@@ -226,8 +226,8 @@ def download(zone: Zone, imerg_dir: Path, earthaccess=None) -> None:
     raise
   except Exception as exc:  # noqa: BLE001 - a 401 or 403 means the application is not authorized
     if isinstance(exc, PermissionError) or any(code in str(exc) for code in ("401", "403", "Unauthorized", "Forbidden")):
-      raise RainContextError(AUTH_HELP) from None
-    raise RainContextError(f"IMERG download failed: {exc}") from None
+      raise RainContextError(f"{AUTH_HELP} (error received: {type(exc).__name__}: {exc})") from None
+    raise RainContextError(f"IMERG download failed: {type(exc).__name__}: {exc}") from None
   lines = ["date,cell_lon,cell_lat,precip_mm"] + [f"{day},{lon},{lat},{value}" for day, rows in days for lon, lat, value in rows]
   _write_atomic(imerg_dir / "cells.csv", ("\n".join(lines) + "\n").encode("utf-8"))
   source = {"product": PRODUCT, "version": VERSION, "start": zone.rain_start, "end": zone.rain_end}
