@@ -63,23 +63,23 @@ Rules:
 
 ## Invariants
 
-- INV-01 [none]
+- INV-01 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_manual_review.py]
   When `prepare` chooses units, it takes the rank-1 unit, the unit at position ⌈n/2⌉ among units with impact, and the unit with the greatest `length_m`, with ties to the lower id.
-- INV-03 [none]
+- INV-03 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_manual_review.py]
   When `prepare` lists the communities of a unit, they are exactly its isolated communities, up to 20, ordered by population descending with `null` last and then by id number.
-- INV-05 [none]
+- INV-05 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_manual_review.py]
   When `prepare` writes a community, `distance_to_node_m` is measured from its original coordinates in `communities.json` to its snapped node and `suggested_class` is `oneway_artifact` if it is joined ignoring direction, `snapping_artifact` if not and its node is an endpoint of a closed edge, and `null` otherwise.
-- INV-06 [none]
+- INV-06 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_manual_review.py]
   When `prepare` writes the sheet, every `class`, `note`, `reviewer` and `reviewed_on` is empty and `verdict` is absent.
-- INV-07 [none]
+- INV-07 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_manual_review.py]
   If a sheet already exists, then `prepare` exits non-zero with an English error and leaves it unchanged.
-- INV-09 [none]
+- INV-09 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_manual_review.py]
   If `reviewer` or `reviewed_on` is empty, then `summarize` exits non-zero with an English error naming the field and does not change the sheet.
-- INV-10 [none]
+- INV-10 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_manual_review.py]
   If a `class` is not one of the four classes, then `summarize` exits non-zero with an English error naming the community and does not change the sheet.
-- INV-11 [none]
+- INV-11 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_manual_review.py]
   When any listed community has no `class`, `summarize` writes the verdict `incomplete`.
-- INV-12 [none]
+- INV-12 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_manual_review.py]
   When every listed community has a class, `summarize` writes the verdict `pass` if the share of `real` is at least 0.8 and `fail` otherwise.
 
 ## Deferred / Open questions
