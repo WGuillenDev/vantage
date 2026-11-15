@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { loadAreas, loadZoneFile, type Area } from './storage.ts'
 import { useAppStore } from './store.ts'
+import type { CorridorGraph } from './mapCorridor.ts'
 import type { RankedUnit } from './ranking.ts'
 import type { TrustMeta } from './trustSignals.ts'
 import { resolveActiveZone } from './zones.ts'
@@ -8,15 +9,15 @@ import { resolveActiveZone } from './zones.ts'
 export interface ZoneData {
   zone: Area
   meta: TrustMeta
-  graph: { edges: { id: string; road?: string | null }[]; hospitals: { name: string }[] }
+  graph: CorridorGraph
   units: RankedUnit[]
 }
 
-// Loads the active zone's files; `map-corridor` will take over zone loading and this will read from its store.
+// Loads the active zone's files (map-corridor): the store's zone, then ?area, then the first validated.
 // Returns null while loading and the error message if a file fails.
 export function useZoneData(): ZoneData | string | null {
   const activeId = useAppStore((state) => state.activeZoneId)
-  const [data, setData] = useState<ZoneData | string | null>(null)
+  const [loaded, setLoaded] = useState<{ key: string | null; value: ZoneData | string } | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -29,15 +30,16 @@ export function useZoneData(): ZoneData | string | null {
           loadZoneFile<ZoneData['graph']>(zone.id, 'graph.json'),
           loadZoneFile<{ candidates: RankedUnit[] }>(zone.id, 'scenarios.json'),
         ])
-        if (!cancelled) setData({ zone, meta, graph, units: scenarios.candidates })
+        if (!cancelled) setLoaded({ key: activeId, value: { zone, meta, graph, units: scenarios.candidates } })
       })
       .catch((reason: unknown) => {
-        if (!cancelled) setData(reason instanceof Error ? reason.message : String(reason))
+        if (!cancelled) setLoaded({ key: activeId, value: reason instanceof Error ? reason.message : String(reason) })
       })
     return () => {
       cancelled = true
     }
   }, [activeId])
 
-  return data
+  // A result of another zone is not shown while the new one loads (INV-11).
+  return loaded !== null && loaded.key === activeId ? loaded.value : null
 }
