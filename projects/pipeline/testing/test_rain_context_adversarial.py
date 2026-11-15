@@ -152,8 +152,9 @@ def test_inv_14_any_rejection_by_the_archive_says_how_to_authorize(tmp_path, err
   zone = make_zone(tmp_path)
   fake = FakeGesDisc(tmp_path, asymmetric)
   fake.open = lambda granules: (_ for _ in ()).throw(error)
-  with pytest.raises(RainContextError, match="NASA GESDISC DATA ARCHIVE"):
+  with pytest.raises(RainContextError, match="NASA GESDISC DATA ARCHIVE") as raised:
     rain_context.download(zone, tmp_path / "work" / "imerg", fake)
+  assert str(error) in str(raised.value)  # the received error is kept, so a wrong diagnosis can be spotted
   assert not (tmp_path / "work").exists()
 
 
