@@ -44,13 +44,13 @@ Validator behavior: every error names the file, the field and the rule, in Engli
 
 ## Invariants
 
-- INV-01 [none]
+- INV-01 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_validate.py]
   When the validator reads a contract JSON file whose `schema_version` is not `"0.3"`, it reports an error naming that file.
-- INV-02 [none]
+- INV-02 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_validate.py]
   If a candidate lacks `length_m` or `suspect_isolated_community_ids`, then the validator reports an error naming the candidate.
-- INV-03 [none]
+- INV-03 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_validate.py]
   If a candidate's `suspect_isolated_community_ids` contains an id that is not in its `isolated_community_ids`, then the validator reports an error naming the candidate and the id.
-- INV-05 [none]
+- INV-05 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_validate.py]
   If a candidate's `exposure` contains `soil_moisture_pctl` or `radar_evidence`, then the validator rejects the file as an unknown field.
 - INV-06 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_validate.py]
   If a contract file contains a field the schema does not define, then the validator rejects it.
@@ -58,9 +58,9 @@ Validator behavior: every error names the file, the field and the rule, in Engli
   If a candidate's `isolated_community_ids` contains an id not in its `affected_community_ids`, then the validator reports an error.
 - INV-08 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_validate.py]
   If `rain.csv` dates do not cover `meta.json → rain.start`..`end`, then the validator reports an error.
-- INV-10 [none]
+- INV-10 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_validate.py]
   If `areas.json` is missing, empty, lists the same `id` twice, or lists an area with no folder `storage/<id>/`, then the validator reports an error naming the file or the area.
-- INV-12 [none]
+- INV-12 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_validate.py]
   When the validator runs on `storage/`, it validates every zone folder listed in `areas.json` with the same checks, and its exit code is non-zero if any zone fails.
 
 ## Deferred / Open questions
@@ -81,7 +81,7 @@ Testing gaps (tagged `none`; `builder` turns each into `test: <command>` as it w
   Given the default mock set copied into `storage/`, when `make mock validate` runs, then it exits 0.
 - ACC-02 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_validate.py]
   Given the `no-toggle` variant (the mock set without `overlay_before.png` and `overlay_after.png`), when the validator runs, then it exits 0.
-- ACC-03 [none]
+- ACC-03 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_validate.py]
   Given the 0.3 mock set, when it is inspected, then it contains at least one candidate with a non-empty `suspect_isolated_community_ids` and `area.name` marked as a mock.
-- ACC-04 [none]
+- ACC-04 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_validate.py]
   Given the mock set with two zones (one `validated: true`, one `validated: false`), when the validator runs on `storage/`, then it exits 0.
