@@ -108,7 +108,11 @@ export function MapView({ data }: { data: ZoneData | string | null }) {
     })
     map.on('mousemove', 'units-line', () => (map.getCanvas().style.cursor = 'pointer'))
     map.on('mouseleave', 'units-line', () => (map.getCanvas().style.cursor = ''))
+    // The canvas is sized before the layout settles; follow the container so the map fills it.
+    const observer = new ResizeObserver(() => map.resize())
+    observer.observe(element)
     return () => {
+      observer.disconnect()
       setReady(false)
       mapRef.current = null
       map.remove()
