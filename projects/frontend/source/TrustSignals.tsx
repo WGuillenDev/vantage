@@ -1,4 +1,4 @@
-import { NOTICE, UNVALIDATED_BANNER, attributionLines, isUnvalidated, readingPanel } from './trustSignals.ts'
+import { NOTICE, REFERRAL_NOTE, UNVALIDATED_BANNER, attributionLines, isUnvalidated, readingPanel } from './trustSignals.ts'
 import type { ZoneData } from './zoneData.ts'
 
 export function TrustHeader({ data }: { data: ZoneData | string | null }) {
@@ -28,6 +28,7 @@ export function TrustFooter({ data }: { data: ZoneData | string | null }) {
             {panel.speeds.map((s) => `${s.roadClass} ${s.kmh} km/h`).join(', ')}.
           </li>
           <li>Hospitales de referencia: {panel.hospitals.join(', ')}.</li>
+          <li>{REFERRAL_NOTE}</li>
           {panel.radarNote && <li>Radar: {panel.radarNote}</li>}
           <li>«Sin ruta al hospital de referencia» significa que no hay camino a esos hospitales.</li>
           <li>La población es una estimación modelada.</li>

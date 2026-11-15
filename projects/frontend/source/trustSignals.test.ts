@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { readFileSync } from 'node:fs'
-import { attributionLines, isUnvalidated, readingPanel, simulationNote, suspectLabel } from './trustSignals.ts'
+import { REFERRAL_NOTE, attributionLines, isUnvalidated, readingPanel, simulationNote, suspectLabel } from './trustSignals.ts'
 import type { Area } from './storage.ts'
 
 const examples = new URL('../../contract/examples/', import.meta.url)
@@ -49,5 +49,12 @@ describe('trust-signals', () => {
     expect(simulationNote(1)).toBe('Las comunidades sin ruta pueden incluir artefactos del modelo.')
     expect(simulationNote(3)).toBe('Las comunidades sin ruta pueden incluir artefactos del modelo.')
     expect(simulationNote(0)).toBeNull()
+  })
+})
+
+describe('referral-set note', () => {
+  test('says the order depends on the referral hospitals and never claims a cause', () => {
+    expect(REFERRAL_NOTE).toContain('hospitales cuentan como referencia')
+    expect(REFERRAL_NOTE).not.toMatch(/confirmad|causa/i)
   })
 })
