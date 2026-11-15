@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import date
 
 import h5py
@@ -154,3 +155,52 @@ def test_inv_14_any_rejection_by_the_archive_says_how_to_authorize(tmp_path, err
   with pytest.raises(RainContextError, match="NASA GESDISC DATA ARCHIVE"):
     rain_context.download(zone, tmp_path / "work" / "imerg", fake)
   assert not (tmp_path / "work").exists()
+
+
+@pytest.mark.parametrize("bad", ["nan", "sNaN"])
+def test_inv_04_a_nan_cell_coordinate_is_a_clean_error(tmp_path, bad):
+  zone, work_dir = setup(tmp_path, EDGES)
+  path = work_dir / "imerg" / "cells.csv"
+  path.write_text(path.read_text(encoding="utf-8").replace("0.15,0.15", f"{bad},0.15", 1), encoding="utf-8")
+  run_expecting_clean_error(zone, work_dir)
+
+
+def test_inv_01_a_unit_without_edges_is_a_clean_error(tmp_path):
+  zone, work_dir = setup(tmp_path, EDGES)
+  path = zone.output_dir / "scenarios.json"
+  data = json.loads(path.read_text(encoding="utf-8"))
+  data["candidates"][0]["edge_ids"] = []
+  path.write_text(json.dumps(data), encoding="utf-8")
+  run_expecting_clean_error(zone, work_dir)
+
+
+@pytest.mark.parametrize("content", ["[]", "{}", '{"candidates": 3}', '{"candidates": [1]}', "null"])
+def test_inv_01_a_malformed_scenarios_file_is_a_clean_error(tmp_path, content):
+  zone, work_dir = setup(tmp_path, EDGES)
+  (zone.output_dir / "scenarios.json").write_text(content, encoding="utf-8")
+  run_expecting_clean_error(zone, work_dir)
+
+
+def test_inv_01_a_failed_second_write_leaves_neither_output(tmp_path, monkeypatch):
+  zone, work_dir = setup(tmp_path, EDGES)
+  before = (zone.output_dir / "scenarios.json").read_bytes()
+  real_replace, calls = os.replace, []
+
+  def flaky(src, dst):
+    calls.append(dst)
+    if len(calls) == 2:
+      raise OSError("disk full")
+    real_replace(src, dst)
+
+  monkeypatch.setattr(rain_context.os, "replace", flaky)
+  with pytest.raises(OSError):
+    rain_context.run(zone, work_dir)
+  assert not (zone.output_dir / "rain.csv").exists()
+  assert (zone.output_dir / "scenarios.json").read_bytes() == before
+
+
+def test_acc_02_a_float32_value_is_written_as_the_granule_shows_it(tmp_path):
+  zone = make_zone(tmp_path)
+  rain_context.download(zone, tmp_path / "work" / "imerg", FakeGesDisc(tmp_path, lambda d, lo, la: 0.35))
+  value = (tmp_path / "work" / "imerg" / "cells.csv").read_text(encoding="utf-8").splitlines()[1].split(",")[3]
+  assert value == "0.35"
