@@ -52,25 +52,25 @@ Definitions:
 
 ## Invariants
 
-- INV-01 [none]
+- INV-01 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_rank_sensitivity.py]
   When rank-sensitivity runs with no perturbation, the scenarios it computes are identical to `output/<id>/scenarios.json`.
-- INV-02 [none]
+- INV-02 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_rank_sensitivity.py]
   If the unperturbed run differs from `output/<id>/scenarios.json`, then rank-sensitivity exits non-zero with an English error saying the baseline is not reproducible and writes no report.
-- INV-03 [none]
+- INV-03 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_rank_sensitivity.py]
   When rank-sensitivity finishes, the report has one run for speed ×0.8, one for ×1.2, and one for each referral hospital removed.
-- INV-06 [none]
+- INV-06 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_rank_sensitivity.py]
   When rank-sensitivity removes a hospital, the recomputed network has every other referral hospital and not the removed one.
-- INV-07 [none]
+- INV-07 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_rank_sensitivity.py]
   When rank-sensitivity reports a run, its top-k overlap equals the number of unit ids shared by the baseline's and the run's top k by `rank`.
-- INV-08 [none]
+- INV-08 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_rank_sensitivity.py]
   When rank-sensitivity reports a rank correlation, it is the Spearman correlation, with average ranks for ties, over the units with impact in both runs, and `null` when fewer than 2 such units exist.
-- INV-09 [none]
+- INV-09 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_rank_sensitivity.py]
   When rank-sensitivity grades a run, `passes` is true exactly when it is a speed run with a top-5 overlap of at least 4, and hospital runs have no `passes`.
-- INV-10 [none]
+- INV-10 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_rank_sensitivity.py]
   When the baseline has fewer than 5 units with impact, rank-sensitivity writes the verdict `insufficient_units` and no `passes`.
-- INV-11 [none]
+- INV-11 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_rank_sensitivity.py]
   If the zone has a single referral hospital, then rank-sensitivity skips the hospital removal, records that it did, and does not fail.
-- INV-14 [none]
+- INV-14 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_rank_sensitivity.py]
   If `output/<id>/scenarios.json` is missing, then rank-sensitivity exits non-zero with an English error that says to run `make all` and writes no report.
 
 ## Deferred / Open questions
