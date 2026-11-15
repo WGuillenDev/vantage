@@ -1,14 +1,22 @@
 # VANTAGE — Guion de la presentación
 
-> Borrador para ensayar (tarea X4). Todos los números salen de los informes del repositorio; la fuente va entre paréntesis. Duración objetivo: 5 minutos más preguntas. Está en español; la entrega a Space Apps puede requerir inglés.
+> Para ensayar (tarea X4). Duración: **30 segundos**, más preguntas. Todos los números del respaldo salen de los informes del repositorio; la fuente va entre paréntesis. Está en español; la entrega a Space Apps puede requerir inglés.
 
-## Idea en una frase
+## Guion (30 s, unas 70 palabras)
 
-VANTAGE muestra qué tramos de un corredor vial, si se cortan, dejan a comunidades sin ruta a un hospital de referencia, y cuánto tiempo extra implica. Caso de demostración: la Ruta 32 (San José–Limón).
+> Quisimos usar NISAR para anticipar derrumbes en la Ruta 32. Probamos tres señales con criterios escritos de antemano: ninguna funcionó, y lo reportamos con su número. Entonces cambiamos la pregunta: ¿qué pasa si se corta un tramo? VANTAGE muestra qué tramos críticos, si se cortan, dejan a comunidades sin ruta a un hospital de referencia, y cuánto tiempo extra implica. Solo lo probamos en la Ruta 32, y la zona aparece como no validada.
 
-## 1. El giro (60 s): lo que intentamos y no funcionó
+Mientras se habla: el sitio publicado con el primer tramo (T-20) abierto.
 
-Empezamos para el reto «Dancing with the SARs» con una pregunta: ¿puede NISAR ayudar a anticipar derrumbes en la Ruta 32? Escribimos los criterios antes de calcular y probamos tres señales. Ninguna funcionó:
+Reglas: decir «tramo crítico» y «señal»; nunca «cierre confirmado», «causado por la lluvia» ni «funciona en cualquier lugar». Lo que no cabe en 30 s no se improvisa: va a las preguntas.
+
+---
+
+## Respaldo para preguntas (no se dice en los 30 s)
+
+### Los tres resultados negativos
+
+Decir claramente: **no afirmamos que NISAR no pueda**. GUNW, offsets y series por píxel quedan sin probar.
 
 | Señal | Resultado | Fuente |
 |---|---|---|
@@ -16,27 +24,7 @@ Empezamos para el reto «Dancing with the SARs» con una pregunta: ¿puede NISAR
 | Humedad del suelo SME2 antes de un cierre | Sobre su p75 en 2 de 6 cierres (se pedían 5) | `SPIKING.md` S2c |
 | Lluvia IMERG de los 12 días previos | Sobre su p75 en 3 de 8 cierres (se pedían 6) | `SPIKING.md` S5 |
 
-Decir claramente: **no afirmamos que NISAR no pueda**. GUNW, offsets y series por píxel quedan sin probar. Lo que mostramos es que este flujo con GCOV a 10 m no alcanza.
-
-## 2. Qué construimos en su lugar (60 s)
-
-Cambiamos la pregunta de «¿dónde se va a caer?» a «¿qué pasa si se corta?»: la **consecuencia**. Con la red vial de OpenStreetMap, tres hospitales de referencia y población estimada (WorldPop), cortamos cada tramo y medimos quién pierde la ruta y cuánto tiempo extra. La lluvia reciente (IMERG) se muestra solo como **contexto**, etiquetada como hipótesis.
-
-El método está pensado para cualquier corredor con red en OSM; **solo se demostró en la Ruta 32**.
-
-## 3. Demostración (90 s)
-
-Sitio publicado, con datos reales. Guion:
-
-1. Mapa y lista: 115 unidades de cierre, 100 con impacto. Aviso visible: «tramos críticos por consecuencia; no son derrumbes confirmados». Banner: «zona no validada».
-2. Abrir el primer tramo (T-20, 168 m): ≈ 3 h 35 min extra, ~377 mil personas que dependen (estimadas).
-3. Pestaña Simulación: cerrar un tramo y ver el recálculo instantáneo en el navegador, sin servidor.
-4. «Cómo leer estos números»: velocidades, hospitales de referencia y la nota de que el orden depende de ese conjunto.
-5. Pestaña «¿Por qué?»: la lluvia, con la etiqueta «Hipótesis, no causa confirmada».
-
-## 4. Cuánto confiar en esto (60 s): lo que medimos
-
-Parte del producto, no una disculpa. Decir solo las tres filas; el resto va a preguntas:
+### Cuánto confiar en esto
 
 | Prueba | Resultado |
 |---|---|
@@ -46,7 +34,7 @@ Parte del producto, no una disculpa. Decir solo las tres filas; el resto va a pr
 
 Por eso la zona se publica como «no validada».
 
-## 5. Límites que decimos nosotros antes de que pregunten
+### Límites
 
 - Una sola zona demostrada. «Hospital de referencia» puede no trasladarse a otro país.
 - La red no trae caminos locales: algunos «sin ruta» son artefactos (marcados en la aplicación).
@@ -54,11 +42,7 @@ Por eso la zona se publica como «no validada».
 - Limón queda sin ruta en 22 unidades, todas al este de Siquirres (único tramo sin alternativa); Limón tiene su hospital, que no cuenta como referencia.
 - Probado en un viewport móvil emulado, no en celular físico.
 
-## 6. Cierre (30 s)
-
-Tres resultados negativos con su número, un producto que responde una pregunta distinta y útil, y un conjunto de pruebas que dicen cuánto confiar en él. Reproducible: `make osm worldpop imerg all publish`, todo en el repositorio, MIT.
-
-## Preguntas probables
+### Preguntas probables
 
 - **¿Predice derrumbes?** No. Muestra consecuencia de un corte; la lluvia es contexto y no se probó como señal.
 - **¿Por qué no usaron más NISAR?** Probamos la detección con GCOV; no alcanzó. Se descartó con un número, y GUNW y otras vías quedan abiertas.
@@ -67,3 +51,4 @@ Tres resultados negativos con su número, un producto que responde una pregunta 
 - **¿El ranking es estable?** Sí ante velocidades ×0,8/×1,2 y al quitar cada hospital (top 5 y top 10 iguales), con la reserva de que el factor de velocidad es uniforme y casi no puede cambiar el orden.
 - **¿Qué tan exactos son los tiempos?** Del orden de magnitud: límites publicados, ~15 % más rápidos que el router; mostramos «≈» y se redondea a múltiplos de 5 min.
 - **¿Está validado?** No: la revisión manual dio 0 de 4. Lo decimos en la aplicación.
+- **¿Cómo se reproduce?** `make osm worldpop imerg all publish`, todo en el repositorio, MIT.
