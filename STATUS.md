@@ -22,16 +22,16 @@ Prioridad ahora: la mitad de datos reales (grafo con las dos calzadas y hospital
 
 ## Progreso
 
-**31 / 46 tareas · 67 %** `█████████████░░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman; las `[-]` descartadas no cuentan)_
+**34 / 46 tareas · 74 %** `██████████████░░░░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman; las `[-]` descartadas no cuentan)_
 
 | Fase | Hechas | % |
 |---|---|---|
 | 1 · Bootstrap | 9 / 9 | 100 % |
 | 2 · Spiking | 9 / 9 | 100 % |
-| 3 · Building | 13 / 23 | 57 % |
+| 3 · Building | 16 / 23 | 70 % |
 | 4 · Polish | 0 / 5 | 0 % |
 
-_Actualizá este bloque cada vez que marques una tarea `[x]`. Una tarea es `[x]` si su código está en `main`, sus pruebas pasan y cumple su «Terminada cuando» sin datos reales. Quedan `[~]` las que piden datos reales, una revisión manual o el celular (P5, P7, P10, P11, P12, E1, E4, E5, F7): ver su fila._
+_Actualizá este bloque cada vez que marques una tarea `[x]`. Una tarea es `[x]` si su código está en `main`, sus pruebas pasan y cumple su «Terminada cuando» sin datos reales. Quedan `[~]` las que piden datos reales, una revisión manual o el celular (P5, P10, P11, P12, E5, F7): ver su fila._
 
 ## Puertas
 
@@ -122,12 +122,12 @@ Un delta por rebanada, en `projects/<proyecto>/deltas/<delta>.spec.md`. Nombres 
 | ID | Tarea | Dueño | Estado | Terminada cuando |
 |---|---|---|---|---|
 | P3 | Grafo vial de OSM para el área configurada: tramos, hospitales, comunidades → `graph.json` (spec: `projects/pipeline/deltas/road-graph.spec.md`) | I | [x] | Valida; los ids se cruzan. Ya portado a zonas y fusionado en `main` (PR #31); la corrida real con OSM (no hay `work/ruta-32/osm`) y la lista de hospitales (`PENDING` en `ruta-32.toml`) siguen pendientes y se siguen en P7/E5 a la mayor componente fuertemente conexa y que la lista de hospitales sea el conjunto de referencia de la zona, como parámetro (D8) |
-| E4 | Población WorldPop sobre las comunidades (para que la criticidad deje de dar 0) | W | [~] | `population` poblada donde hay dato. Código y pruebas fusionados en `main` (PR #34); falta la corrida real con el ráster de la Ruta 32 (ACC-01: ≥ 90 % de comunidades con valor; ACC-02: total asignado dentro de ±5 % del ráster o con la diferencia explicada) |
+| E4 | Población WorldPop sobre las comunidades (para que la criticidad deje de dar 0) | W | [x] | `population` poblada donde hay dato. Código y pruebas fusionados en `main` (PR #34); falta la corrida real con el ráster de la Ruta 32 (ACC-01: ≥ 90 % de comunidades con valor; ACC-02: total asignado dentro de ±5 % del ráster o con la diferencia explicada) **Hecho (15 nov):** 758 de 758 comunidades con población; asignado 2 899 678 frente a 2 957 560 del ráster en el bbox (−1,96 %). |
 | E5 | Decidir la métrica de impacto (hospital de referencia vs. más cercano; con el más cercano el parque da 0 comunidades afectadas) y revisar a mano la 1 aislada hasta Limón | R | [~] | Una sola cifra por tramo y la decisión anotada abajo — **recomendación S4′: R2, con límites; decisión pendiente**. Métrica decidida en D8; queda la revisión manual de un caso y la lista de hospitales con Ian |
 | P5 | Impacto: quitar un tramo a la vez → tiempo extra, población, aisladas, ranking → `scenarios.json` (clave `candidates`, `source: "network_consequence"`; spec: `projects/pipeline/deltas/impact-scoring.spec.md`) | I | [~] | Valida; un caso revisado a mano; sin aislamientos falsos (comunidades ajustadas a la vía cortada, `oneway`). Portado a zonas y fusionado en `main` (PR #32), con unidades de cierre de `closure-units` (PR #36); falta verlo con la red real |
-| E1 | IMERG: `rain.csv` y lluvia acumulada por tramo (`exposure.rain_mm_12d`) | I | [~] | Valida; las fechas cubren el periodo. Código en `main` (PR #35) y celdas de la Ruta 32 en `work/ruta-32/imerg/`; falta la corrida con el grafo real. Lectura ya probada en S5; no afirmar relación con los cierres |
+| E1 | IMERG: `rain.csv` y lluvia acumulada por tramo (`exposure.rain_mm_12d`) | I | [x] | Valida; las fechas cubren el periodo. Código en `main` (PR #35) y celdas de la Ruta 32 en `work/ruta-32/imerg/`; falta la corrida con el grafo real. Lectura ya probada en S5; no afirmar relación con los cierres **Hecho (15 nov):** `rain.csv` con 317 días (1 ene–13 nov) y `exposure.rain_mm_12d` en las 115 unidades. |
 | E3 | Zona como parámetro (nombre o bbox en config → `meta.area`) | I | [x] | Cambiar el bbox cambia la salida sin tocar código |
-| P7 | `meta.json` y `make all` de punta a punta | R | [~] | `make all` regenera todo y `make validate` pasa. El ejecutor de etapas (`pipeline-run`, PR #33) y el `Makefile` (`all`, `osm`, `worldpop`, `imerg`, `timecheck`, `review-*`) ya existen; falta la corrida real |
+| P7 | `meta.json` y `make all` de punta a punta | R | [x] | `make all` regenera todo y `make validate` pasa. El ejecutor de etapas (`pipeline-run`, PR #33) y el `Makefile` (`all`, `osm`, `worldpop`, `imerg`, `timecheck`, `review-*`) ya existen; falta la corrida real **Hecho (15 nov):** `make all AREA=ruta-32` y `make publish validate` salen con 0; `meta.json` nombra la Ruta 32. |
 | P8 | **Primer despliegue con datos reales** | R, W | [ ] | El sitio publicado muestra datos reales (meta: sáb 21:00) |
 | E2 | S2c (SME2), solo si sobra tiempo | R | [x] | FALLA (ver S2c); sin humedad en la exposición |
 | P9 | Unidad de cierre fina: ambas calzadas, cortada en cada unión del grafo, más de 19 cierres (`RELIABILITY.md` paso 5; el tope de ~5 km se descartó, ver spec) | I | [x] | Spec `closure-units` aprobado; unidades por uniones, no por cadenado. Hecho en `main` (PR #36); cuántos cierres da sobre la red real se verá en P7 |

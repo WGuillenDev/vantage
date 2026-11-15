@@ -90,6 +90,22 @@ Dueños según `STATUS.md`. Cada paso termina con un criterio comprobable.
 - Tiempo extra de los primeros 5 tramos: ¿tiene sentido para quien conoce la ruta?
 - Población total frente al ráster.
 
+**Estado del bloque B (15 nov):**
+
+| # | Estado | Detalle |
+|---|---|---|
+| B1 | Hecho | `make all AREA=ruta-32` con exit 0: `graph.json` 2,29 MB (7 136 nodos, 8 715 aristas, 758 comunidades), `scenarios.json` con 115 unidades de cierre, `rain.csv`, `meta.json`, `areas.json` |
+| B2 | Hecho | `make publish validate` con exit 0; `meta.json` sin «MOCK», con las tres atribuciones (OSM del 2026-11-15, IMERG Late, WorldPop) |
+| B3 | Hecho, con tres notas | Ver abajo. La app local con datos reales abre sin errores de consola y muestra el aviso, el banner «Zona no validada», la lista, el mapa y el pie |
+| B4 | Hecho | 758 de 758 comunidades con población (≥ 90 %); asignado 2 899 678 frente a 2 957 560 del ráster en el bbox: −1,96 % (±5 %) |
+| B5 | Hecho | `rain.csv` con 317 días, del 2026-01-01 al 2026-11-13; `exposure.rain_mm_12d` presente en las unidades |
+
+Notas de la revisión de sentido (B3):
+- **Unidades:** 115 (antes 19 en S4′); mediana 497 m, mínima 15 m, máxima 34,5 km; solo 6 pasan de 5 km. 100 tienen impacto y 15 no.
+- **Aislamientos:** 965 pares comunidad-unidad aislados, 208 marcados como sospechosos (21,6 %). S4′ midió 12,7 % con otra unidad de cierre, así que no es comparable uno a uno. En 22 de las 39 unidades con aislados, todos son sospechosos. Esas 22 son las que más hay que revisar a mano en D3.
+- **Ranking:** los cinco primeros son tramos cortos de un mismo cuello de botella (168 m, 497 m, 332 m, 1,5 km y uno de 34,5 km con 35 aristas), con criticidad casi igual y unas 311 comunidades afectadas. Los tiempos extra de 2 h 20 min a 3 h 35 min salen de límites publicados (A3), así que son optimistas; D2 mide el desvío.
+- **Cobertura:** `road-graph` descarta comunidades a más de 3 km de la red (Talamanca, sur de Limón); está aceptado en el spec.
+
 ### Bloque C — Despliegue real (P8)
 
 | # | Paso | Dueño | Terminado cuando |
