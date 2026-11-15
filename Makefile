@@ -2,7 +2,7 @@ EXAMPLES := projects/contract/examples
 OUTPUT   := projects/pipeline/output
 STORAGE  := projects/frontend/public/storage
 
-.PHONY: mock publish validate all osm worldpop imerg timecheck sensitivity review-prepare review-summary
+.PHONY: mock publish validate all osm worldpop imerg timecheck sensitivity inputs inputs-check review-prepare review-summary
 
 mock:
 	test -d $(EXAMPLES)
@@ -36,6 +36,12 @@ timecheck:
 
 sensitivity:
 	uv run --project projects/pipeline rank-sensitivity --area $(AREA)
+
+inputs:
+	uv run --project projects/pipeline inputs-manifest --area $(AREA)
+
+inputs-check:
+	uv run --project projects/pipeline inputs-manifest --area $(AREA) --check
 
 review-prepare:
 	uv run --project projects/pipeline manual-review prepare --area $(AREA)
