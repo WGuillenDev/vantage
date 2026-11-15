@@ -1,3 +1,5 @@
+import { checkSchemaVersion, fileErrorMessage } from './mapCorridor.ts'
+
 export interface Area {
   id: string
   name: string
@@ -7,23 +9,23 @@ export interface Area {
 
 const STORAGE = `${import.meta.env.BASE_URL}storage/`
 
-export async function loadAreas(): Promise<Area[]> {
-  const response = await fetch(`${STORAGE}areas.json`)
-  if (!response.ok) {
-    throw new Error(`Could not load areas.json (${response.status}); run "make mock"`)
+// Every data file is read here: a failed request or a wrong schema_version names the file (map-corridor INV-12).
+async function readJson<T>(url: string, file: string): Promise<T> {
+  let response: Response
+  try {
+    response = await fetch(url)
+  } catch {
+    throw new Error(fileErrorMessage(file, 'sin conexión o archivo inaccesible'))
   }
-  return ((await response.json()) as { areas: Area[] }).areas
+  if (!response.ok) throw new Error(fileErrorMessage(file, `error ${response.status}`))
+  const data: unknown = await response.json()
+  checkSchemaVersion(file, data)
+  return data as T
 }
 
-// The zone picker (`zone-picker` slice) will choose the zone; until then the first one is used.
-export async function loadDefaultZone(): Promise<{ area: Area; base: string }> {
-  const [area] = await loadAreas()
-  if (!area) throw new Error('areas.json lists no zones')
-  return { area, base: `${STORAGE}${area.id}/` }
+export async function loadAreas(): Promise<Area[]> {
+  return (await readJson<{ areas: Area[] }>(`${STORAGE}areas.json`, 'areas.json')).areas
 }
 
-export async function loadZoneFile<T>(zoneId: string, file: string): Promise<T> {
-  const response = await fetch(`${STORAGE}${zoneId}/${file}`)
-  if (!response.ok) throw new Error(`Could not load ${file} (${response.status}); run "make mock"`)
-  return (await response.json()) as T
-}
+export const loadZoneFile = <T>(zoneId: string, file: string): Promise<T> =>
+  readJson<T>(`${STORAGE}${zoneId}/${file}`, file)

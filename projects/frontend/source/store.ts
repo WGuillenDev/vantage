@@ -11,7 +11,7 @@ interface AppState {
 
 export const useAppStore = create<AppState>((set) => ({
   activeZoneId: null,
-  setActiveZone: (id) => set({ activeZoneId: id }),
+  setActiveZone: (id) => set({ activeZoneId: id, selectedUnitId: null }),
   selectedUnitId: null,
   selectUnit: (id) => set({ selectedUnitId: id }),
 }))
