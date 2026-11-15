@@ -28,7 +28,7 @@ Flow: open the map → see the critical segments → pick one → read how hospi
 On selecting a segment, show:
 - **Extra time to the referral hospital** and **population that depends on the segment** (the headline metrics).
 - **Affected communities** and **alternate routes** (for example Ruta 126, light vehicles only; Ruta 10, freight).
-- A block **Exposure**: accumulated rainfall (`rain_mm_12d`), no soil moisture (`soil_moisture_pctl` stays `null`; S2c failed), and "radar evidence: not detectable at this scale" (`radar_evidence`). Each value handles `null`.
+- A block **Exposure**: accumulated rainfall (`rain_mm_12d`) only; soil moisture and radar evidence were removed from the contract in 0.3 (S2c failed; the radar finding is in `meta.json → detection_limits`). The value handles `null`.
 - The mean backscatter change (ΔdB) only if the zone has one.
 - A label saying it is a critical segment by consequence, not a confirmed closure.
 - Two actions: "Simulate closure of this segment" and "Why?".
@@ -90,7 +90,7 @@ Do not build any of these unless the team decides otherwise:
 - [ ] The detail view shows extra time, dependent population, communities, alternate routes and the Exposure block (nulls handled).
 - [ ] Closing segments recalculates in the browser; isolated communities appear only when there is truly no path.
 - [ ] The "Why?" panel shows exposure with the hypothesis label.
-- [ ] Every data file passes validation (schema 0.2).
+- [ ] Every data file passes validation (schema 0.3).
 - [ ] No text says "confirmed" or "caused by"; the notice about critical segments is visible.
 - [ ] Attribution is visible (NASA/JPL, IMERG, OpenStreetMap).
 - [ ] The app works on a phone, in a private browser window and offline.

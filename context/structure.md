@@ -9,7 +9,7 @@ flowchart TD
     src["<b>External sources</b><br/>OSM roads · WorldPop · IMERG rain (context) · NISAR GCOV (optional, experimental)"]
     pipe["<b>pipeline/</b><br/>Python, offline"]
     out["<b>pipeline/output/</b><br/>committed, light artifacts"]
-    data["<b>frontend/public/storage/</b><br/>meta.json<br/>graph.json<br/>scenarios.json<br/>rain.csv<br/>change.geojson + PNGs (optional, may be empty)"]
+    data["<b>frontend/public/storage/</b><br/>areas.json<br/>&lt;zone&gt;/ meta.json, graph.json, scenarios.json, rain.csv<br/>change.geojson + PNGs (optional, may be empty)"]
     spa["<b>frontend/</b><br/>Static SPA, no server<br/>MapLibre + graph.ts"]
     contract["<b>contract/</b><br/>JSON Schemas + mocks"]
 
@@ -44,7 +44,7 @@ vantage/
 └── projects/
     ├── contract/
     │   ├── schemas/         # JSON Schemas (one per data file)
-    │   └── examples/        # mock data that satisfies the schemas
+    │   └── examples/        # mock data (areas.json + one folder per zone) that satisfies the schemas
     ├── pipeline/            # Python, managed with uv
     │   └── output/          # committed pipeline output (light artifacts only)
     └── frontend/            # Bun + strict TypeScript, React + Vite
@@ -59,7 +59,8 @@ The exact subfolders inside `pipeline/` and `frontend/source/` are not fixed. Pr
 
 | File | Contents |
 |---|---|
-| `meta.json` | `schema_version` (0.2), `area` (name and bbox, a parameter), sources, `exposure_sources`, `detection_limits`; `passes` only if a change layer exists |
+| `areas.json` (at `storage/`) | Index of zones: `id`, `name`, `bbox`, `validated`. Each zone's files below live in `storage/<id>/` |
+| `meta.json` | `schema_version` (0.3), `area` (name and bbox, a parameter), sources, `exposure_sources`, `detection_limits`; `passes` only if a change layer exists |
 | `change.geojson` + overlay PNGs | **Optional.** Change polygons with ΔdB per zone and the raster image; the file may be an empty FeatureCollection and the PNGs may be absent |
 | `graph.json` | Road network (nodes and edges), hospitals, communities and travel times, so closures can be simulated in the browser |
 | `scenarios.json` | Per critical segment (key `candidates`): extra time, dependent population, affected communities, rank, `source`, `exposure` |
@@ -67,7 +68,7 @@ The exact subfolders inside `pipeline/` and `frontend/source/` are not fixed. Pr
 
 ### Rules
 
-1. Schemas and mocks were frozen at 0.1 and moved to 0.2 after G1 (`context/contracts.md` §12). Every file carries `schema_version`.
+1. Schemas and mocks were frozen at 0.1 and moved to 0.2 after G1 and to 0.3 in `contract-update` (`context/contracts.md` §12, §14). Every file carries `schema_version`.
 2. The frontend works from minute one with `make mock`, which copies `contract/examples/` into `frontend/public/storage/`. When the pipeline produces real data (`make all`), it writes to `pipeline/output/` (committed), and `make publish` copies that into `storage/`; the web does not change. `storage/` is git-ignored.
 3. `make validate` checks the data folder against the schemas (using `jsonschema` in Python). It runs in CI and before every deploy.
 4. **Raw NISAR data is never committed**, only light artifacts. GitHub rejects files over 100 MB.
@@ -93,7 +94,7 @@ referral_hospitals = []                # OSM ids (way/…); for Ruta 32: Calder�
 |---|---|---|
 | Road graph | OSM for the configured area | Segment network, hospitals and communities → `graph.json` |
 | Impact (consequence) | Graph + population | Remove one segment at a time (both carriageways) and recompute shortest paths to the nearest referral hospital → extra time, dependent population, isolated communities, criticality ranking → `scenarios.json` |
-| Exposure layer | IMERG Late daily | `rain.csv`, and per-segment `exposure` in `scenarios.json` (`rain_mm_12d`; `soil_moisture_pctl` stays `null`; `radar_evidence`) |
+| Exposure layer | IMERG Late daily | `rain.csv`, and per-segment `exposure` in `scenarios.json` (`rain_mm_12d` only since 0.3) |
 | Change detection (optional, experimental) | Two GCOV passes | ΔdB change polygons + overlay PNG. At landslide scale the test was negative (`approach.md` §5), so this stage may produce an empty layer. Not a generator of critical segments |
 | Export | All of the above | Files in `pipeline/output/`, then `make publish` and `make validate` |
 
