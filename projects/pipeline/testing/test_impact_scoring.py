@@ -385,6 +385,30 @@ def test_inv15_every_unit_carries_the_zones_alternates(tmp_path):
   assert all(c["alternates"] == [] for c in json.loads((zone2.output_dir / "scenarios.json").read_text(encoding="utf-8"))["candidates"])
 
 
+# --- duplicate unit ids (INV-25, INV-26) ---
+
+
+def agreeing_duplicate_graph() -> dict:
+  """Both entries are named T-01 and the graph agrees with both, so the cross-reference checks have nothing to object to."""
+  graph = two_paths()
+  for e in graph["edges"]:
+    if e["id"] in ("e1", "e2"):
+      e["candidate_id"] = "T-01"
+  return graph
+
+
+def test_inv25_score_rejects_two_units_with_the_same_id():
+  with pytest.raises(ImpactScoringError, match="T-01"):
+    score(two_paths(), [unit("T-01", "e1"), unit("T-01", "e2")])
+
+
+def test_inv26_run_stops_when_closure_units_lists_the_same_id_twice(tmp_path):
+  zone, work, _, _ = stage(tmp_path, graph=agreeing_duplicate_graph(), units=[unit("T-01", "e1"), unit("T-01", "e2")])
+  with pytest.raises(ImpactScoringError, match="T-01"):
+    impact_scoring.run(zone, work)
+  assert not (zone.output_dir / "scenarios.json").exists()
+
+
 # --- acceptance against the contract mock (ACC-02, ACC-03) ---
 
 
