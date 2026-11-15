@@ -13,32 +13,32 @@ Leyenda: `[ ]` pendiente · `[~]` en curso · `[x]` hecha · `[-]` descartada (c
 |---|---|---|---|---|
 | 1 | **Bootstrap** | Sáb 09:00–11:00 | Repo, herramientas, contrato y mocks, esqueleto desplegado | [x] |
 | 2 | **Spiking** | Sáb 11:00–15:00 | Probar los supuestos riesgosos y decidir en la **Puerta 1** | [x] Cerrada: G1 NO-GO de detección; S2c y S5 (señal) FALLAN; S4′ solo pasa «hospital de referencia»; S3 queda parcial (sin comunicado primario) |
-| 3 | **Building** | Sáb ~17:00 → dom 14:00 | Datos reales por el pipeline y UI completa sobre el contrato | [~] Casi cerrada (dom 15 nov): 18 de 18 deltas con spec aprobado y código en `main`; corrida real de la Ruta 32 hecha y commiteada en `output/`; todas las tareas de pipeline y frontend `[x]` salvo P8; 996 pruebas de pipeline y 189 de frontend pasan. Falta solo P8: fusionar el PR y ver el sitio publicado |
-| 4 | **Polish** | Dom 14:00 → cierre | Congelar, corregir errores, probar, desplegar, presentar | [~] En curso: README final y guion escritos (X3, X4); faltan G2 y G3, la etiqueta `v1.0`, el ensayo, la prueba en celular físico y la entrega |
+| 3 | **Building** | Sáb ~17:00 → dom 14:00 | Datos reales por el pipeline y UI completa sobre el contrato | [x] Cerrada (dom 15 nov): 18 de 18 deltas con spec aprobado y código en `main`; corrida real de la Ruta 32 publicada (P8); 996 pruebas de pipeline y 189 de frontend pasan |
+| 4 | **Polish** | Dom 14:00 → cierre | Congelar, corregir errores, probar, desplegar, presentar | [~] En curso: G2 decidida (X1); sitio publicado con datos reales; README y guion escritos; etiqueta `v1.0` creada en local. Faltan: subir la etiqueta, abrir el sitio en ventana privada y en un celular físico (X2), ensayar (X4) y entregar (X5) |
 
 **G1 decidida (sáb 14 nov ~16:35): NO-GO** para detectar derrumbes con GCOV de NISAR (mínimo detectable ≈10×10 px ≈ 1 ha a −5 dB; detalle en `SPIKING.md` S2 y `context/approach.md` §5). Tras los demás spikes (S2c, S4′, S5; ver `SPIKING.md`) ninguna señal de exposición anticipó los cierres, y el producto se redefine en la **D8**: es la **consecuencia (criticidad)** de cada tramo de la Ruta 32, con la lluvia IMERG como contexto etiquetado «hipótesis». «Riesgo = consecuencia × exposición» (D2) ya no se usa. La capa de radar es opcional y puede ir vacía.
 
-Prioridad ahora: fusionar el PR de `docs/close-phase-three`, ver el sitio publicado con datos reales (P8) y pasar a la fase 4 (X1–X5). Todo el trabajo de datos, pipeline y UI de la fase 3 está hecho.
+Prioridad ahora: cerrar la fase 4. Subir la etiqueta `v1.0` (`git push origin v1.0`), abrir el sitio en una ventana privada y en un celular físico (X2), ensayar el guion una vez (X4) y entregar (X5).
 
 ## Progreso
 
-**40 / 46 tareas · 87 %** `█████████████████░░░` _(solo cuentan las `[x]`; las `[~]` aún no suman; las `[-]` descartadas no cuentan)_
+**42 / 46 tareas · 91 %** `██████████████████░░` _(solo cuentan las `[x]`; las `[~]` aún no suman; las `[-]` descartadas no cuentan)_
 
 | Fase | Hechas | % |
 |---|---|---|
 | 1 · Bootstrap | 9 / 9 | 100 % |
 | 2 · Spiking | 9 / 9 | 100 % |
-| 3 · Building | 22 / 23 | 96 % |
-| 4 · Polish | 0 / 5 | 0 % |
+| 3 · Building | 23 / 23 | 100 % |
+| 4 · Polish | 1 / 5 | 20 % |
 
-_Actualizá este bloque cada vez que marques una tarea `[x]`. Una tarea es `[x]` si su código está en `main`, sus pruebas pasan y cumple su «Terminada cuando». Hoy solo P8 queda `[~]`: depende de fusionar el PR y ver el sitio publicado._
+_Actualizá este bloque cada vez que marques una tarea `[x]`. Una tarea es `[x]` si su código está en `main`, sus pruebas pasan y cumple su «Terminada cuando». Hoy quedan `[~]` X2, X3 y X4, y X5 sin empezar._
 
 ## Puertas
 
 | Puerta | Cuándo | Pregunta | Decisión |
 |---|---|---|---|
 | G1 | Sáb 15:00 (decidida ~16:35) | ¿Hay pasadas compatibles de NISAR y se nota el cambio? | **NO-GO** en detección; el producto pasa a consecuencia × exposición (D1–D6), redefinido después en D8 |
-| G2 | Dom 14:00 | Congelar funcionalidades: se corta lo que no esté listo | _pendiente_ |
+| G2 | Dom 14:00 | Congelar funcionalidades: se corta lo que no esté listo | **Decidida (15 nov):** no se corta ninguna funcionalidad; la lista de no hechos y límites es la D11 |
 | G3 | Dom 18:00 | Congelar código: solo corrección de errores | _pendiente_ |
 
 ---
@@ -128,7 +128,7 @@ Un delta por rebanada, en `projects/<proyecto>/deltas/<delta>.spec.md`. Nombres 
 | E1 | IMERG: `rain.csv` y lluvia acumulada por tramo (`exposure.rain_mm_12d`) | I | [x] | Valida; las fechas cubren el periodo; no afirmar relación con los cierres. Hecho (15 nov, PR #35): `rain.csv` con 317 días (1 ene–13 nov), `exposure.rain_mm_12d` en las 115 unidades y 8 de 8 celdas iguales al granulo original de NASA (ACC-02). |
 | E3 | Zona como parámetro (nombre o bbox en config → `meta.area`) | I | [x] | Cambiar el bbox cambia la salida sin tocar código. Hecho (PR #18). |
 | P7 | `meta.json` y `make all` de punta a punta | R | [x] | `make all` regenera todo y `make validate` pasa. Hecho (15 nov, PR #33): `make all AREA=ruta-32` y `make publish validate` salen con 0, la salida es idéntica entre corridas y `meta.json` nombra la Ruta 32. |
-| P8 | **Primer despliegue con datos reales** | R, W | [~] | El sitio publicado muestra datos reales (meta: sáb 21:00). 15 nov: `output/` real commiteado, `deploy.yml` corre `make publish`; desde un clon limpio pasan CI y los pasos del despliegue, y el build servido en local no muestra «MOCK» y sí aviso, banner de zona no validada y atribuciones. PR abierto. **Falta:** fusionarlo y abrir el sitio publicado en ventana privada. |
+| P8 | **Primer despliegue con datos reales** | R, W | [~] | El sitio publicado muestra datos reales (meta: sáb 21:00). 15 nov: `output/` real commiteado, `deploy.yml` corre `make publish`; desde un clon limpio pasan CI y los pasos del despliegue, y el build servido en local no muestra «MOCK» y sí aviso, banner de zona no validada y atribuciones. PR abierto. **Hecho (15 nov):** fusionado; el despliegue de `main` (`656051d`) termina bien y `graph.json`, `meta.json` y `scenarios.json` publicados en `wguillendev.github.io/vantage/storage/ruta-32/` tienen el mismo SHA-256 que `output/`. La vista en ventana privada queda en X2. |
 | E2 | S2c (SME2), solo si sobra tiempo | R | [x] | FALLA (ver S2c); sin humedad en la exposición |
 | P9 | Unidad de cierre fina: ambas calzadas, cortada en cada unión del grafo, más de 19 cierres (`RELIABILITY.md` paso 5; el tope de ~5 km se descartó, ver spec) | I | [x] | Spec aprobado; unidades por uniones, no por cadenado. Hecho (PR #36): 115 unidades sobre la red real, de 15 m a 34,5 km. |
 | P10 | Sensibilidad: velocidad ×0,8/×1,2 y quitar cada hospital de referencia (paso 1; el ajuste a la red no se varía, ver spec) | V | [x] | Top 5 comparte ≥ 4 tramos en las dos de velocidad; quitar hospital se reporta, no se juzga. Hecho (15 nov): `make sensitivity AREA=ruta-32` (el comando faltaba), veredicto `pass`, top 5 y top 10 iguales en ×0,8, ×1,2 y al quitar cada hospital. También se midió la distancia de ajuste (1 500 y 5 000 m): top 20 igual (D13). Reservas: el factor de velocidad es uniforme y los tres hospitales están juntos (D9). |
@@ -165,9 +165,9 @@ Cortadas `[-]`: **F2** (mostrar pasadas) y **F9** (alternar antes/después): dep
 
 | ID | Tarea | Dueño | Estado | Terminada cuando |
 |---|---|---|---|---|
-| X1 | G2 (dom 14:00): cortar lo que no esté listo y anotarlo en decisiones | todos | [ ] | Lista de cortes |
-| X2 | G3 (dom 18:00): solo errores; probar el sitio en ventana privada y en celular | todos | [ ] | El flujo principal funciona |
-| X3 | README final (cómo correrlo, `make all`, atribuciones, límites) y etiqueta `v1.0` | R, W | [~] | Alguien nuevo puede correrlo **15 nov:** README final escrito (estado, resultados con datos reales, comandos del pipeline, límites, atribuciones). Falta la etiqueta `v1.0`, que se pone tras fusionar la rama. |
+| X1 | G2 (dom 14:00): cortar lo que no esté listo y anotarlo en decisiones | todos | [x] | Lista de cortes **15 nov:** G2 adopta la D11: no se corta ninguna funcionalidad y los no hechos y límites quedan listados ahí. |
+| X2 | G3 (dom 18:00): solo errores; probar el sitio en ventana privada y en celular | todos | [~] | El flujo principal funciona **15 nov:** el sitio responde (200) y sirve los datos reales (mismo SHA-256 que `output/`). El flujo en un viewport móvil emulado ya se probó en F7. Falta abrirlo en una ventana privada y en un celular físico. |
+| X3 | README final (cómo correrlo, `make all`, atribuciones, límites) y etiqueta `v1.0` | R, W | [~] | Alguien nuevo puede correrlo **15 nov:** README final escrito (estado, resultados con datos reales, comandos del pipeline, límites, atribuciones). Etiqueta `v1.0` creada en local sobre `656051d` (el `main` publicado); falta subirla con `git push origin v1.0`. |
 | X4 | Presentación: el resultado negativo de detectabilidad como hallazgo con su número; texto cauto | todos | [~] | Ensayada una vez **15 nov:** guion en `presentation.md` con los hallazgos y sus números; falta ensayarlo una vez. |
 | X5 | Entrega a Space Apps con los enlaces finales | R | [ ] | Enviada antes del cierre |
 
