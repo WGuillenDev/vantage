@@ -1,6 +1,7 @@
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEffect, useRef, useState } from 'react'
+import { alternateEdgeIds, alternateFeatures, alternateRoads, closedFeatures } from './closureWhatif.ts'
 import { colorForCriticality, fitBounds, GRAY, legendRange, pointFeatures, rankingUnknown, unitFeatures } from './mapCorridor.ts'
 import { useAppStore } from './store.ts'
 import type { ZoneData } from './zoneData.ts'
@@ -8,7 +9,11 @@ import type { ZoneData } from './zoneData.ts'
 const EMPTY = { type: 'FeatureCollection' as const, features: [] }
 const CLICK_TOLERANCE = 6 // px around the pointer, so thin roads are easy to hit
 
-function Legend({ data }: { data: ZoneData }) {
+const SOURCES = ['units', 'hospitals', 'communities', 'closed', 'alternates']
+const CLOSED_COLOR = '#b91c1c'
+const ALTERNATE_COLOR = '#0284c7'
+
+function Legend({ data, hasClosed }: { data: ZoneData; hasClosed: boolean }) {
   const { min, max } = legendRange(data.units)
   const format = new Intl.NumberFormat('es').format
   const range = { min, max }
@@ -30,6 +35,18 @@ function Legend({ data }: { data: ZoneData }) {
         <span aria-hidden="true" className="inline-block h-1 w-4 rounded" style={{ background: GRAY }} />
         sin impacto
       </p>
+      {hasClosed && (
+        <>
+          <p className="mt-1 flex items-center gap-1">
+            <span aria-hidden="true" className="inline-block w-4 border-t-4 border-dashed" style={{ borderColor: CLOSED_COLOR }} />
+            tramo cerrado
+          </p>
+          <p className="flex items-center gap-1">
+            <span aria-hidden="true" className="inline-block w-4 border-t-4 border-dashed" style={{ borderColor: ALTERNATE_COLOR }} />
+            rutas alternas
+          </p>
+        </>
+      )}
       <p className="mt-1 flex items-center gap-1">
         <span aria-hidden="true" className="inline-block h-2.5 w-2.5 rounded-full border border-white bg-red-600" />
         hospital de referencia
@@ -47,6 +64,7 @@ export function MapView({ data }: { data: ZoneData | string | null }) {
   const mapRef = useRef<maplibregl.Map | null>(null)
   const [ready, setReady] = useState(false)
   const selected = useAppStore((state) => state.selectedUnitId)
+  const closed = useAppStore((state) => state.closedUnitIds)
 
   useEffect(() => {
     const element = container.current
@@ -71,7 +89,14 @@ export function MapView({ data }: { data: ZoneData | string | null }) {
     })
     mapRef.current = map
     map.on('load', () => {
-      for (const id of ['units', 'hospitals', 'communities']) map.addSource(id, { type: 'geojson', data: EMPTY })
+      for (const id of SOURCES) map.addSource(id, { type: 'geojson', data: EMPTY })
+      // closure-whatif: the alternate roads sit under the units, the closed units on top of them.
+      map.addLayer({
+        id: 'alternates-line',
+        type: 'line',
+        source: 'alternates',
+        paint: { 'line-color': ALTERNATE_COLOR, 'line-width': 5, 'line-dasharray': [2, 1.5] },
+      })
       map.addLayer({ id: 'units-casing', type: 'line', source: 'units', paint: { 'line-color': '#ffffff', 'line-width': 7 } })
       map.addLayer({ id: 'units-line', type: 'line', source: 'units', paint: { 'line-color': ['get', 'color'], 'line-width': 4 } })
       map.addLayer({
@@ -82,6 +107,12 @@ export function MapView({ data }: { data: ZoneData | string | null }) {
         paint: { 'line-color': '#f59e0b', 'line-width': 9, 'line-opacity': 0.9 },
       })
       map.moveLayer('units-line')
+      map.addLayer({
+        id: 'closed-line',
+        type: 'line',
+        source: 'closed',
+        paint: { 'line-color': CLOSED_COLOR, 'line-width': 4, 'line-dasharray': [1.5, 1] },
+      })
       map.addLayer({
         id: 'communities',
         type: 'circle',
@@ -128,7 +159,7 @@ export function MapView({ data }: { data: ZoneData | string | null }) {
     if (!map || !ready) return
     const set = (id: string, collection: typeof EMPTY) => (map.getSource(id) as maplibregl.GeoJSONSource).setData(collection)
     if (typeof data !== 'object' || data === null) {
-      for (const id of ['units', 'hospitals', 'communities']) set(id, EMPTY)
+      for (const id of SOURCES) set(id, EMPTY)
       return
     }
     const points = pointFeatures(data.graph)
@@ -143,10 +174,25 @@ export function MapView({ data }: { data: ZoneData | string | null }) {
     if (map && ready) map.setFilter('units-selected', ['==', ['get', 'id'], selected ?? ''])
   }, [selected, ready])
 
+  // INV-12: the closed units and the roads named like their alternates follow the closed set.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !ready) return
+    const set = (id: string, collection: typeof EMPTY) => (map.getSource(id) as maplibregl.GeoJSONSource).setData(collection)
+    if (typeof data !== 'object' || data === null) {
+      set('closed', EMPTY)
+      set('alternates', EMPTY)
+      return
+    }
+    const names = alternateRoads(data.units, closed)
+    set('closed', closedFeatures(data.graph, data.units, closed) as unknown as typeof EMPTY)
+    set('alternates', alternateFeatures(data.graph.edges, alternateEdgeIds(data.graph.edges, names)) as unknown as typeof EMPTY)
+  }, [data, closed, ready])
+
   return (
     <div className="absolute inset-0">
       <div ref={container} className="h-full w-full" />
-      {typeof data === 'object' && data !== null && <Legend data={data} />}
+      {typeof data === 'object' && data !== null && <Legend data={data} hasClosed={closed.length > 0} />}
     </div>
   )
 }
