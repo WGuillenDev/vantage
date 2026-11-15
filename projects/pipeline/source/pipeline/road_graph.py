@@ -14,6 +14,7 @@ from pathlib import Path
 import networkx as nx
 import numpy as np
 import osmnx as ox
+from osmnx._errors import InsufficientResponseError  # shortcut: osmnx 2.1 has no public errors module; recheck on upgrade
 from shapely.geometry import LineString
 
 from .area_config import PIPELINE_DIR, ConfigError, Zone, load_zone
@@ -247,8 +248,12 @@ def build(roads_osm: Path, features_osm: Path, zone: Zone) -> tuple[dict, list[d
   _check_speeds(pieces, zone.speed_model_kmh)
   nodes, edges = _build_edges(pieces, zone.speed_model_kmh)
   snapper = _Snapper(_largest_strong_component(nodes, edges))
-  features = ox.features_from_xml(features_osm)
-  hospitals = _hospitals(features, zone.referral_hospitals, snapper)
+  try:
+    features = ox.features_from_xml(features_osm)
+  except InsufficientResponseError:
+    # The zone config always lists at least one referral hospital, so an extract with no features misses it.
+    raise RoadGraphError(f"Referral hospital {min(zone.referral_hospitals, key=_osm_key)} was not found in the OSM extract") from None
+  hospitals =_hospitals(features, zone.referral_hospitals, snapper)
   communities, originals = _communities(features, snapper)
   graph = {"schema_version": "0.3", "nodes": nodes, "edges": edges, "hospitals": hospitals, "communities": communities}
   return graph, originals
