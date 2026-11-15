@@ -22,17 +22,19 @@ function useIsWide(): boolean {
   )
 }
 
-// Placeholders stand in for panels owned by other slices (closure-whatif, segment-detail, trust-signals).
+// Placeholders stand in for panels owned by other slices (closure-whatif).
 function Placeholder({ children }: { children: ReactNode }) {
   return <p className="p-3 text-sm text-gray-600">{children}</p>
 }
 
-export function Layout({ header, footer, map, overlay, ranking }: {
+export function Layout({ header, footer, map, overlay, ranking, detail, why }: {
   header: ReactNode
   footer: ReactNode
   map: ReactNode
   overlay: ReactNode
   ranking: ReactNode
+  detail: (onWhy?: () => void) => ReactNode
+  why: ReactNode
 }) {
   const wide = useIsWide()
   const selected = useAppStore((state) => state.selectedUnitId)
@@ -61,7 +63,8 @@ export function Layout({ header, footer, map, overlay, ranking }: {
           {map}
           {overlay}
           {wide && (
-            <div className="absolute right-2 top-2 flex w-72 flex-col items-end gap-1">
+            <div className="absolute right-2 top-2 flex max-h-[calc(100%-1rem)] w-72 flex-col items-end gap-1 overflow-y-auto">
+              {selected !== null && <div className="w-full rounded bg-white shadow">{detail()}</div>}
               <button
                 type="button"
                 aria-expanded={whyOpen}
@@ -73,7 +76,7 @@ export function Layout({ header, footer, map, overlay, ranking }: {
               </button>
               {whyOpen && (
                 <section id="why-card" aria-label="¿Por qué?" className="w-full rounded bg-white shadow">
-                  <Placeholder>Explicación «¿Por qué?»: pendiente.</Placeholder>
+                  {why}
                 </section>
               )}
             </div>
@@ -119,14 +122,17 @@ export function Layout({ header, footer, map, overlay, ranking }: {
               <>
                 {selected !== null && (
                   <div className="md:hidden">
-                    <Placeholder>Detalle del tramo seleccionado: pendiente.</Placeholder>
+                    {detail(() => {
+                      setTab('porque')
+                      setExpanded(true)
+                    })}
                   </div>
                 )}
                 <div className="min-h-0 flex-1">{ranking}</div>
               </>
             )}
             {activeTab === 'simulacion' && <Placeholder>Simulación de cierre: pendiente.</Placeholder>}
-            {activeTab === 'porque' && <Placeholder>Explicación «¿Por qué?»: pendiente.</Placeholder>}
+            {activeTab === 'porque' && why}
           </div>
         </aside>
       </div>
