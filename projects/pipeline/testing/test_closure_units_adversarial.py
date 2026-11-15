@@ -120,3 +120,48 @@ def test_inv_04_units_in_the_exact_same_place_are_numbered_by_their_lowest_edge_
     edges.append((f"e{n}", f"a{n}", f"b{n}", ROAD, False, 1000))
   owner = unit_of(build_units(make_graph(nodes, edges), (ROAD,)))
   assert [owner[f"e{n}"] for n in range(1, 7)] == [f"T-{n:02d}" for n in range(1, 7)]
+
+
+def test_inv_09_a_unit_whose_carriageways_are_cut_by_ramps_keeps_the_longer_carriageways_total_length():
+  # 3 km of dual carriageway. An exit ramp at a1 cuts the eastbound side and one at b2 cuts the westbound side, so each
+  # carriageway is two stretches inside one unit. The longer carriageway's total edge length is 3000.
+  nodes = {f"a{k}": (k * 0.009, 0.0) for k in range(4)} | {f"b{k}": (k * 0.009, EAST) for k in range(4)}
+  nodes |= {"r1": (0.009, -0.01), "r2": (0.018, EAST + 0.01)}
+  edges = [("e1", "a0", "a1", ROAD, True, 1000), ("e2", "a1", "a2", ROAD, True, 1000), ("e3", "a2", "a3", ROAD, True, 1000)]
+  edges += [("e4", "b3", "b2", ROAD, True, 1000), ("e5", "b2", "b1", ROAD, True, 1000), ("e6", "b1", "b0", ROAD, True, 1000)]
+  edges += [("e7", "a1", "r1", "Ramp", False, 500), ("e8", "b2", "r2", "Ramp", False, 500)]
+  (unit,) = build_units(make_graph(nodes, edges), (ROAD,))
+  assert sorted(unit["edge_ids"]) == ["e1", "e2", "e3", "e4", "e5", "e6"]
+  assert unit["length_m"] == 3000
+
+
+def test_inv_09_a_two_way_stretch_cut_by_a_side_road_counts_each_side_of_the_cut_alone():
+  nodes = {"n1": (0.0, 0.0), "n2": (0.01, 0.0), "n3": (0.03, 0.0), "n4": (0.01, 0.01)}
+  graph = make_graph(nodes, [("e1", "n1", "n2", ROAD, False, 1000), ("e2", "n2", "n3", ROAD, False, 2000), ("e3", "n2", "n4", "Calle", False, 500)])
+  assert [u["length_m"] for u in build_units(graph, (ROAD,))] == [1000, 2000]
+
+
+def zero_length_graph() -> dict:
+  nodes = {"n1": (0.0, 0.0), "n2": (0.000001, 0.0), "n3": (0.5, 0.0)}
+  return make_graph(nodes, [("e1", "n1", "n2", ROAD, False, 0), ("e2", "n2", "n3", "Calle", False, 1000)])
+
+
+def test_inv_09_a_unit_of_length_zero_is_an_error_naming_its_edges():
+  with pytest.raises(ClosureUnitsError, match="e1"):
+    build_units(zero_length_graph(), (ROAD,))
+
+
+def test_inv_09_a_unit_of_length_zero_writes_nothing(tmp_path):
+  zone, work_dir = write_graph(tmp_path, zero_length_graph())
+  before = (zone.output_dir / "graph.json").read_bytes()
+  with pytest.raises(ClosureUnitsError, match="length of 0 m"):
+    closure_units.run(zone, work_dir)
+  assert not (work_dir / "closure_units.json").exists()
+  assert (zone.output_dir / "graph.json").read_bytes() == before
+
+
+def test_inv_03_a_repeated_edge_id_is_an_error_not_a_silently_lost_edge():
+  nodes = {"n1": (0.0, 0.0), "n2": (0.01, 0.0), "n3": (0.02, 0.0)}
+  graph = make_graph(nodes, [("e1", "n1", "n2", ROAD, False, 1000), ("e1", "n2", "n3", ROAD, False, 1000)])
+  with pytest.raises(ClosureUnitsError, match="e1"):
+    build_units(graph, (ROAD,))
