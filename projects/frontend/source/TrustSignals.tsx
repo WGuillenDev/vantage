@@ -1,21 +1,38 @@
+import { useState } from 'react'
 import { ChevronDown, Info, TriangleAlert } from 'lucide-react'
 import { NOTICE, REFERRAL_NOTE, UNVALIDATED_BANNER, attributionLines, isUnvalidated, readingPanel } from './trustSignals.ts'
 import { readyData, type ZoneState } from './zoneData.ts'
 
 export function TrustHeader({ state }: { state: ZoneState }) {
   const zone = readyData(state)?.zone
+  const [open, setOpen] = useState(false)
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-amber-200 bg-amber-50 px-3 py-1.5 text-xs text-amber-950 md:text-sm">
-      <p className="flex items-center gap-1.5">
-        <Info aria-hidden="true" className="h-4 w-4 shrink-0" />
-        {NOTICE}
-      </p>
-      {isUnvalidated(zone) && (
-        <p role="status" className="flex items-center gap-1.5 rounded-full bg-red-100 px-2.5 py-0.5 font-medium text-red-900">
-          <TriangleAlert aria-hidden="true" className="h-4 w-4 shrink-0" />
-          {UNVALIDATED_BANNER}
+    <div className="border-b border-amber-200 bg-amber-50 px-3 py-1.5 text-xs text-amber-950 md:text-sm">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+        <p className="flex min-w-0 flex-1 items-center gap-1.5 leading-tight md:flex-none">
+          <Info aria-hidden="true" className="h-4 w-4 shrink-0" />
+          {NOTICE}
         </p>
-      )}
+        {isUnvalidated(zone) && (
+          <>
+            {/* Narrow screens: a short chip that opens the full banner. */}
+            <button
+              type="button"
+              aria-expanded={open}
+              aria-label={UNVALIDATED_BANNER}
+              onClick={() => setOpen((value) => !value)}
+              className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full bg-red-100 px-2.5 font-medium text-red-900 md:hidden"
+            >
+              <TriangleAlert aria-hidden="true" className="h-4 w-4" />
+              No validada
+            </button>
+            <p role="status" className={`${open ? 'flex' : 'hidden md:flex'} basis-full items-center gap-1.5 rounded-full bg-red-100 px-2.5 py-0.5 font-medium text-red-900 md:basis-auto`}>
+              <TriangleAlert aria-hidden="true" className="h-4 w-4 shrink-0" />
+              {UNVALIDATED_BANNER}
+            </p>
+          </>
+        )}
+      </div>
     </div>
   )
 }

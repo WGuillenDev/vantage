@@ -41,10 +41,10 @@ export function Layout({ header, footer, map, ranking, detail, simulation, why }
   const swiped = useRef(false)
   const panel = useRef<HTMLDivElement>(null)
 
-  // A new selection brings its detail, at the top of the panel, into view.
+  // A new selection or tab starts at the top of the panel, where the detail and the summaries are.
   useEffect(() => {
-    if (selected !== null) panel.current?.scrollTo({ top: 0 })
-  }, [selected])
+    panel.current?.scrollTo({ top: 0 })
+  }, [selected, tab])
 
   // INV-05: selecting a unit expands the sheet (it only matters on narrow screens).
   const [seen, setSeen] = useState(selected)

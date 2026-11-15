@@ -14,7 +14,7 @@ const WhyPanel = lazy(() => import('./WhyPanel.tsx'))
 
 function TopBar({ state }: { state: ZoneState }) {
   return (
-    <header className="flex items-center gap-4 border-b border-line bg-white px-3 py-2">
+    <header className="flex items-center gap-4 border-b border-line bg-white px-3 py-1.5">
       <h1 className="flex items-center gap-1.5 text-base font-bold tracking-wide">
         <Route aria-hidden="true" className="h-5 w-5 text-brand" />
         VANTAGE
