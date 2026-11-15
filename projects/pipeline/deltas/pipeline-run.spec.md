@@ -69,23 +69,23 @@ Attributions: the OpenStreetMap line with the date of the extract (`© OpenStree
 
 ## Invariants
 
-- INV-01 [none]
+- INV-01 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_pipeline_run.py]
   When a zone's run finishes, `output/<id>/` holds `meta.json`, `graph.json`, `scenarios.json` and `rain.csv`, and the validator passes on it.
-- INV-02 [none]
+- INV-02 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_pipeline_run.py]
   When a stage of a zone's run fails or the validator fails on the new files, pipeline-run exits non-zero with an English error naming the stage or the validator, and `output/<id>/` equals what it was before the run.
-- INV-04 [none]
+- INV-04 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_pipeline_run.py]
   When pipeline-run runs the stages of a zone, it runs them in the order `road-graph`, `population-data`, `closure-units`, `impact-scoring`, `rain-context`.
-- INV-05 [none]
+- INV-05 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_pipeline_run.py]
   When `make all` runs, it makes no network request.
-- INV-06 [none]
+- INV-06 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_pipeline_run.py]
   When pipeline-run writes `meta.json`, `area.name`, `area.bbox`, `rain.start`, `rain.end`, `speed_model_kmh` and `detection_limits` (present only if the zone has it) equal the zone config's values, and `rain.product` and `rain.version` equal those in `work/<id>/imerg/source.json`.
-- INV-10 [none]
+- INV-10 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_pipeline_run.py]
   When pipeline-run writes `meta.json`, its attributions include the OpenStreetMap line with the extract date and the IMERG line, and include the WorldPop line only if population was filled.
-- INV-11 [none]
+- INV-11 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_pipeline_run.py]
   When pipeline-run writes `areas.json`, it lists every zone folder under `output/` once, ordered by id, with `id`, `name`, `bbox` and `validated` taken from that zone's config.
-- INV-13 [none]
+- INV-13 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_pipeline_run.py]
   When `make all` runs twice on the same inputs, every file of `output/` is byte-identical except `generated_at` in each `meta.json`.
-- INV-14 [none]
+- INV-14 [test: uv run --project projects/pipeline pytest projects/pipeline/testing/test_pipeline_run.py]
   When `make publish` or `make mock` runs, `storage/` becomes an exact copy of its source (`output/` or the contract examples) and holds nothing else.
 
 ## Deferred / Open questions
