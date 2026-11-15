@@ -1,0 +1,47 @@
+{
+  "zone": "ruta-32",
+  "inputs": {
+    "configs/ruta-32.toml": {
+      "sha256": "7e6a94fe393db5ea68ec9b55df4e997fdcbec946ea36fe7cf9f21a0ea8fcf5ed",
+      "bytes": 1805
+    },
+    "work/ruta-32/osm/roads.osm": {
+      "sha256": "eef50dc98bec5d61b7756fe27243c042abbfbdba5235d61bf071ef45330a5115",
+      "bytes": 14775692
+    },
+    "work/ruta-32/osm/features.osm": {
+      "sha256": "c643dd0e04bea5a9084ce8dfcf57cb7599228656b74db8cd35d08993b2a3cd23",
+      "bytes": 251194
+    },
+    "work/ruta-32/osm/extract_date.txt": {
+      "sha256": "fb7930664b2cef48da257f1389d39e01e9f69648e4bbd410ccacb1866a6a56a9",
+      "bytes": 11
+    },
+    "work/ruta-32/imerg/cells.csv": {
+      "sha256": "c208a5dc4af5a07e2983f04034b30d83fb277cf0dcfa08097b850c51548b1c69",
+      "bytes": 1036699
+    },
+    "work/ruta-32/imerg/source.json": {
+      "sha256": "cf008262f2f70a571c75c93d748846d069ca56c48edcdd0200c87b1b4ab5d2b0",
+      "bytes": 99
+    },
+    "work/worldpop/cri_ppp_2020.tif": {
+      "sha256": "6c4312e1d88606c83b9a45889f07c727e6f27b005bed4301905183c4b42b2476",
+      "bytes": 31521380
+    }
+  },
+  "outputs": {
+    "output/ruta-32/graph.json": {
+      "sha256": "b43150bb38a55f142094bab9f7d080148948a3117a38badc6e58b661f7440e52",
+      "bytes": 2291855
+    },
+    "output/ruta-32/scenarios.json": {
+      "sha256": "8dc1cf30ff8577d9826061cf0b8f359dd5111e16536102f6c96f45656ba52048",
+      "bytes": 1229402
+    },
+    "output/ruta-32/rain.csv": {
+      "sha256": "3932f4cc1b9668fc6b5267f339a616ad5e4798c85b9123dee7b6bcf1b4edcc2e",
+      "bytes": 5515
+    }
+  }
+}
