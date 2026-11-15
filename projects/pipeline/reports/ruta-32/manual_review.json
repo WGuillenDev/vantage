@@ -1,0 +1,78 @@
+{
+  "reviewer": "roney ruiz",
+  "reviewed_on": "2026-11-15",
+  "units": [
+    {
+      "id": "T-20",
+      "why": "highest_criticality",
+      "communities": []
+    },
+    {
+      "id": "T-56",
+      "why": "median_criticality",
+      "communities": [
+        {
+          "community_id": "c668",
+          "name": "Altos de Germania",
+          "population": 866,
+          "distance_to_node_m": 1555.8,
+          "node_is_closed_endpoint": true,
+          "joined_ignoring_direction": false,
+          "suggested_class": "snapping_artifact",
+          "class": "snapping_artifact",
+          "note": "Classified from review_maps.html: snapped to a node inside the closed stretch."
+        },
+        {
+          "community_id": "c139",
+          "name": "Germania",
+          "population": 691,
+          "distance_to_node_m": 648.8,
+          "node_is_closed_endpoint": true,
+          "joined_ignoring_direction": false,
+          "suggested_class": "snapping_artifact",
+          "class": "snapping_artifact",
+          "note": "Classified from review_maps.html: snapped to a node inside the closed stretch."
+        },
+        {
+          "community_id": "c666",
+          "name": "Trinidad",
+          "population": 408,
+          "distance_to_node_m": 2135.5,
+          "node_is_closed_endpoint": true,
+          "joined_ignoring_direction": false,
+          "suggested_class": "snapping_artifact",
+          "class": "snapping_artifact",
+          "note": "Classified from review_maps.html: snapped to a node inside the closed stretch."
+        }
+      ]
+    },
+    {
+      "id": "T-24",
+      "why": "longest",
+      "communities": [
+        {
+          "community_id": "c686",
+          "name": "Las Minas",
+          "population": 1071,
+          "distance_to_node_m": 220.8,
+          "node_is_closed_endpoint": true,
+          "joined_ignoring_direction": false,
+          "suggested_class": "snapping_artifact",
+          "class": "snapping_artifact",
+          "note": "Classified from review_maps.html: snapped to a node inside the closed stretch."
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "counts": {
+      "real": 0,
+      "snapping_artifact": 4,
+      "oneway_artifact": 0,
+      "outside_network": 0
+    },
+    "unclassified": 0,
+    "share_real": 0.0
+  },
+  "verdict": "fail"
+}

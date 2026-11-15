@@ -161,7 +161,7 @@ Decisión (R, 15 nov): **se mantienen los tres hospitales de San José**, porque
 |---|---|---|
 | D1 | Hecho | Faltaba el punto de entrada: se añadió `rank-sensitivity` y `make sensitivity`. La corrida real falló al principio porque la comprobación de la línea base comparaba `exposure` (que añade `rain-context` después del scoring); se corrigió con prueba. Veredicto `pass`: top 5 = 5 y top 10 = 10 en ×0,8, ×1,2 y al quitar cada hospital (correlación 1,0). Reportes en `reports/ruta-32/sensitivity.json` |
 | D2 | Hecho | `time_crosscheck.json`: 20 pares contra OSRM, error relativo mediano 15,3 % (umbral 25 %), sesgo −15,2 %, veredicto `pass`. `reference_times.json`: 4 referencias citadas (Enter Costa Rica y Anywhere.com, consultadas el 2026-11-15) con errores de 12 % (Limón), 33 % (Siquirres), 34 % (Turrialba) y 10 % (Guápiles); no se califican |
-| D3 | Esperando a una persona | Hoja `reports/ruta-32/manual_review.json` preparada, sin commitear mientras esté vacía. 3 unidades (T-20, T-56, T-24) y solo 4 comunidades aisladas que clasificar (Germania, Altos de Germania, Trinidad, Las Minas). La herramienta sugiere `snapping_artifact` en las cuatro |
+| D3 | Hecho, veredicto `fail` | R clasificó las 4 comunidades aisladas (Germania, Altos de Germania, Trinidad, Las Minas; unidades T-56 y T-24, T-20 no tiene aisladas) como `snapping_artifact` con los mapas de `review_maps.html`: 0 reales de 4, 0 % frente al 80 % exigido. Revisor y fecha en `manual_review.json` |
 | D4 | Medido, no se aplica | Ver «Efecto de corregir los aislamientos sospechosos»; `validated` sigue en `false` hasta D3 |
 | D5 | Hecho | Ver «Resultado de D5» |
 
