@@ -38,6 +38,20 @@ def _read_json(path: Path):
     raise PopulationError(f"{path}: cannot be read ({exc})") from None
 
 
+def _is_number(value) -> bool:
+  return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
+
+
+def _check_places(originals: list[dict]) -> None:
+  seen = set()
+  for place in originals:
+    if place["id"] in seen:
+      raise PopulationError(f"communities.json repeats the community id {place['id']}")
+    seen.add(place["id"])
+    if not (_is_number(place.get("lon")) and _is_number(place.get("lat"))):
+      raise PopulationError(f"communities.json: {place['id']} has no numeric lon and lat")
+
+
 def _check_ids(graph: dict, originals: list[dict]) -> None:
   in_graph = {c["id"] for c in graph["communities"]}
   in_file = {c["id"] for c in originals}
@@ -66,6 +80,8 @@ def _assign(src, window: Window, places: list[dict]) -> tuple[np.ndarray, np.nda
   valid = ~np.isnan(data)
   if src.nodata is not None:
     valid &= data != src.nodata
+  if (~np.isfinite(data[valid]) | (data[valid] < 0)).any():
+    raise PopulationError(f"{Path(src.name).name}: holds a negative or non-finite value that is not nodata")
   t = src.transform
   col_lon = t.c + (window.col_off + np.arange(window.width) + 0.5) * t.a
   place_lon = np.array([p["lon"] for p in places])
@@ -116,7 +132,10 @@ def run(zone: Zone, work_dir: Path, skip: bool = False) -> Path:
     log.info("Population skipped (--no-population): every community keeps population null")
     report = None
   else:
+    if not graph["communities"]:
+      raise PopulationError(f"{graph_path}: no communities to fill")
     originals = _read_json(work_dir / "communities.json")
+    _check_places(originals)
     _check_ids(graph, originals)
     raster = PIPELINE_DIR / zone.population_raster
     if not raster.is_file():
@@ -145,7 +164,9 @@ def run(zone: Zone, work_dir: Path, skip: bool = False) -> Path:
     }
   for community in graph["communities"]:
     community["population"] = values[community["id"]]
-  if report is not None:
+  if report is None:
+    (work_dir / "population_report.json").unlink(missing_ok=True)
+  else:
     _write_atomic(work_dir / "population_report.json", (json.dumps(report, indent=2) + "\n").encode("utf-8"))
   _write_atomic(graph_path, _dump(graph))
   return graph_path
