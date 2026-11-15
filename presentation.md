@@ -34,16 +34,14 @@ Sitio publicado, con datos reales. Guion:
 4. «Cómo leer estos números»: velocidades, hospitales de referencia y la nota de que el orden depende de ese conjunto.
 5. Pestaña «¿Por qué?»: la lluvia, con la etiqueta «Hipótesis, no causa confirmada».
 
-## 4. Cuánto confiar en esto (90 s): lo que medimos
+## 4. Cuánto confiar en esto (60 s): lo que medimos
 
-Presentar esto como parte del producto, no como disculpa:
+Parte del producto, no una disculpa. Decir solo las tres filas; el resto va a preguntas:
 
 | Prueba | Resultado |
 |---|---|
-| Estabilidad del ranking ante velocidades ×0,8/×1,2 y al quitar cada hospital | Top 5 y top 10 iguales (`pass`). Reserva: el factor de velocidad es uniforme y casi no puede cambiar el orden |
-| Tiempos contra el router OSRM (20 pares) | Error relativo mediano 15,3 % (umbral 25 %); el modelo es ~15 % más rápido porque usa límites publicados |
-| Revisión manual de aislamientos (4 comunidades) | **0 reales**: las 4 son artefactos de enganche. Veredicto `fail` (se pedía ≥ 80 %) |
-| Efecto de esos artefactos en el ranking | Excluir los 208 aislamientos sospechosos (21,6 %) deja el top 10 igual (10 de 10) |
+| Tiempos contra el router OSRM (20 pares) | Error relativo mediano 15,3 % (umbral 25 %); el modelo es ~15 % más rápido |
+| Revisión manual de aislamientos (4 comunidades) | **0 reales**: las 4 son artefactos de enganche (`fail`). Excluir los 208 sospechosos (21,6 %) deja el top 10 igual |
 | Cambiar el conjunto de hospitales (añadir Limón y Guápiles) | El top 20 no coincide en ninguno: **el ranking es un resultado sobre el acceso a los hospitales nacionales de San José**, no sobre «criticidad general» |
 
 Por eso la zona se publica como «no validada».
@@ -66,5 +64,6 @@ Tres resultados negativos con su número, un producto que responde una pregunta 
 - **¿Por qué no usaron más NISAR?** Probamos la detección con GCOV; no alcanzó. Se descartó con un número, y GUNW y otras vías quedan abiertas.
 - **¿Funciona en otro lugar?** Está diseñado para ello (la zona es un archivo de configuración), pero solo se probó en la Ruta 32.
 - **¿Por qué esos tres hospitales?** Son los hospitales nacionales; es un supuesto de modelo y lo medimos: con otros, el ranking cambia por completo.
+- **¿El ranking es estable?** Sí ante velocidades ×0,8/×1,2 y al quitar cada hospital (top 5 y top 10 iguales), con la reserva de que el factor de velocidad es uniforme y casi no puede cambiar el orden.
 - **¿Qué tan exactos son los tiempos?** Del orden de magnitud: límites publicados, ~15 % más rápidos que el router; mostramos «≈» y se redondea a múltiplos de 5 min.
 - **¿Está validado?** No: la revisión manual dio 0 de 4. Lo decimos en la aplicación.
