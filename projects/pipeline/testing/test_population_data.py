@@ -268,3 +268,68 @@ def test_inv14_raster_outside_the_bbox_stops_the_run(tmp_path):
   assert "raster.tif" in str(exc.value)
   assert "bbox" in str(exc.value)
   assert (zone.output_dir / "graph.json").read_bytes() == original
+
+
+@pytest.mark.parametrize("bad", [-5.0, float("inf"), float("-inf")])
+def test_inv15_negative_or_non_finite_pixel_stops_the_run(tmp_path, bad):
+  data = blank()
+  data[5, 5] = bad  # not the declared nodata, so it is a value the raster claims to hold
+  data[5, 6] = 2.6
+  zone, work_dir = setup(tmp_path, data, {"c1": center(5, 5)})
+  original = (zone.output_dir / "graph.json").read_bytes()
+  with pytest.raises(PopulationError, match="raster.tif"):
+    population_data.run(zone, work_dir)
+  assert (zone.output_dir / "graph.json").read_bytes() == original
+  assert not (work_dir / "population_report.json").exists()
+
+
+def test_inv16_graph_without_communities_stops_the_run(tmp_path):
+  zone, work_dir = setup(tmp_path, np.ones((SIZE, SIZE), dtype="float32"), {})
+  original = (zone.output_dir / "graph.json").read_bytes()
+  with pytest.raises(PopulationError, match="no communities"):
+    population_data.run(zone, work_dir)
+  assert (zone.output_dir / "graph.json").read_bytes() == original
+  population_data.run(zone, work_dir, skip=True)  # nothing to fill is fine when the raster is skipped
+  assert graph_of(zone)["communities"] == []
+
+
+def test_inv17_no_population_deletes_the_report_of_an_earlier_run(tmp_path):
+  zone, work_dir = setup(tmp_path, np.ones((SIZE, SIZE), dtype="float32"), {"c1": center(5, 5)})
+  population_data.run(zone, work_dir)
+  assert (work_dir / "population_report.json").is_file()
+  population_data.run(zone, work_dir, skip=True)
+  assert populations(zone) == {"c1": None}
+  assert not (work_dir / "population_report.json").exists()
+
+
+def test_inv18_repeated_community_id_stops_the_run(tmp_path):
+  zone, work_dir = setup(tmp_path, np.ones((SIZE, SIZE), dtype="float32"), {"c1": center(5, 5), "c2": center(25, 25)})
+  originals = json.loads((work_dir / "communities.json").read_text(encoding="utf-8"))
+  (work_dir / "communities.json").write_text(json.dumps([*originals, {**originals[0], "lon": center(25, 5)[0]}]), encoding="utf-8")
+  original = (zone.output_dir / "graph.json").read_bytes()
+  with pytest.raises(PopulationError, match="c1"):
+    population_data.run(zone, work_dir)
+  assert (zone.output_dir / "graph.json").read_bytes() == original
+
+
+@pytest.mark.parametrize("change", [{"lon": None}, {"lon": "10.0"}, {"lat": True}, {"lat": float("nan")}, "drop-lon"])
+def test_inv19_community_without_numeric_coordinates_stops_the_run(tmp_path, change):
+  zone, work_dir = setup(tmp_path, np.ones((SIZE, SIZE), dtype="float32"), {"c1": center(5, 5), "c2": center(25, 25)})
+  originals = json.loads((work_dir / "communities.json").read_text(encoding="utf-8"))
+  if change == "drop-lon":
+    del originals[1]["lon"]
+  else:
+    originals[1].update(change)
+  (work_dir / "communities.json").write_text(json.dumps(originals), encoding="utf-8")
+  original = (zone.output_dir / "graph.json").read_bytes()
+  with pytest.raises(PopulationError, match="c2"):
+    population_data.run(zone, work_dir)
+  assert (zone.output_dir / "graph.json").read_bytes() == original
+
+
+def test_inv20_second_run_writes_the_same_graph(tmp_path):
+  zone, work_dir = setup(tmp_path, np.ones((SIZE, SIZE), dtype="float32"), {"c1": center(5, 5), "c2": center(25, 25)})
+  population_data.run(zone, work_dir)
+  first = (zone.output_dir / "graph.json").read_bytes()
+  population_data.run(zone, work_dir)
+  assert (zone.output_dir / "graph.json").read_bytes() == first
