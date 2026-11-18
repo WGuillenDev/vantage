@@ -1,6 +1,6 @@
 # VANTAGE — Functions
 
-> What VANTAGE does, feature by feature. Language note: UI copy is Spanish (the team and users are in Costa Rica); names in code and in this document are English.
+> What VANTAGE does, feature by feature. Language note: UI copy is English (NASA Space Apps requires projects in English); place and hospital names keep their original Spanish; names in code and in this document are English.
 
 ## 1. User and main flow
 

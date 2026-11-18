@@ -39,5 +39,5 @@ Specs are living contracts, written in three steps: `/drafter <slice>` interview
 - Do not invent data: unknown values stay pending or `null`, never made-up numbers, dates or names.
 - Never commit raw NISAR data, large rasters or credentials.
 - No backend, accounts or other regions without a team decision.
-- Commits, code and error messages are in English; UI copy is Spanish.
+- Commits, code, error messages and UI copy are in English (Space Apps requires English); place names keep their original Spanish.
 - Pushing and pulling are denied by the permission policy.
