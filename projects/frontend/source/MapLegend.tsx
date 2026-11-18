@@ -16,12 +16,12 @@ export function MapLegend({ data, hasClosed }: { data: ZoneData; hasClosed: bool
   // Collapsed on phones so it does not cover the map or the attribution.
   const [open, setOpen] = useState(() => window.matchMedia('(min-width: 768px)').matches)
   const { min, max } = legendRange(data.units)
-  const format = new Intl.NumberFormat('es').format
+  const format = new Intl.NumberFormat('en').format
   const range = { min, max }
   const gradient = [0, 0.25, 0.5, 0.75, 1].map((t) => colorForCriticality(min + (max - min) * t, range)).join(', ')
 
   return (
-    <div className="absolute bottom-6 left-2 max-w-[calc(100%-4rem)] rounded-card bg-surface/90 text-xs shadow-card backdrop-blur" role="group" aria-label="Leyenda de criticidad">
+    <div className="absolute bottom-6 left-2 max-w-[calc(100%-4rem)] rounded-card bg-surface/90 text-xs shadow-card backdrop-blur" role="group" aria-label="Criticality legend">
       <button
         type="button"
         aria-expanded={open}
@@ -29,7 +29,7 @@ export function MapLegend({ data, hasClosed }: { data: ZoneData; hasClosed: bool
         className="flex min-h-11 w-full items-center gap-1.5 px-2.5 font-semibold md:min-h-8"
       >
         <Layers aria-hidden="true" className="h-4 w-4" />
-        Criticidad del tramo
+        Segment criticality
       </button>
       {open && (
         <div className="space-y-1 px-2.5 pb-2">
@@ -38,30 +38,30 @@ export function MapLegend({ data, hasClosed }: { data: ZoneData; hasClosed: bool
             <span>{format(min)}</span>
             <span>{format(max)}</span>
           </p>
-          {rankingUnknown(data.units) && <p className="w-40">El color no ordena los tramos: se desconoce la población.</p>}
+          {rankingUnknown(data.units) && <p className="w-40">The color does not rank the segments: population is unknown.</p>}
           <p className="flex items-center gap-1.5">
             <Swatch color={GRAY} />
-            sin impacto
+            no impact
           </p>
           {hasClosed && (
             <>
               <p className="flex items-center gap-1.5">
                 <Swatch color={CLOSED_COLOR} dashed />
-                tramo cerrado
+                closed segment
               </p>
               <p className="flex items-center gap-1.5">
                 <Swatch color={ALTERNATE_COLOR} dashed />
-                rutas alternas
+                alternate routes
               </p>
             </>
           )}
           <p className="flex items-center gap-1.5">
             <PointIcon kind="hospital" />
-            hospital de referencia
+            referral hospital
           </p>
           <p className="flex items-center gap-1.5">
             <PointIcon kind="community" />
-            comunidad
+            community
           </p>
         </div>
       )}

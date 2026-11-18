@@ -2,7 +2,7 @@ import type { Area } from './storage.ts'
 import { useAppStore } from './store.ts'
 
 export const zoneOptions = (areas: Area[]): { id: string; label: string }[] =>
-  areas.map((area) => ({ id: area.id, label: area.validated ? area.name : `${area.name} (no validada)` }))
+  areas.map((area) => ({ id: area.id, label: area.validated ? area.name : `${area.name} (unvalidated)` }))
 
 export const showsZoneControl = (areas: Area[]): boolean => areas.length >= 2
 

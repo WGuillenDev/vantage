@@ -22,7 +22,7 @@ const graph = read<CorridorGraph>('graph.json')
 const scenarios = read<{ baseline: BaselineEntry[]; candidates: DetailUnit[] }>('scenarios.json')
 const units = scenarios.candidates
 const baseline = scenarios.baseline
-const NO_ROUTE = 'sin ruta al hospital de referencia'
+const NO_ROUTE = 'no route to the referral hospital'
 
 const run = (...ids: string[]) => simulate(graph, units, baseline, ids)
 const view = (...ids: string[]) => simulationView(graph, units, baseline, ids)
@@ -90,7 +90,7 @@ describe('simulate', () => {
 })
 
 describe('simulationView', () => {
-  test('INV-06 shows "sin ruta al hospital de referencia" for a community without a route, and the model note', () => {
+  test('INV-06 shows "no route to the referral hospital" for a community without a route, and the model note', () => {
     const v = view('T-03')
     expect(v.rows).toEqual([
       { id: 'c4', name: 'Comunidad Mock 4', withoutClosure: formatDuration(1680), withClosure: NO_ROUTE, extra: NO_ROUTE, hospital: NO_ROUTE },
@@ -99,10 +99,10 @@ describe('simulationView', () => {
     expect(view('T-04').summary.note).toBeNull()
   })
 
-  test('INV-08 formats the summary: durations are approximate and the population is an estimate or "sin dato"', () => {
+  test('INV-08 formats the summary: durations are approximate and the population is an estimate or "no data"', () => {
     expect(view('T-01', 'T-02').summary).toMatchObject({ extraTime: formatDuration(1200), withoutRoute: 0, population: formatPopulation(2300) })
-    expect(view('T-04').summary.population).toBe('sin dato')
-    expect(view('T-03').summary.extraTime).toBe('ninguno')
+    expect(view('T-04').summary.population).toBe('no data')
+    expect(view('T-03').summary.extraTime).toBe('none')
   })
 
   test('INV-08 compares each affected community before and after, with the hospital it reaches by name', () => {
@@ -124,7 +124,7 @@ describe('simulationView', () => {
 
   test('INV-09 one chip per closed unit, in the order it was closed, with its label', () => {
     expect(view('T-03', 'T-01').chips).toEqual([
-      { id: 'T-03', label: 'Vía sin nombre · T-03' },
+      { id: 'T-03', label: 'Unnamed road · T-03' },
       { id: 'T-01', label: 'Ruta 32 · T-01' },
     ])
     expect(view().chips).toEqual([])

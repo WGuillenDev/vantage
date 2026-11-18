@@ -28,9 +28,9 @@ describe('trust-signals adversarial', () => {
   })
 
   test('INV-01 INV-03 the notice and banner texts are exactly the spec wording', () => {
-    expect(NOTICE).toBe('Tramos críticos por consecuencia; no son derrumbes confirmados.')
-    expect(UNVALIDATED_BANNER).toBe('Zona no validada: sus resultados no se han revisado.')
-    expect(NOTICE.replace('no son derrumbes confirmados', '')).not.toMatch(/confirmad/i)
+    expect(NOTICE).toBe('Critical segments by consequence; not confirmed landslides.')
+    expect(UNVALIDATED_BANNER).toBe('Unvalidated zone: its results have not been reviewed.')
+    expect(NOTICE.replace('not confirmed landslides', '')).not.toMatch(/confirm/i)
   })
 
   test('INV-03 a zone with validated true never gets the banner', () => {
@@ -48,13 +48,13 @@ describe('trust-signals adversarial', () => {
   })
 
   test('INV-05 the mark matches the whole community id, not a prefix or substring', () => {
-    expect(suspectLabel('c1', ['c10'])).toBe('sin ruta al hospital de referencia')
-    expect(suspectLabel('c10', ['c1'])).toBe('sin ruta al hospital de referencia')
+    expect(suspectLabel('c1', ['c10'])).toBe('no route to the referral hospital')
+    expect(suspectLabel('c10', ['c1'])).toBe('no route to the referral hospital')
   })
 
   test('INV-09 separators hold at 1 000 and 100 000 and the label is always last', () => {
-    expect(formatPopulation(1000)).toBe('1\u00a0000 estimada')
-    expect(formatPopulation(100000)).toBe('100\u00a0000 estimada')
-    expect(formatPopulation(12)).toBe('12 estimada')
+    expect(formatPopulation(1000)).toBe('1,000 estimated')
+    expect(formatPopulation(100000)).toBe('100,000 estimated')
+    expect(formatPopulation(12)).toBe('12 estimated')
   })
 })

@@ -1,8 +1,8 @@
 import type { Area } from './storage.ts'
 
-export const NOTICE = 'Tramos críticos por consecuencia; no son derrumbes confirmados.'
-export const UNVALIDATED_BANNER = 'Zona no validada: sus resultados no se han revisado.'
-export const REFERRAL_NOTE = 'El orden de los tramos depende de qué hospitales cuentan como referencia: con otro conjunto, los tramos críticos cambian.'
+export const NOTICE = 'Critical segments by consequence; not confirmed landslides.'
+export const UNVALIDATED_BANNER = 'Unvalidated zone: its results have not been reviewed.'
+export const REFERRAL_NOTE = 'The order of the segments depends on which hospitals count as referral hospitals: with another set, the critical segments change.'
 
 export interface TrustMeta {
   speed_model_kmh: Record<string, number>
@@ -23,10 +23,10 @@ export function readingPanel(meta: TrustMeta, graph: { hospitals: { name: string
   }
 }
 
-export const NO_ROUTE = 'sin ruta al hospital de referencia'
+export const NO_ROUTE = 'no route to the referral hospital'
 
 export const suspectLabel = (communityId: string, suspectIds: string[]): string =>
-  suspectIds.includes(communityId) ? `${NO_ROUTE} (posible artefacto del modelo)` : NO_ROUTE
+  suspectIds.includes(communityId) ? `${NO_ROUTE} (possible model artifact)` : NO_ROUTE
 
 export const simulationNote = (communitiesWithoutRoute: number): string | null =>
-  communitiesWithoutRoute > 0 ? 'Las comunidades sin ruta pueden incluir artefactos del modelo.' : null
+  communitiesWithoutRoute > 0 ? 'Communities without a route may include model artifacts.' : null

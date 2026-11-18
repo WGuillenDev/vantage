@@ -41,21 +41,21 @@ describe('segment-ranking', () => {
 
   test('INV-03 a null extra time reads as no route, never as a time', () => {
     const row = rowView(unit({ id: 'T-03', extra_time_s: null }), [], 10)
-    expect(row.extraTime).toBe('sin ruta al hospital de referencia')
+    expect(row.extraTime).toBe('no route to the referral hospital')
   })
 
-  test('INV-03 a null population reads "sin dato", never 0', () => {
+  test('INV-03 a null population reads "no data", never 0', () => {
     const row = rowView(unit({ id: 'T-04', population_dependent: null }), [], 10)
-    expect(row.population).toBe('sin dato')
+    expect(row.population).toBe('no data')
     expect(row.population).not.toContain('0')
   })
 
-  test('INV-03 a known population has thousands separators and the "estimada" label', () => {
-    expect(rowView(unit({ id: 'T-02', population_dependent: 2300 }), [], 10).population).toBe('2 300 estimada')
-    expect(rowView(unit({ id: 'T-02', population_dependent: 0 }), [], 10).population).toBe('0 estimada')
+  test('INV-03 a known population has thousands separators and the "estimated" label', () => {
+    expect(rowView(unit({ id: 'T-02', population_dependent: 2300 }), [], 10).population).toBe('2,300 estimated')
+    expect(rowView(unit({ id: 'T-02', population_dependent: 0 }), [], 10).population).toBe('0 estimated')
   })
 
-  test('row label uses the most frequent road, or "Vía sin nombre"', () => {
+  test('row label uses the most frequent road, or "Unnamed road"', () => {
     const edges = [
       { id: 'e1', road: 'Ruta 32' },
       { id: 'e2', road: 'Calle X' },
@@ -63,16 +63,16 @@ describe('segment-ranking', () => {
       { id: 'e4', road: null },
     ]
     expect(rowView(unit({ id: 'T-05', edge_ids: ['e1', 'e2', 'e3'] }), edges, 10).label).toBe('Calle X · T-05')
-    expect(rowView(unit({ id: 'T-06', edge_ids: ['e4', 'e99'] }), edges, 10).label).toBe('Vía sin nombre · T-06')
+    expect(rowView(unit({ id: 'T-06', edge_ids: ['e4', 'e99'] }), edges, 10).label).toBe('Unnamed road · T-06')
     expect(rowView(unit({ id: 'T-01', edge_ids: ['e1'] }), graph.edges, 10).label).toBe('Ruta 32 · T-01')
   })
 
-  test('row length is in metres below 1 000 and in km with a decimal comma otherwise', () => {
+  test('row length is in metres below 1 000 and in km with a decimal point otherwise', () => {
     const length = (m: number) => rowView(unit({ id: 'T-01', length_m: m }), [], 10).length
     expect(length(850)).toBe('850 m')
-    expect(length(999.6)).toBe('1,0 km')
-    expect(length(8700)).toBe('8,7 km')
-    expect(length(12400)).toBe('12,4 km')
+    expect(length(999.6)).toBe('1.0 km')
+    expect(length(8700)).toBe('8.7 km')
+    expect(length(12400)).toBe('12.4 km')
   })
 
   test('INV-05 the bar is proportional to the zone maximum and hidden when it is 0', () => {

@@ -39,22 +39,22 @@ describe('trust-signals', () => {
   })
 
   test('INV-05 only a suspect isolated community gets the model-artifact mark', () => {
-    const base = 'sin ruta al hospital de referencia'
-    expect(suspectLabel('c4', ['c4'])).toBe(`${base} (posible artefacto del modelo)`)
+    const base = 'no route to the referral hospital'
+    expect(suspectLabel('c4', ['c4'])).toBe(`${base} (possible model artifact)`)
     expect(suspectLabel('c2', ['c4'])).toBe(base)
     expect(suspectLabel('c2', [])).toBe(base)
   })
 
   test('INV-06 the simulation note shows while at least one community has no route', () => {
-    expect(simulationNote(1)).toBe('Las comunidades sin ruta pueden incluir artefactos del modelo.')
-    expect(simulationNote(3)).toBe('Las comunidades sin ruta pueden incluir artefactos del modelo.')
+    expect(simulationNote(1)).toBe('Communities without a route may include model artifacts.')
+    expect(simulationNote(3)).toBe('Communities without a route may include model artifacts.')
     expect(simulationNote(0)).toBeNull()
   })
 })
 
 describe('referral-set note', () => {
   test('says the order depends on the referral hospitals and never claims a cause', () => {
-    expect(REFERRAL_NOTE).toContain('hospitales cuentan como referencia')
-    expect(REFERRAL_NOTE).not.toMatch(/confirmad|causa/i)
+    expect(REFERRAL_NOTE).toContain('hospitals count as referral hospitals')
+    expect(REFERRAL_NOTE).not.toMatch(/confirm|cause/i)
   })
 })

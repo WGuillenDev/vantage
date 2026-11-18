@@ -73,7 +73,7 @@ export function MapView({ state }: { state: ZoneState }) {
             tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
             tileSize: 256,
             maxzoom: 19,
-            attribution: '© colaboradores de OpenStreetMap',
+            attribution: '© OpenStreetMap contributors',
           },
         },
         // Muted base map so the criticality colors carry the eye.

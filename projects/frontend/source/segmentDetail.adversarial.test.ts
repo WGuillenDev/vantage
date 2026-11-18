@@ -15,16 +15,16 @@ const unit = (over: Partial<DetailUnit> = {}): DetailUnit => ({
 describe('segment-detail adversarial', () => {
   test('a community with a route is never reported as having no route', () => {
     const view = detailView(unit({ per_community: [{ community_id: 'c1', time_s: 900, extra_s: null, hospital_id: 'h1' }] }), graph, [])
-    expect(view.communities[0]!.withClosure).not.toBe('sin ruta al hospital de referencia')
+    expect(view.communities[0]!.withClosure).not.toBe('no route to the referral hospital')
   })
 
-  test('a missing baseline entry reads "sin dato", not "sin ruta"', () => {
-    expect(detailView(unit(), graph, []).communities[0]!.withoutClosure).toBe('sin dato')
+  test('a missing baseline entry reads "no data", not "no route"', () => {
+    expect(detailView(unit(), graph, []).communities[0]!.withoutClosure).toBe('no data')
   })
 
-  test('an unknown hospital id reads "sin dato"', () => {
+  test('an unknown hospital id reads "no data"', () => {
     const view = detailView(unit({ per_community: [{ community_id: 'c1', time_s: 900, extra_s: 300, hospital_id: 'h9' }] }), graph, [])
-    expect(view.communities[0]!.hospital).toBe('sin dato')
+    expect(view.communities[0]!.hospital).toBe('no data')
   })
 
   test('a community missing from graph.json falls back to its id', () => {

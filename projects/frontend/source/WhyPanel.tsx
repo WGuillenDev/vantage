@@ -16,7 +16,7 @@ function RainChart({ days }: { days: ReturnType<typeof highlightedDays> }) {
   const last = days[days.length - 1]?.date
   return (
     <figure className="space-y-1">
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Lluvia diaria del periodo, con los últimos 12 días resaltados" className="w-full rounded-lg bg-raised">
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Daily rain over the period, with the last 12 days highlighted" className="w-full rounded-lg bg-raised">
         {days.map((d, i) => {
           const h = (d.mm / max) * (H - 4)
           return (
@@ -28,17 +28,17 @@ function RainChart({ days }: { days: ReturnType<typeof highlightedDays> }) {
       </svg>
       <figcaption className="flex justify-between text-xs text-muted tabular-nums">
         <span>{first}</span>
-        <span>máx. {Math.round(max)} mm/día</span>
+        <span>max {Math.round(max)} mm/day</span>
         <span>{last}</span>
       </figcaption>
       <p className="flex items-center gap-3 text-xs text-muted">
         <span className="flex items-center gap-1">
           <span aria-hidden="true" className="h-2 w-3 rounded-sm" style={{ background: HIGHLIGHT }} />
-          últimos 12 días
+          last 12 days
         </span>
         <span className="flex items-center gap-1">
           <span aria-hidden="true" className="h-2 w-3 rounded-sm" style={{ background: BASE }} />
-          resto del periodo
+          rest of the period
         </span>
       </p>
     </figure>
@@ -67,11 +67,11 @@ export default function WhyPanel({ state }: { state: ZoneState }) {
       <Badge tone="warning">{HYPOTHESIS_LABEL}</Badge>
       <p>{WHY_TEXT}</p>
       {current === null ? (
-        <p className="text-muted">Cargando lluvia…</p>
+        <p className="text-muted">Loading rain…</p>
       ) : typeof current === 'string' ? (
         <Message alert>{current}</Message>
       ) : end === undefined ? (
-        <Message alert>No se pudo cargar meta.json: falta el fin del periodo de lluvia.</Message>
+        <Message alert>Could not load meta.json: the end of the rain period is missing.</Message>
       ) : (
         <RainChart days={highlightedDays(current, end)} />
       )}

@@ -22,13 +22,13 @@ export function CommunityRow({ row, suspect = false }: { row: CommunityRowData; 
           {row.name}
         </span>
         <span className="flex shrink-0 flex-wrap justify-end gap-1">
-          {isolated ? <Badge tone="danger">Sin ruta</Badge> : <Badge tone="warning">+{row.extra}</Badge>}
-          {suspect && <Badge tone="info">Posible artefacto del modelo</Badge>}
+          {isolated ? <Badge tone="danger">No route</Badge> : <Badge tone="warning">+{row.extra}</Badge>}
+          {suspect && <Badge tone="info">Possible model artifact</Badge>}
         </span>
       </div>
       <p className="mt-1 flex flex-wrap items-center gap-1 text-xs text-muted tabular-nums">
         {row.withoutClosure}
-        <ArrowRight aria-label="con cierre" className="h-3 w-3" />
+        <ArrowRight aria-label="with closure" className="h-3 w-3" />
         {isolated ? NO_ROUTE : row.withClosure}
       </p>
       {!isolated && (

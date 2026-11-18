@@ -13,7 +13,7 @@ const respondWith = (response: object) => {
 const respondJson = (body: unknown) => respondWith({ ok: true, status: 200, json: async () => body })
 
 describe('map-corridor adversarial: INV-12 trust boundary', () => {
-  test('INV-12 a 200 response that is not JSON (dev server HTML fallback) names the file in Spanish', async () => {
+  test('INV-12 a 200 response that is not JSON (dev server HTML fallback) names the file in English', async () => {
     respondWith({
       ok: true,
       status: 200,
@@ -21,7 +21,7 @@ describe('map-corridor adversarial: INV-12 trust boundary', () => {
         throw new SyntaxError("Unexpected token '<'")
       },
     })
-    await expect(loadZoneFile('z', 'graph.json')).rejects.toThrow(/No se pudo cargar graph\.json/)
+    await expect(loadZoneFile('z', 'graph.json')).rejects.toThrow(/Could not load graph\.json/)
   })
 
   test('INV-12 areas.json with a valid version but no "areas" list is rejected, not returned as undefined', async () => {

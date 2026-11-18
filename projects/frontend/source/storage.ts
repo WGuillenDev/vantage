@@ -33,7 +33,7 @@ function elementProblem(file: string, data: Json): string | null {
         !(entry.time_s === null || (typeof entry.time_s === 'number' && Number.isFinite(entry.time_s) && entry.time_s >= 0)) ||
         !(entry.hospital_id === null || isText(entry.hospital_id)),
     )
-    if (badEntry >= 0) return `la entrada ${badEntry + 1} de "baseline" está mal formada`
+    if (badEntry >= 0) return `entry ${badEntry + 1} of "baseline" is malformed`
     const bad = (data.candidates as unknown[]).findIndex(
       (unit) =>
         !isObject(unit) ||
@@ -45,7 +45,7 @@ function elementProblem(file: string, data: Json): string | null {
         !Array.isArray(unit.edge_ids) ||
         !(unit.alternates === undefined || Array.isArray(unit.alternates)),
     )
-    return bad >= 0 ? `el tramo ${bad + 1} de "candidates" está mal formado` : null
+    return bad >= 0 ? `segment ${bad + 1} of "candidates" is malformed` : null
   }
   if (file !== 'graph.json') return null
   const badEdge = (data.edges as unknown[]).findIndex(
@@ -61,17 +61,17 @@ function elementProblem(file: string, data: Json): string | null {
       !(edge.candidate_id === null || isText(edge.candidate_id)) ||
       (edge.candidate_id !== null && !(Array.isArray(edge.geometry) && edge.geometry.length >= 2 && edge.geometry.every(isPosition))),
   )
-  if (badEdge >= 0) return `la arista ${badEdge + 1} de "edges" está mal formada`
+  if (badEdge >= 0) return `edge ${badEdge + 1} of "edges" is malformed`
   const nodes = new Set((data.nodes as unknown[]).map((node) => (isObject(node) ? node.id : undefined)))
   for (const list of ['hospitals', 'communities']) {
     for (const [index, item] of (data[list] as unknown[]).entries()) {
       if (!isObject(item) || !isText(item.id) || !isText(item.name) || !isText(item.node)) {
-        return `el elemento ${index + 1} de "${list}" está mal formado`
+        return `item ${index + 1} of "${list}" is malformed`
       }
-      if (!nodes.has(item.node)) return `"${list}" usa el nodo "${item.node}", que no está en "nodes"`
+      if (!nodes.has(item.node)) return `"${list}" uses node "${item.node}", which is not in "nodes"`
       const { population } = item
       if (list === 'communities' && !(population === undefined || population === null || (Number.isInteger(population) && (population as number) >= 1))) {
-        return `la comunidad ${index + 1} de "communities" tiene una población no válida`
+        return `community ${index + 1} of "communities" has an invalid population`
       }
     }
   }
@@ -84,19 +84,19 @@ async function readJson<T>(url: string, file: string): Promise<T> {
   try {
     response = await fetch(url)
   } catch {
-    throw new Error(fileErrorMessage(file, 'sin conexión o archivo inaccesible'))
+    throw new Error(fileErrorMessage(file, 'offline or file unreachable'))
   }
   if (!response.ok) throw new Error(fileErrorMessage(file, `error ${response.status}`))
   let data: unknown
   try {
     data = await response.json()
   } catch {
-    throw new Error(fileErrorMessage(file, 'el contenido no es JSON válido'))
+    throw new Error(fileErrorMessage(file, 'the content is not valid JSON'))
   }
   checkSchemaVersion(file, data)
   for (const key of REQUIRED_LISTS[file] ?? []) {
     if (!Array.isArray((data as Record<string, unknown>)[key])) {
-      throw new Error(fileErrorMessage(file, `falta la lista "${key}"`))
+      throw new Error(fileErrorMessage(file, `the list "${key}" is missing`))
     }
   }
   const problem = elementProblem(file, data as Json)

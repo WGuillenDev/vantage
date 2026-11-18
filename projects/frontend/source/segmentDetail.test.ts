@@ -52,10 +52,10 @@ describe('segment-detail', () => {
     expect(ok.header).toBe('Ruta 32 · T-01')
     expect(ok.rank).toBe(1)
     expect(ok.extraTime).toBe('≈ 20 min')
-    expect(ok.population).toBe('2 300 estimada')
+    expect(ok.population).toBe('2,300 estimated')
     const nulls = detailView(unit({ extra_time_s: null, population_dependent: null }), graphOf(), baseline)
-    expect(nulls.extraTime).toBe('sin ruta al hospital de referencia')
-    expect(nulls.population).toBe('sin dato')
+    expect(nulls.extraTime).toBe('no route to the referral hospital')
+    expect(nulls.population).toBe('no data')
   })
 
   test('INV-02 lists exactly the affected communities: isolated first, then extra time descending, then id', () => {
@@ -74,11 +74,11 @@ describe('segment-detail', () => {
     )
     expect(view.communities.map((c) => c.id)).toEqual(['c3', 'c2', 'c4', 'c1'])
     const [isolated, second] = view.communities
-    expect(isolated!.hospital).toBe('sin ruta al hospital de referencia')
-    expect(isolated!.withClosure).toBe('sin ruta al hospital de referencia')
-    expect(isolated!.extra).toBe('sin ruta al hospital de referencia')
+    expect(isolated!.hospital).toBe('no route to the referral hospital')
+    expect(isolated!.withClosure).toBe('no route to the referral hospital')
+    expect(isolated!.extra).toBe('no route to the referral hospital')
     expect(second).toMatchObject({ name: 'Beto', hospital: 'Hospital Uno', withoutClosure: '≈ 10 min', withClosure: '≈ 25 min', extra: '≈ 15 min' })
-    expect(JSON.stringify(view)).not.toContain('aislada')
+    expect(JSON.stringify(view)).not.toContain('isolated')
   })
 
   test('INV-02 skips ids in per_community that are not affected', () => {
@@ -90,26 +90,26 @@ describe('segment-detail', () => {
   })
 
   test('INV-05 shows the alternates by vehicle, or the empty text', () => {
-    expect(detailView(unit(), graphOf(), baseline).alternates).toEqual(['sin alternas registradas'])
+    expect(detailView(unit(), graphOf(), baseline).alternates).toEqual(['no alternates recorded'])
     const view = detailView(
       unit({ alternates: [{ name: 'Ruta 126', vehicles: 'light' }, { name: 'Ruta 10', vehicles: 'freight' }] }),
       graphOf(),
       baseline,
     )
-    expect(view.alternates).toEqual(['Ruta 126 · livianos', 'Ruta 10 · pesados'])
+    expect(view.alternates).toEqual(['Ruta 126 · light vehicles', 'Ruta 10 · heavy vehicles'])
   })
 
-  test('INV-06 a null rain value reads "sin dato", never 0', () => {
-    expect(detailView(unit({ exposure: { rain_mm_12d: null } }), graphOf(), baseline).rain).toBe('sin dato')
-    expect(detailView(unit({ exposure: null }), graphOf(), baseline).rain).toBe('sin dato')
-    expect(detailView(unit({ exposure: undefined }), graphOf(), baseline).rain).toBe('sin dato')
-    expect(detailView(unit(), graphOf(), baseline).rain).toBe('85,2 mm en 12 días')
-    expect(detailView(unit({ exposure: { rain_mm_12d: 0 } }), graphOf(), baseline).rain).toBe('0 mm en 12 días')
+  test('INV-06 a null rain value reads "no data", never 0', () => {
+    expect(detailView(unit({ exposure: { rain_mm_12d: null } }), graphOf(), baseline).rain).toBe('no data')
+    expect(detailView(unit({ exposure: null }), graphOf(), baseline).rain).toBe('no data')
+    expect(detailView(unit({ exposure: undefined }), graphOf(), baseline).rain).toBe('no data')
+    expect(detailView(unit(), graphOf(), baseline).rain).toBe('85.2 mm in 12 days')
+    expect(detailView(unit({ exposure: { rain_mm_12d: 0 } }), graphOf(), baseline).rain).toBe('0 mm in 12 days')
   })
 
-  test('INV-08 the hypothesis label always travels with the Exposición block', () => {
+  test('INV-08 the hypothesis label always travels with the Exposure block', () => {
     for (const exposure of [{ rain_mm_12d: 3 }, { rain_mm_12d: null }, null]) {
-      expect(detailView(unit({ exposure }), graphOf(), baseline).rainLabel).toBe('Hipótesis, no causa confirmada')
+      expect(detailView(unit({ exposure }), graphOf(), baseline).rainLabel).toBe('Hypothesis, not a confirmed cause')
     }
   })
 
@@ -133,11 +133,11 @@ describe('segment-detail', () => {
     expect(highlightedDays(rows, '2026-07-10').map((d) => d.highlighted)).toEqual([false, true, true, false])
   })
 
-  test('INV-12 a rain.csv that cannot be read yields a Spanish message naming the file', () => {
+  test('INV-12 a rain.csv that cannot be read yields an English message naming the file', () => {
     expect(() => parseRain('')).toThrow('rain.csv')
     expect(() => parseRain('date,precip_mm\n2026-06-28,abc\n')).toThrow('rain.csv')
     expect(() => parseRain('date,precip_mm\n')).toThrow('rain.csv')
-    expect(rainErrorMessage('error 404')).toBe('No se pudo cargar rain.csv: error 404.')
+    expect(rainErrorMessage('error 404')).toBe('Could not load rain.csv: error 404.')
   })
 
   describe('INV-13', () => {
@@ -168,7 +168,7 @@ describe('suspect isolation mark in the detail card (trust-signals INV-05)', () 
 
   test('marks only the suspect isolated community', () => {
     const view = detailView(unit, graph, baseline)
-    expect(view.communities.find((c) => c.id === 'c1')?.withClosure).toBe('sin ruta al hospital de referencia (posible artefacto del modelo)')
-    expect(view.communities.find((c) => c.id === 'c2')?.withClosure).toBe('sin ruta al hospital de referencia')
+    expect(view.communities.find((c) => c.id === 'c1')?.withClosure).toBe('no route to the referral hospital (possible model artifact)')
+    expect(view.communities.find((c) => c.id === 'c2')?.withClosure).toBe('no route to the referral hospital')
   })
 })

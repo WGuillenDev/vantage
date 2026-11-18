@@ -8,9 +8,9 @@ const WIDE_QUERY = '(min-width: 768px)'
 const DRAG_THRESHOLD = 24 // px of vertical travel that count as a swipe on the sheet's handle
 
 const TABS: { id: TabId; label: string; icon: LucideIcon }[] = [
-  { id: 'tramos', label: 'Tramos', icon: ListOrdered },
-  { id: 'simulacion', label: 'Simulación', icon: FlaskConical },
-  { id: 'porque', label: '¿Por qué?', icon: CloudRain },
+  { id: 'tramos', label: 'Segments', icon: ListOrdered },
+  { id: 'simulacion', label: 'Simulation', icon: FlaskConical },
+  { id: 'porque', label: 'Why?', icon: CloudRain },
 ]
 
 function useIsWide(): boolean {
@@ -92,7 +92,7 @@ export function Layout({ header, footer, map, ranking, detail, simulation, why }
             className="flex min-h-11 min-w-11 touch-none flex-col items-center justify-center gap-0.5 text-xs text-muted md:hidden"
           >
             <span aria-hidden="true" className="h-1 w-10 rounded-full bg-white/20" />
-            {expanded ? 'Contraer panel' : 'Expandir panel'}
+            {expanded ? 'Collapse panel' : 'Expand panel'}
           </button>
           <div role="tablist" className="flex gap-1 border-b border-line p-1.5">
             {TABS.map(({ id, label, icon: Icon }) => (

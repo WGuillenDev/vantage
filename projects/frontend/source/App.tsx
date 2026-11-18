@@ -17,7 +17,7 @@ function TopBar({ state }: { state: ZoneState }) {
       <h1 className="text-lg font-semibold tracking-[0.22em] text-white">VANTAGE</h1>
       <span aria-hidden="true" className="hidden h-5 w-px bg-line sm:block" />
       <ZonePicker />
-      {state.status === 'loading' && <p className="text-sm text-muted">Cargando…</p>}
+      {state.status === 'loading' && <p className="text-sm text-muted">Loading…</p>}
       {state.status === 'error' && <p className="truncate text-sm text-red-300">{state.message}</p>}
     </div>
   )
@@ -39,7 +39,7 @@ function App() {
       detail={(onWhy) => <SegmentDetail state={state} onWhy={onWhy} />}
       simulation={<Simulation state={state} />}
       why={
-        <Suspense fallback={<Message>Cargando…</Message>}>
+        <Suspense fallback={<Message>Loading…</Message>}>
           <WhyPanel state={state} />
         </Suspense>
       }

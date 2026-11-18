@@ -24,10 +24,10 @@ describe('formatDuration', () => {
 })
 
 describe('formatPopulation', () => {
-  test('INV-09 a population figure is labeled "estimada" and null reads "sin dato"', () => {
-    expect(formatPopulation(2300)).toBe('2\u00a0300 estimada')
-    expect(formatPopulation(999)).toBe('999 estimada')
-    expect(formatPopulation(0)).toBe('0 estimada')
-    expect(formatPopulation(null)).toBe('sin dato')
+  test('INV-09 a population figure is labeled "estimated" and null reads "no data"', () => {
+    expect(formatPopulation(2300)).toBe('2,300 estimated')
+    expect(formatPopulation(999)).toBe('999 estimated')
+    expect(formatPopulation(0)).toBe('0 estimated')
+    expect(formatPopulation(null)).toBe('no data')
   })
 })

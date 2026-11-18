@@ -146,7 +146,7 @@ describe('map-corridor: INV-12 data errors', () => {
     globalThis.fetch = (async () => ({ ok, status, json: async () => body })) as unknown as typeof fetch
   }
 
-  test('INV-12 a wrong schema_version names the file in Spanish', () => {
+  test('INV-12 a wrong schema_version names the file in English', () => {
     expect(() => checkSchemaVersion('graph.json', { schema_version: '0.2' })).toThrow(/graph\.json/)
     expect(() => checkSchemaVersion('graph.json', {})).toThrow(/graph\.json/)
     expect(() => checkSchemaVersion('graph.json', { schema_version: '0.3' })).not.toThrow()
@@ -197,11 +197,11 @@ describe('map-corridor: INV-15 forbidden words', () => {
     .map((name) => ({ name, text: readFileSync(new URL(name, dir), 'utf-8') }))
 
   test('INV-15 no source contains the forbidden words', () => {
-    const allowed = /no son derrumbes confirmados|no es un derrumbe confirmado|no causa confirmada/gi
+    const allowed = /not confirmed landslides|not a confirmed landslide|not a confirmed cause/gi
     for (const { name, text } of sources) {
       const lower = text.toLowerCase()
-      expect({ name, hit: /candidato|causado por|funciona en cualquier lugar/.test(lower) }).toEqual({ name, hit: false })
-      expect({ name, hit: /confirmad/.test(lower.replace(allowed, '')) }).toEqual({ name, hit: false })
+      expect({ name, hit: /candidato|causado por|funciona en cualquier lugar|caused by|works anywhere/.test(lower) }).toEqual({ name, hit: false })
+      expect({ name, hit: /confirmad|confirmed/.test(lower.replace(allowed, '')) }).toEqual({ name, hit: false })
     }
   })
 })

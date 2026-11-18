@@ -35,12 +35,12 @@ interface Collection<F> {
 type UnitFeature = Feature<{ type: 'MultiLineString'; coordinates: Position[][] }, { id: string; color: string; affected: boolean }>
 type PointFeature = Feature<{ type: 'Point'; coordinates: Position }, { id: string; name: string }>
 
-export const fileErrorMessage = (file: string, detail: string): string => `No se pudo cargar ${file}: ${detail}.`
+export const fileErrorMessage = (file: string, detail: string): string => `Could not load ${file}: ${detail}.`
 
 export function checkSchemaVersion(file: string, data: unknown): void {
   const version = (data as { schema_version?: unknown } | null)?.schema_version
   if (version !== SCHEMA_VERSION) {
-    throw new Error(fileErrorMessage(file, `versión de esquema no compatible (se esperaba ${SCHEMA_VERSION})`))
+    throw new Error(fileErrorMessage(file, `unsupported schema version (expected ${SCHEMA_VERSION})`))
   }
 }
 

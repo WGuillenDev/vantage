@@ -7,9 +7,9 @@ import { ZoneGate } from './ZoneGate.tsx'
 import type { ZoneState } from './zoneData.ts'
 
 const FILTERS: { id: RankFilter; label: string }[] = [
-  { id: 'all', label: 'Todos' },
-  { id: 'no-route', label: 'Sin ruta' },
-  { id: 'suspect', label: 'Con sospechosos' },
+  { id: 'all', label: 'All' },
+  { id: 'no-route', label: 'No route' },
+  { id: 'suspect', label: 'With suspects' },
 ]
 
 export function SegmentRanking({ state }: { state: ZoneState }) {
@@ -29,25 +29,25 @@ export function SegmentRanking({ state }: { state: ZoneState }) {
         const colored = !rankingUnknown(data.units)
         const without = countWithoutImpact(data.units)
         return (
-          <section className="text-sm" aria-label="Tramos críticos">
+          <section className="text-sm" aria-label="Critical segments">
             <div className="sticky top-0 z-10 space-y-2 border-b border-line bg-surface p-3">
-              <h2 className="font-semibold">Tramos críticos por criticidad</h2>
-              {selected === null && <p className="text-muted">Toca un tramo para ver sus comunidades afectadas y simular su cierre.</p>}
+              <h2 className="font-semibold">Critical segments by criticality</h2>
+              {selected === null && <p className="text-muted">Tap a segment to see its affected communities and simulate its closure.</p>}
               {noPopulationNote(data.units) && (
-                <p className="text-muted">El orden sale del tiempo extra y de las comunidades aisladas, porque la población es desconocida.</p>
+                <p className="text-muted">The order comes from the extra time and the isolated communities, because population is unknown.</p>
               )}
               <label className="relative block">
-                <span className="sr-only">Buscar tramo</span>
+                <span className="sr-only">Search segment</span>
                 <Search aria-hidden="true" className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-muted" />
                 <input
                   type="search"
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Buscar por vía o código"
+                  placeholder="Search by road or code"
                   className="w-full rounded-lg border border-line bg-raised py-2 pl-8 pr-2 text-ink placeholder:text-slate-400 focus:border-brand/60 max-md:min-h-11"
                 />
               </label>
-              <div role="group" aria-label="Filtrar tramos" className="flex flex-wrap gap-1">
+              <div role="group" aria-label="Filter segments" className="flex flex-wrap gap-1">
                 {FILTERS.map((item) => (
                   <button
                     key={item.id}
@@ -62,9 +62,9 @@ export function SegmentRanking({ state }: { state: ZoneState }) {
               </div>
             </div>
             {listed.length === 0 ? (
-              <p className="p-3">Ningún tramo deja a comunidades con tiempo extra o sin ruta.</p>
+              <p className="p-3">No segment leaves communities with extra time or without a route.</p>
             ) : rows.length === 0 ? (
-              <p className="p-3 text-muted">Ningún tramo coincide con la búsqueda.</p>
+              <p className="p-3 text-muted">No segment matches the search.</p>
             ) : (
               <ol className="divide-y divide-line">
                 {rows.map((unit) => {
@@ -118,7 +118,7 @@ export function SegmentRanking({ state }: { state: ZoneState }) {
                 })}
               </ol>
             )}
-            <p className="border-t border-line p-3 text-muted">{without === 1 ? '1 tramo sin impacto' : `${without} tramos sin impacto`}</p>
+            <p className="border-t border-line p-3 text-muted">{without === 1 ? '1 segment with no impact' : `${without} segments with no impact`}</p>
           </section>
         )
       }}

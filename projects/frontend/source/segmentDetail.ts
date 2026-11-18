@@ -3,10 +3,10 @@ import { rowView, type RankedUnit } from './ranking.ts'
 import { NO_ROUTE, suspectLabel } from './trustSignals.ts'
 
 export { NO_ROUTE }
-export const NO_DATA = 'sin dato'
-export const HYPOTHESIS_LABEL = 'Hipótesis, no causa confirmada'
+export const NO_DATA = 'no data'
+export const HYPOTHESIS_LABEL = 'Hypothesis, not a confirmed cause'
 export const WHY_TEXT =
-  'La lluvia reciente es contexto, no una predicción. No se probó como señal de cierres en esta zona.'
+  'Recent rain is context, not a prediction. It was not tested as a closure signal in this zone.'
 const WINDOW_DAYS = 12
 
 interface PerCommunity {
@@ -58,7 +58,7 @@ export interface DetailView {
 const timeText = (seconds: number | null | undefined): string =>
   seconds === undefined ? NO_DATA : seconds === null ? NO_ROUTE : formatDuration(seconds)
 
-const formatMm = (mm: number): string => String(Math.round(mm * 10) / 10).replace('.', ',')
+const formatMm = (mm: number): string => String(Math.round(mm * 10) / 10)
 
 export function detailView(unit: DetailUnit, graph: DetailGraph, baseline: BaselineEntry[]): DetailView {
   const names = new Map(graph.communities.map((c) => [c.id, c.name]))
@@ -87,7 +87,7 @@ export function detailView(unit: DetailUnit, graph: DetailGraph, baseline: Basel
     (a, b) => Number(b.isolated) - Number(a.isolated) || b.sortExtra - a.sortExtra || a.view.id.localeCompare(b.view.id),
   )
 
-  const alternates = (unit.alternates ?? []).map((a) => `${a.name} · ${a.vehicles === 'light' ? 'livianos' : 'pesados'}`)
+  const alternates = (unit.alternates ?? []).map((a) => `${a.name} · ${a.vehicles === 'light' ? 'light vehicles' : 'heavy vehicles'}`)
   const mm = unit.exposure?.rain_mm_12d
 
   return {
@@ -96,8 +96,8 @@ export function detailView(unit: DetailUnit, graph: DetailGraph, baseline: Basel
     extraTime: unit.extra_time_s === null ? NO_ROUTE : formatDuration(unit.extra_time_s),
     population: formatPopulation(unit.population_dependent),
     communities: communities.map((c) => c.view),
-    alternates: alternates.length === 0 ? ['sin alternas registradas'] : alternates,
-    rain: typeof mm === 'number' ? `${formatMm(mm)} mm en 12 días` : NO_DATA,
+    alternates: alternates.length === 0 ? ['no alternates recorded'] : alternates,
+    rain: typeof mm === 'number' ? `${formatMm(mm)} mm in 12 days` : NO_DATA,
     rainLabel: HYPOTHESIS_LABEL,
   }
 }
@@ -107,21 +107,21 @@ export interface RainDay {
   mm: number
 }
 
-export const rainErrorMessage = (detail: string): string => `No se pudo cargar rain.csv: ${detail}.`
+export const rainErrorMessage = (detail: string): string => `Could not load rain.csv: ${detail}.`
 
 // Parses rain.csv (`date,precip_mm`); anything unreadable fails naming the file (INV-12).
 export function parseRain(text: string): RainDay[] {
   const lines = text.trim().split(/\r?\n/)
-  if (lines[0]?.trim() !== 'date,precip_mm') throw new Error(rainErrorMessage('encabezado inesperado'))
+  if (lines[0]?.trim() !== 'date,precip_mm') throw new Error(rainErrorMessage('unexpected header'))
   const rows = lines.slice(1).map((line) => {
     const [date, value] = line.split(',')
     const mm = Number(value)
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date ?? '') || value === undefined || value.trim() === '' || !Number.isFinite(mm) || mm < 0) {
-      throw new Error(rainErrorMessage(`fila no válida "${line}"`))
+      throw new Error(rainErrorMessage(`invalid row "${line}"`))
     }
     return { date: date!, mm }
   })
-  if (rows.length === 0) throw new Error(rainErrorMessage('no tiene filas'))
+  if (rows.length === 0) throw new Error(rainErrorMessage('has no rows'))
   return rows
 }
 
@@ -140,7 +140,7 @@ export async function loadRain(url: string): Promise<RainDay[]> {
   try {
     response = await fetch(url)
   } catch {
-    throw new Error(rainErrorMessage('sin conexión o archivo inaccesible'))
+    throw new Error(rainErrorMessage('offline or file unreachable'))
   }
   if (!response.ok) throw new Error(rainErrorMessage(`error ${response.status}`))
   return parseRain(await response.text())

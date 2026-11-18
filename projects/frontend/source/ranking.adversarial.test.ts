@@ -39,8 +39,8 @@ describe('segment-ranking adversarial', () => {
 
   test('INV-03 a unit with no route and no population shows both marks together', () => {
     const row = rowView(unit({ id: 'T-09', extra_time_s: null, population_dependent: null }), [], 0)
-    expect(row.extraTime).toBe('sin ruta al hospital de referencia')
-    expect(row.population).toBe('sin dato')
+    expect(row.extraTime).toBe('no route to the referral hospital')
+    expect(row.population).toBe('no data')
     expect(row.barFraction).toBeNull()
   })
 
@@ -57,13 +57,13 @@ describe('segment-ranking adversarial', () => {
   test('length rounds at the 1 000 m boundary without printing "1000 m"', () => {
     const length = (m: number) => rowView(unit({ id: 'T-01', length_m: m }), [], 1).length
     expect(length(999.4)).toBe('999 m')
-    expect(length(999.5)).toBe('1,0 km')
-    expect(length(1000)).toBe('1,0 km')
+    expect(length(999.5)).toBe('1.0 km')
+    expect(length(1000)).toBe('1.0 km')
   })
 
   test('population separators hold for seven digits', () => {
-    expect(rowView(unit({ id: 'T-01', population_dependent: 1234567 }), [], 1).population).toBe('1 234 567 estimada')
-    expect(rowView(unit({ id: 'T-01', population_dependent: 999 }), [], 1).population).toBe('999 estimada')
+    expect(rowView(unit({ id: 'T-01', population_dependent: 1234567 }), [], 1).population).toBe('1,234,567 estimated')
+    expect(rowView(unit({ id: 'T-01', population_dependent: 999 }), [], 1).population).toBe('999 estimated')
   })
 
   test('duration changes exactly at its 300 s and 5-minute rounding boundaries', () => {

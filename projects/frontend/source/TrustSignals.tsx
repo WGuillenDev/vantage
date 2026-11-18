@@ -24,7 +24,7 @@ export function TrustHeader({ state }: { state: ZoneState }) {
               className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full bg-red-500/15 px-2.5 font-medium text-red-200 ring-1 ring-inset ring-red-400/30 md:hidden"
             >
               <TriangleAlert aria-hidden="true" className="h-4 w-4" />
-              No validada
+              Not validated
             </button>
             <p role="status" className={`${open ? 'flex' : 'hidden md:flex'} basis-full items-center gap-1.5 rounded-full bg-red-500/15 px-2.5 py-0.5 font-medium text-red-200 ring-1 ring-inset ring-red-400/30 md:basis-auto`}>
               <TriangleAlert aria-hidden="true" className="h-4 w-4 shrink-0" />
@@ -46,21 +46,21 @@ export function TrustFooter({ state }: { state: ZoneState }) {
       <details className="group">
         <summary className="flex cursor-pointer list-none items-center gap-1.5 py-2 font-medium text-ink max-md:min-h-11">
           <ChevronDown aria-hidden="true" className="h-4 w-4 transition-transform group-open:rotate-180" />
-          Cómo leer estos números y fuentes
+          How to read these numbers, and sources
         </summary>
         <div className="max-h-[40vh] space-y-3 overflow-y-auto pb-3">
           <ul className="list-disc space-y-0.5 pl-5">
             <li>
-              Los tiempos usan una velocidad constante por clase de vía: {panel.speeds.map((s) => `${s.roadClass} ${s.kmh} km/h`).join(', ')}.
+              Times use a constant speed per road class: {panel.speeds.map((s) => `${s.roadClass} ${s.kmh} km/h`).join(', ')}.
             </li>
-            <li>Hospitales de referencia: {panel.hospitals.join(', ')}.</li>
+            <li>Referral hospitals: {panel.hospitals.join(', ')}.</li>
             <li>{REFERRAL_NOTE}</li>
             {panel.radarNote && <li>Radar: {panel.radarNote}</li>}
-            <li>«Sin ruta al hospital de referencia» significa que no hay camino a esos hospitales.</li>
-            <li>La población es una estimación modelada.</li>
-            <li>La calidad de OpenStreetMap varía.</li>
+            <li>“No route to the referral hospital” means there is no path to those hospitals.</li>
+            <li>Population is a modelled estimate.</li>
+            <li>OpenStreetMap quality varies.</li>
           </ul>
-          <ul aria-label="Fuentes" className="space-y-0.5">
+          <ul aria-label="Sources" className="space-y-0.5">
             {attributionLines(data.meta).map((line) => (
               <li key={line}>{line}</li>
             ))}

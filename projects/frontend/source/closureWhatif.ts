@@ -110,7 +110,7 @@ export function simulationView(graph: CorridorGraph, units: DetailUnit[], baseli
   return {
     chips: ids.map((id) => ({ id, label: rowView(byId.get(id)!, graph.edges, 0).label })),
     summary: {
-      extraTime: sim.extraTime_s === null ? 'ninguno' : formatDuration(sim.extraTime_s),
+      extraTime: sim.extraTime_s === null ? 'none' : formatDuration(sim.extraTime_s),
       withoutRoute: sim.withoutRoute,
       population: formatPopulation(sim.population),
       note: simulationNote(sim.withoutRoute),

@@ -21,7 +21,7 @@ describe('zone-picker', () => {
   test('INV-02 labels only the zones that are not validated', () => {
     const options = zoneOptions([zone('a', true), zone('b', false)])
     expect(options[0]?.label).toBe('Zone a')
-    expect(options[1]?.label).toBe('Zone b (no validada)')
+    expect(options[1]?.label).toBe('Zone b (unvalidated)')
   })
 
   test('INV-03 shows the control only with two or more zones', () => {

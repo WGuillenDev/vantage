@@ -53,7 +53,7 @@ export function Message({ children, alert = false }: { children: ReactNode; aler
 // Placeholder rows while a panel waits for the zone's files.
 export function Skeleton({ rows = 5 }: { rows?: number }) {
   return (
-    <div role="status" aria-label="Cargando" className="animate-pulse space-y-3 p-3">
+    <div role="status" aria-label="Loading" className="animate-pulse space-y-3 p-3">
       {Array.from({ length: rows }, (_, i) => (
         <div key={i} className="space-y-1.5">
           <div className="h-3.5 w-2/3 rounded bg-white/10" />

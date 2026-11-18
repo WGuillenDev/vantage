@@ -19,23 +19,23 @@ export function SegmentDetail({ state, onWhy }: { state: ZoneState; onWhy: () =>
   const isClosed = closed.includes(unit.id)
 
   return (
-    <section aria-label="Detalle del tramo" className="space-y-3 border-b border-line bg-surface p-3 text-sm">
+    <section aria-label="Segment detail" className="space-y-3 border-b border-line bg-surface p-3 text-sm">
       <header className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <h2 className="font-semibold">{view.header}</h2>
-          <p className="text-muted">Posición {view.rank}</p>
+          <p className="text-muted">Rank {view.rank}</p>
         </div>
-        <Button variant="ghost" aria-label="Cerrar detalle" onClick={() => selectUnit(null)} className="px-2!">
+        <Button variant="ghost" aria-label="Close detail" onClick={() => selectUnit(null)} className="px-2!">
           <X aria-hidden="true" className="h-4 w-4" />
         </Button>
       </header>
       <dl className="grid grid-cols-2 gap-2">
-        <Stat label="Tiempo extra" value={view.extraTime} />
-        <Stat label="Población que depende" value={view.population} />
+        <Stat label="Extra time" value={view.extraTime} />
+        <Stat label="Dependent population" value={view.population} />
       </dl>
 
       <div>
-        <h3 className="mb-1.5 font-medium">Comunidades afectadas</h3>
+        <h3 className="mb-1.5 font-medium">Affected communities</h3>
         <ul className="space-y-1.5">
           {view.communities.map((c) => (
             <CommunityRow key={c.id} row={c} suspect={suspects.has(c.id)} />
@@ -46,7 +46,7 @@ export function SegmentDetail({ state, onWhy }: { state: ZoneState; onWhy: () =>
       <div>
         <h3 className="mb-1.5 flex items-center gap-1.5 font-medium">
           <Route aria-hidden="true" className="h-4 w-4" />
-          Alternas
+          Alternates
         </h3>
         <ul className="space-y-0.5 text-muted">
           {view.alternates.map((line) => (
@@ -58,18 +58,18 @@ export function SegmentDetail({ state, onWhy }: { state: ZoneState; onWhy: () =>
       <div>
         <h3 className="mb-1.5 flex items-center gap-1.5 font-medium">
           <CloudRain aria-hidden="true" className="h-4 w-4" />
-          Exposición
+          Exposure
         </h3>
         <p>
-          Lluvia: {view.rain} <Badge tone="info">{view.rainLabel}</Badge>
+          Rain: {view.rain} <Badge tone="info">{view.rainLabel}</Badge>
         </p>
       </div>
 
       <div className="flex flex-wrap gap-2">
         <Button variant="primary" disabled={isClosed} onClick={() => closeUnit(unit.id)}>
-          {isClosed ? 'Cerrado en la simulación' : 'Simular cierre de este tramo'}
+          {isClosed ? 'Closed in the simulation' : 'Simulate closing this segment'}
         </Button>
-        <Button onClick={onWhy}>¿Por qué?</Button>
+        <Button onClick={onWhy}>Why?</Button>
       </div>
     </section>
   )

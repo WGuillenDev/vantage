@@ -1,4 +1,5 @@
 import { formatDuration, formatPopulation } from './format.ts'
+import { NO_ROUTE } from './trustSignals.ts'
 
 export interface RankedUnit {
   id: string
@@ -38,7 +39,7 @@ function mainRoad(unit: RankedUnit, edges: { id: string; road?: string | null }[
     const road = roadById.get(id)
     if (road) counts.set(road, (counts.get(road) ?? 0) + 1)
   }
-  let best = 'Vía sin nombre'
+  let best = 'Unnamed road'
   let bestCount = 0
   for (const [road, count] of counts) {
     if (count > bestCount) [best, bestCount] = [road, count]
@@ -47,14 +48,14 @@ function mainRoad(unit: RankedUnit, edges: { id: string; road?: string | null }[
 }
 
 const formatLength = (meters: number): string =>
-  Math.round(meters) < 1000 ? `${Math.round(meters)} m` : `${(meters / 1000).toFixed(1).replace('.', ',')} km`
+  Math.round(meters) < 1000 ? `${Math.round(meters)} m` : `${(meters / 1000).toFixed(1)} km`
 
 export function rowView(unit: RankedUnit, edges: { id: string; road?: string | null }[], maxCrit: number): RowView {
   return {
     id: unit.id,
     label: `${mainRoad(unit, edges)} · ${unit.id}`,
     length: formatLength(unit.length_m),
-    extraTime: unit.extra_time_s === null ? 'sin ruta al hospital de referencia' : formatDuration(unit.extra_time_s),
+    extraTime: unit.extra_time_s === null ? NO_ROUTE : formatDuration(unit.extra_time_s),
     population: formatPopulation(unit.population_dependent),
     barFraction: maxCrit > 0 ? unit.criticality / maxCrit : null,
   }
