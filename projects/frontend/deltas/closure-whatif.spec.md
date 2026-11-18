@@ -35,10 +35,10 @@ Reads `graph.json` and `scenarios.json` (the baseline and the units' `edge_ids` 
 | Closed set | Unit ids, without duplicates and without order. The closed edges are the union of their `edge_ids`. |
 | Computation | The fastest route from each community's node to a referral hospital's node, following `oneway` edges only `from → to`, with cost the sum of `time_s`; one search from all hospitals over reversed edges. A tie between hospitals goes to the lowest hospital number. |
 | Affected | A community that had a baseline route and, with the closure, is without a route or has extra time above 0. A community with no baseline route is never affected. |
-| Summary | Extra time: the largest extra time among affected communities that keep a route (none if there are none); the number of communities without a route; the affected population (sum of known populations, "sin dato" if none is known). |
-| Comparison | Per affected community: time without closures, time with them, extra (durations as approximate durations, `trust-signals`), hospital reached; "sin ruta al hospital de referencia" when there is no route. |
+| Summary | Extra time: the largest extra time among affected communities that keep a route (none if there are none); the number of communities without a route; the affected population (sum of known populations, "no data" if none is known). |
+| Comparison | Per affected community: time without closures, time with them, extra (durations as approximate durations, `trust-signals`), hospital reached; "no route to the referral hospital" when there is no route. |
 | Map | Closed units drawn in a distinct style; edges whose `road` equals the name of any alternate of a closed unit highlighted and labeled "rutas alternas". |
-| Chips | One per closed unit, with its label and a remove control, plus "Restablecer". |
+| Chips | One per closed unit, with its label and a remove control, plus "Reset". |
 
 ## Invariants
 
@@ -51,11 +51,11 @@ Reads `graph.json` and `scenarios.json` (the baseline and the units' `edge_ids` 
 - INV-04 [test: bun test --cwd projects/frontend source/graph.test.ts]
   When two referral hospitals are equally near a community, `computeAccess` reports the one with the lowest hospital number.
 - INV-06 [test: bun test --cwd projects/frontend source/closureWhatif.test.ts]
-  When a community had a baseline route and has none after closing, the simulation lists it as affected and shows "sin ruta al hospital de referencia" for it, and when a community had no baseline route, the simulation never lists it as affected.
+  When a community had a baseline route and has none after closing, the simulation lists it as affected and shows "no route to the referral hospital" for it, and when a community had no baseline route, the simulation never lists it as affected.
 - INV-08 [test: bun test --cwd projects/frontend source/closureWhatif.test.ts]
-  When units are closed, the summary shows the largest extra time among affected communities that keep a route, the number of communities without a route, and the sum of the known populations of the affected ones, with "sin dato" if none is known.
+  When units are closed, the summary shows the largest extra time among affected communities that keep a route, the number of communities without a route, and the sum of the known populations of the affected ones, with "no data" if none is known.
 - INV-09 [test: bun test --cwd projects/frontend source/closureWhatif.test.ts]
-  When a unit is closed, the simulation shows one chip for it, when the chip's remove control is used the unit is open again, and when "Restablecer" is pressed nothing is closed, with the results updating each time.
+  When a unit is closed, the simulation shows one chip for it, when the chip's remove control is used the unit is open again, and when "Reset" is pressed nothing is closed, with the results updating each time.
 - INV-12 [none]
   When the closed set changes, the map draws the closed units in the closed style and highlights the edges whose `road` equals a name in the `alternates` of any closed unit.
 - INV-13 [test: bun test --cwd projects/frontend source/closureWhatif.test.ts]
@@ -79,4 +79,4 @@ Testing gaps (`none`, which `builder` turns into `test: bun test --cwd projects/
 - ACC-01 [manual]
   Given the Ruta 32 real data, when a person closes two units, then the summary and the comparison update at once and the closed units and the alternate roads appear on the map.
 - ACC-02 [manual]
-  Given two closed units, when a person removes one chip and then presses "Restablecer", then the results follow each step and end with nothing closed.
+  Given two closed units, when a person removes one chip and then presses "Reset", then the results follow each step and end with nothing closed.

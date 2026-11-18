@@ -32,7 +32,7 @@ Reads `areas.json` (`id`, `name`, `validated` per zone) and the active zone from
 |---|---|
 | Two or more zones | A native select labeled "Zona", listing every zone of `areas.json` in file order, with the active one selected. |
 | One zone | Its name as plain text, with no control. |
-| Label | A zone with `validated: false` is listed as "<name> (no validada)". |
+| Label | A zone with `validated: false` is listed as "<name> (unvalidated)". |
 | Change | Sets the active zone in the store and updates `?area=<id>` in the URL without adding a history entry. |
 
 ## Invariants
@@ -40,7 +40,7 @@ Reads `areas.json` (`id`, `name`, `validated` per zone) and the active zone from
 - INV-01 [test: bun test --cwd projects/frontend source/zones.test.ts]
   When `areas.json` lists two or more zones, the control lists all of them in file order with the active zone selected.
 - INV-02 [test: bun test --cwd projects/frontend source/zones.test.ts]
-  When a listed zone has `validated: false`, the control shows its name followed by "(no validada)".
+  When a listed zone has `validated: false`, the control shows its name followed by "(unvalidated)".
 - INV-03 [test: bun test --cwd projects/frontend source/zones.test.ts]
   When `areas.json` lists one zone, the header shows its name and no control.
 - INV-04 [test: bun test --cwd projects/frontend source/zones.test.ts]
@@ -58,4 +58,4 @@ Testing gaps (`none`; `builder` turns the list and URL rules into `test: bun tes
 ## Acceptance criteria
 
 - ACC-01 [manual]
-  Given the two-zone mock set (one validated, one not), when a person chooses the unvalidated zone, then the map shows it, the control reads "(no validada)" on it, the unvalidated-zone banner appears and the URL carries its id.
+  Given the two-zone mock set (one validated, one not), when a person chooses the unvalidated zone, then the map shows it, the control reads "(unvalidated)" on it, the unvalidated-zone banner appears and the URL carries its id.

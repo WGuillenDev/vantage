@@ -42,7 +42,7 @@ Reads, from `${BASE_URL}storage/`: `areas.json`, then `<id>/meta.json`, `<id>/gr
 | Selection | A click on a unit selects it in the store and highlights it; a click elsewhere clears it. |
 | Hover and focus | The pointer over a hospital or a community shows its name. The pointer over a unit shows its label and extra time in a tooltip and highlights it; the same highlight follows a hovered list row. Selecting a unit that is out of view moves the map to it. |
 | Base map | The OpenStreetMap raster is desaturated so the criticality colors stand out; the legend collapses to a button and starts collapsed on narrow screens. |
-| Copy | All user-facing text in Spanish: "tramo crítico", never "candidato" or "causado por", and "confirmado" only in "no son derrumbes confirmados". |
+| Copy | All user-facing text in English: "critical segment", never "candidate" or "caused by", and "confirmed" only in "not confirmed landslides" and "not a confirmed cause". |
 
 ## Invariants
 
@@ -55,7 +55,7 @@ Reads, from `${BASE_URL}storage/`: `areas.json`, then `<id>/meta.json`, `<id>/gr
 - INV-06 [test: bun test --cwd projects/frontend source/mapCorridor]
   When a unit has no affected community, the map draws it gray, and otherwise draws it with a color that is monotone in its `criticality`.
 - INV-07 [test: bun test --cwd projects/frontend source/mapCorridor]
-  When the map is drawn, the legend shows the lowest and highest `criticality` among the zone's units that have an affected community, and the gray "sin impacto" entry.
+  When the map is drawn, the legend shows the lowest and highest `criticality` among the zone's units that have an affected community, and the gray "no impact" entry.
 - INV-08 [test: bun test --cwd projects/frontend source/mapCorridor]
   When a zone is drawn, the hospitals and communities shown are exactly those of `graph.json`, at their nodes' coordinates.
 - INV-09 [test: bun test --cwd projects/frontend source/mapCorridor]
@@ -63,17 +63,17 @@ Reads, from `${BASE_URL}storage/`: `areas.json`, then `<id>/meta.json`, `<id>/gr
 - INV-11 [test: bun test --cwd projects/frontend source/mapCorridor]
   When the active zone changes in the store, the store's selected unit is cleared.
 - INV-12 [test: bun test --cwd projects/frontend source/mapCorridor]
-  If a data file cannot be loaded, is not valid JSON, lacks a list it must carry or has a `schema_version` other than `"0.3"`, then the map shows a Spanish message that names the file and does not render a blank map.
+  If a data file cannot be loaded, is not valid JSON, lacks a list it must carry or has a `schema_version` other than `"0.3"`, then the map shows an English message that names the file and does not render a blank map.
 - INV-14 [manual]
   When a zone is loaded, the map fits the zone's `bbox`.
 - INV-15 [test: bun test --cwd projects/frontend source/mapCorridor]
   When the app renders any text, it contains none of the words "candidato", "causado por" or "funciona en cualquier lugar", and "confirmado" appears only in the phrase "no son derrumbes confirmados" or "no es un derrumbe confirmado".
 - INV-16 [test: bun test --cwd projects/frontend source/mapCorridor]
-  If every unit with an affected community has `criticality` 0, then the legend says in Spanish that the color does not rank the units because the population is unknown.
+  If every unit with an affected community has `criticality` 0, then the legend says that the color does not rank the units because the population is unknown.
 - INV-17 [test: bun test --cwd projects/frontend source/mapCorridor]
-  If a data file has a malformed element in a list it must carry, as defined under Valid data, then the map shows a Spanish message that names the file and does not render a blank map.
+  If a data file has a malformed element in a list it must carry, as defined under Valid data, then the map shows an English message that names the file and does not render a blank map.
 - INV-18 [test: bun test --cwd projects/frontend source/mapCorridor]
-  If a hospital or community of `graph.json` references a node that `graph.json` does not list, then the map shows a Spanish message that names `graph.json` and does not draw a partial zone.
+  If a hospital or community of `graph.json` references a node that `graph.json` does not list, then the map shows an English message that names `graph.json` and does not draw a partial zone.
 - INV-19 [manual]
   When the user clicks a unit on the map, the map selects and highlights that unit, and when the user clicks the map elsewhere, the selection and the highlight are cleared.
 - INV-20 [manual]

@@ -33,11 +33,11 @@ Reads `scenarios.json` and `graph.json` of the active zone, and the store of `ma
 | Topic | Behavior |
 |---|---|
 | Listed units | The units with at least one affected community, by ascending `rank`. |
-| Counter | "N tramos sin impacto" for the others, with the Spanish singular for one. |
-| Label | `<road> · <id>`, where `<road>` is the most frequent `road` among the unit's edges, or "Vía sin nombre" if none has one. |
+| Counter | "N segments with no impact" for the others, with the singular for one. |
+| Label | `<road> · <id>`, where `<road>` is the most frequent `road` among the unit's edges, or "Unnamed road" if none has one. |
 | Length | `length_m` below 1 000 as "N m", otherwise as "N,N km" (comma decimal). |
-| Extra time | `extra_time_s` as an approximate duration (rule in `trust-signals`: "< 5 min", "≈ 20 min", "≈ 1 h 15 min"); "sin ruta al hospital de referencia" when `extra_time_s` is `null`. |
-| Population | `population_dependent` with thousands separators, labeled "estimada" (`trust-signals`); "sin dato" when `null`, never 0. |
+| Extra time | `extra_time_s` as an approximate duration (rule in `trust-signals`: "< 5 min", "≈ 20 min", "≈ 1 h 15 min"); "no route to the referral hospital" when `extra_time_s` is `null`. |
+| Population | `population_dependent` with thousands separators, labeled "estimated" (`trust-signals`); "no data" when `null`, never 0. |
 | Search and filter | A text box matches the row label ignoring case and accents; three filter buttons keep all units, those with `extra_time_s` `null`, or those with suspect isolations. Both narrow the list and keep the rank order. |
 | First use | While no unit is selected, a line above the list tells the user to tap a unit; while the files load, placeholder rows stand in for the list. |
 | Hover | The row under the pointer or with focus is highlighted on the map. |
@@ -46,11 +46,11 @@ Reads `scenarios.json` and `graph.json` of the active zone, and the store of `ma
 ## Invariants
 
 - INV-01 [test: bun test --cwd projects/frontend source/ranking.test.ts]
-  When the list renders, it shows exactly the units with at least one affected community, in ascending `rank`, or a Spanish message saying so when there are none.
+  When the list renders, it shows exactly the units with at least one affected community, in ascending `rank`, or an English message saying so when there are none.
 - INV-02 [test: bun test --cwd projects/frontend source/ranking.test.ts]
   When the list renders, the counter shows the number of units with no affected community.
 - INV-03 [test: bun test --cwd projects/frontend source/ranking.test.ts]
-  When a unit's `extra_time_s` is `null`, its row shows "sin ruta al hospital de referencia" and not a time, and when its `population_dependent` is `null`, it shows "sin dato" and never 0.
+  When a unit's `extra_time_s` is `null`, its row shows "no route to the referral hospital" and not a time, and when its `population_dependent` is `null`, it shows "no data" and never 0.
 - INV-05 [test: bun test --cwd projects/frontend source/ranking.test.ts]
   When the zone's highest `criticality` is 0, the list shows no criticality bars and a note that the order comes from extra time and isolated communities because population is unknown.
 - INV-07 [test: bun test --cwd projects/frontend source/ranking.test.ts]

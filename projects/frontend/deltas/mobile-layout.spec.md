@@ -30,19 +30,19 @@ Non-goals:
 | Topic | Behavior |
 |---|---|
 | Breakpoint | 768 px (Tailwind `md`). |
-| Wide (≥ 768 px) | A side panel on the left with the tabs "Tramos", "Simulación" and "¿Por qué?"; the map fills the rest; the detail of the selected unit sits at the top of the "Tramos" tab. |
-| Narrow (< 768 px) | The map on top; a bottom sheet with the same three tabs, and the detail at the top of "Tramos". |
+| Wide (≥ 768 px) | A side panel on the left with the tabs "Segments", "Simulation" and "Why?"; the map fills the rest; the detail of the selected unit sits at the top of the "Segments" tab. |
+| Narrow (< 768 px) | The map on top; a bottom sheet with the same three tabs, and the detail at the top of "Segments". |
 | Sheet | Two states, collapsed and expanded, switched by activating its handle (a button with `aria-expanded`) or by swiping the handle up or down; the change is animated, and the collapsed content is inert. Expanded, it leaves at least 30 % of the viewport height to the map. |
 | Selection on narrow | Selecting a unit expands the sheet to show its detail. |
 | Touch targets | At least 44 × 44 CSS px for every button, tab and chip on narrow screens. |
-| Always reachable | The notice is always visible; the attributions are one tap away (in the footer's "Cómo leer estos números y fuentes") at every width, and the map's own attribution stays visible. |
+| Always reachable | The notice is always visible; the attributions are one tap away (in the footer's "How to read these numbers, and sources") at every width, and the map's own attribution stays visible. |
 
 ## Invariants
 
 - INV-01 [manual]
-  When the viewport is 768 px wide or more, the app shows a side panel with the tabs "Tramos", "Simulación" and "¿Por qué?" and the map fills the rest.
+  When the viewport is 768 px wide or more, the app shows a side panel with the tabs "Segments", "Simulation" and "Why?" and the map fills the rest.
 - INV-02 [manual]
-  When the viewport is under 768 px wide, the app shows the map above a bottom sheet with the tabs "Tramos", "Simulación" and "¿Por qué?".
+  When the viewport is under 768 px wide, the app shows the map above a bottom sheet with the tabs "Segments", "Simulation" and "Why?".
 - INV-03 [manual]
   When the user activates the sheet's handle, the sheet switches between collapsed and expanded and the handle's `aria-expanded` follows it.
 - INV-05 [manual]
@@ -63,7 +63,7 @@ No claim is automated: layout is checked by a person in a browser at 360 px and 
 - **Drag gestures:** the sheet has two fixed states; a swipe on the handle switches them, and the button remains for keyboard and screen readers (UI polish, 15 Nov). The sheet does not follow the finger while dragging.
 - **Landscape phones:** under 768 px high the expanded sheet may cover most of the map; the 30 % rule applies but is not tuned.
 - **Tablet range:** 768 px and up uses the side panel; a narrow tablet in portrait may feel cramped.
-- **Dependencies:** needs the panels of the other slices to exist; if `closure-whatif` is cut, the "Simulación" tab disappears.
+- **Dependencies:** needs the panels of the other slices to exist; if `closure-whatif` is cut, the "Simulation" tab disappears.
 
 ## Acceptance criteria
 
